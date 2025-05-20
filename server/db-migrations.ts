@@ -35,6 +35,25 @@ export async function runMigrations() {
     } else {
       console.log("Password column already exists.");
     }
+    
+    // Check if users table has the completedOnboarding column
+    const checkOnboardingColumnResult = await pool.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'completed_onboarding'
+    `);
+    
+    // If onboarding column doesn't exist, add it
+    if (checkOnboardingColumnResult.rows.length === 0) {
+      console.log("Adding onboarding fields to users table...");
+      await pool.query(`
+        ALTER TABLE users 
+        ADD COLUMN completed_onboarding BOOLEAN DEFAULT FALSE,
+        ADD COLUMN interests TEXT[],
+        ADD COLUMN last_login_at TIMESTAMP
+      `);
+      console.log("Onboarding fields added successfully.");
+    }
 
     // Check if badges table has the category column (to detect new schema)
     const checkBadgeCategoryColumnResult = await pool.query(`

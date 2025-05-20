@@ -35,6 +35,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   totalXp: integer("total_xp").default(0),
+  completedOnboarding: boolean("completed_onboarding").default(false),
+  interests: text("interests").array(), // Array of interest categories
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   role: varchar("role").default("user"),
