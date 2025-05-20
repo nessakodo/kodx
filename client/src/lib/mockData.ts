@@ -321,7 +321,6 @@ export const MOCK_FORUM_POSTS = [
   }
 ];
 
-// Standard dashboard data for existing users
 export const MOCK_DASHBOARD_DATA = {
   labProgress: [
     {
@@ -358,31 +357,5 @@ export const MOCK_DASHBOARD_DATA = {
       description: "Started your first project",
       iconUrl: null
     }
-  ],
-  reflections: [
-    {
-      id: 1,
-      title: "Quantum Computing Basics",
-      section: "Introduction",
-      content: "Qubit superposition and entanglement enable quantum parallelism. Need to review H-gate operations and Bell states further.",
-      updatedAt: "2025-05-19T00:00:00.000Z",
-      type: "Lab"
-    },
-    {
-      id: 2,
-      title: "Mindful Meditation App",
-      section: "Security Implementation",
-      content: "Implemented encryption for user meditation history. Need to add validation and sanitization for meditation entry descriptions.",
-      updatedAt: "2025-05-17T00:00:00.000Z",
-      type: "Project"
-    }
   ]
-};
-
-// Empty dashboard data for new users
-export const EMPTY_DASHBOARD_DATA = {
-  labProgress: [],
-  projectProgress: [],
-  badges: [],
-  reflections: []
 };

@@ -1,61 +1,105 @@
-// Level-based progression system
-
-// Base XP formula - each level requires more XP than the previous
-export function getXpForLevel(level: number): number {
-  return Math.floor(100 * Math.pow(level, 1.5));
-}
-
-// Get XP required for the next level
-export function getXpForNextLevel(currentLevel: number): number {
-  return getXpForLevel(currentLevel + 1);
-}
-
-// Calculate user level based on total XP
-export function calculateLevel(totalXp: number): number {
-  let level = 1;
-  while (getXpForLevel(level + 1) <= totalXp) {
-    level++;
+// Level definitions with XP thresholds
+export const LEVELS = [
+  {
+    level: 1,
+    title: "Digital Initiate",
+    message: "Your journey begins. The path to digital sovereignty opens.",
+    xpRequired: 0
+  },
+  {
+    level: 2,
+    title: "Bit Wanderer",
+    message: "First steps taken. The digital landscape unfolds before you.",
+    xpRequired: 141
+  },
+  {
+    level: 5,
+    title: "Code Explorer",
+    message: "You've begun shaping the systems around you.",
+    xpRequired: 559
+  },
+  {
+    level: 10,
+    title: "Circuit Voyager",
+    message: "The tools have become extensions of your thought.",
+    xpRequired: 3162
+  },
+  {
+    level: 15,
+    title: "Signal Scribe",
+    message: "You now translate chaos into clarity.",
+    xpRequired: 6510
+  },
+  {
+    level: 20,
+    title: "Protocol Architect",
+    message: "You no longer just build—you design with intention.",
+    xpRequired: 8944
+  },
+  {
+    level: 30,
+    title: "Cyber Sage",
+    message: "Systems reveal themselves to you as patterns.",
+    xpRequired: 16431
+  },
+  {
+    level: 50,
+    title: "Sovereignty Keeper",
+    message: "You code with purpose. You lead with awareness.",
+    xpRequired: 35355
   }
-  return level;
+];
+
+// Helper function to calculate level based on XP
+export function calculateLevel(xp: number): number {
+  if (xp <= 0) return 1;
+  
+  // Search through the levels array to find the highest level the user has reached
+  let currentLevel = 1;
+  
+  for (const levelData of LEVELS) {
+    if (xp >= levelData.xpRequired) {
+      currentLevel = levelData.level;
+    } else {
+      break;
+    }
+  }
+  
+  return currentLevel;
 }
 
-// Calculate progress percentage to next level
-export function calculateLevelProgress(totalXp: number): number {
-  const currentLevel = calculateLevel(totalXp);
-  const currentLevelXp = getXpForLevel(currentLevel);
-  const nextLevelXp = getXpForLevel(currentLevel + 1);
-  
-  const xpInCurrentLevel = totalXp - currentLevelXp;
-  const xpRequiredForNextLevel = nextLevelXp - currentLevelXp;
-  
-  return Math.min(100, Math.floor((xpInCurrentLevel / xpRequiredForNextLevel) * 100));
-}
-
-// Get level data including title and message
+// Helper function to get level data
 export function getLevelData(level: number) {
-  const levelTitles = [
-    { level: 1, title: "Digital Awakening", message: "The start of your tech enlightenment journey" },
-    { level: 2, title: "Conscious Explorer", message: "Beginning to navigate the digital realm with awareness" },
-    { level: 3, title: "Code Apprentice", message: "Developing foundational understanding of technology structures" },
-    { level: 4, title: "Mindful Technologist", message: "Combining technical skill with balanced perspective" },
-    { level: 5, title: "Cyber Adept", message: "Gaining deeper insights into digital systems" },
-    { level: 6, title: "Digital Harmonizer", message: "Creating balance between technology and wellbeing" },
-    { level: 7, title: "Tech Meditator", message: "Approaching technology with focused intention" },
-    { level: 8, title: "Circuit Sage", message: "Merging technical knowledge with wisdom" },
-    { level: 9, title: "Quantum Thinker", message: "Understanding complex interconnections in technology" },
-    { level: 10, title: "Digital Monk", message: "Achieving mastery of technical and mindful practices" }
-  ];
+  return LEVELS.find(l => l.level === level) || LEVELS[0];
+}
+
+// Helper function to calculate XP needed for next level
+export function getXpForNextLevel(currentXp: number): number {
+  const currentLevel = calculateLevel(currentXp);
+  const nextLevel = currentLevel + 1;
   
-  const defaultTitle = { 
-    title: `Zen Level ${level}`, 
-    message: "Continuing your journey toward digital enlightenment"
-  };
+  const nextLevelData = LEVELS.find(l => l.level === nextLevel);
+  if (!nextLevelData) {
+    // If max level reached, return current XP
+    return currentXp;
+  }
   
-  const levelData = levelTitles.find(l => l.level === level) || defaultTitle;
+  return nextLevelData.xpRequired;
+}
+
+// Helper function to calculate level progress percentage
+export function calculateLevelProgress(currentXp: number): number {
+  const currentLevel = calculateLevel(currentXp);
+  const currentLevelData = LEVELS.find(l => l.level === currentLevel) || LEVELS[0];
+  const nextLevelData = LEVELS.find(l => l.level === currentLevel + 1);
   
-  return {
-    level,
-    xpRequired: getXpForLevel(level),
-    ...levelData
-  };
+  // If at max level, return 100%
+  if (!nextLevelData) return 100;
+  
+  const currentLevelXp = currentLevelData.xpRequired;
+  const nextLevelXp = nextLevelData.xpRequired;
+  const xpRange = nextLevelXp - currentLevelXp;
+  const xpProgress = currentXp - currentLevelXp;
+  
+  return Math.min(100, Math.max(0, Math.floor((xpProgress / xpRange) * 100)));
 }

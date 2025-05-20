@@ -35,6 +35,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   totalXp: integer("total_xp").default(0),
+  completedOnboarding: boolean("completed_onboarding").default(false),
+  interests: text("interests").array(), // Array of interest categories
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   role: varchar("role").default("user"),
@@ -80,12 +83,15 @@ export type InsertProject = typeof projects.$inferInsert;
 
 // Badges table
 export const badges = pgTable("badges", {
-  id: serial("id").primaryKey(),
+  id: varchar("id").primaryKey().notNull(), // Using string ID for badge code (e.g., "lab_starter")
   name: varchar("name").notNull(),
   description: text("description").notNull(),
-  iconUrl: varchar("icon_url").notNull(),
-  unlockCriteria: jsonb("unlock_criteria").notNull(), // JSON with criteria
+  category: varchar("category").notNull(), // labs, community, meta, leveling, etc.
+  rarity: varchar("rarity").notNull(), // common, uncommon, rare, epic, legendary
+  iconUrl: varchar("icon_url"),
+  unlockCriteria: jsonb("unlock_criteria"), // JSON with criteria
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export type Badge = typeof badges.$inferSelect;
@@ -95,8 +101,9 @@ export type InsertBadge = typeof badges.$inferInsert;
 export const userBadges = pgTable("user_badges", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  badgeId: integer("badge_id").notNull().references(() => badges.id, { onDelete: 'cascade' }),
+  badgeId: varchar("badge_id").notNull().references(() => badges.id, { onDelete: 'cascade' }),
   earnedAt: timestamp("earned_at").defaultNow(),
+  isDisplayed: boolean("is_displayed").default(true), // For users to choose which badges to display on profile
 });
 
 // Lab progress
