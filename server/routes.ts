@@ -19,23 +19,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes - Development mode
   app.get('/api/auth/user', async (req: any, res) => {
-    if (req.isAuthenticated() && req.user) {
-      return res.json(req.user);
+    // For development purposes, auto-authenticate with a mock user
+    try {
+      // Try to get user from database first (to avoid creating duplicates)
+      let user = await storage.getUser("test-user-123");
+      
+      if (!user) {
+        // Create test user if not exists
+        const testUser = {
+          id: "test-user-123",
+          email: "test@example.com",
+          firstName: "Test",
+          lastName: "User",
+          username: "testuser",
+          profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
+          role: "user",
+          totalXp: 1250,
+        };
+        
+        user = await storage.upsertUser(testUser);
+        console.log("Created test user:", user);
+      }
+      
+      return res.json(user);
+    } catch (error) {
+      console.error("Error in auth:", error);
+      return res.status(500).json({ message: "Auth error" });
     }
-    
-    // For development purposes, auto-authenticate with test user
-    const testUser = {
-      id: "test-user-123",
-      email: "test@example.com",
-      firstName: "Test",
-      lastName: "User",
-      username: "testuser",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
-      role: "user",
-      totalXp: 1250,
-    };
-    
-    return res.json(testUser);
+  });
+  
+  // Also provide an admin user for testing
+  app.get('/api/auth/admin', async (req: any, res) => {
+    try {
+      // Try to get admin user from database first
+      let adminUser = await storage.getUser("admin-user-456");
+      
+      if (!adminUser) {
+        // Create admin user if not exists
+        const testAdminUser = {
+          id: "admin-user-456",
+          email: "admin@example.com",
+          firstName: "Admin",
+          lastName: "User",
+          username: "adminuser",
+          profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User",
+          role: "admin",
+          totalXp: 5000,
+        };
+        
+        adminUser = await storage.upsertUser(testAdminUser);
+        console.log("Created admin user:", adminUser);
+      }
+      
+      return res.json(adminUser);
+    } catch (error) {
+      console.error("Error in admin auth:", error);
+      return res.status(500).json({ message: "Auth error" });
+    }
   });
 
   // Labs routes

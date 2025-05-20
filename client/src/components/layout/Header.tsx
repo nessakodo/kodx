@@ -15,7 +15,7 @@ import { useState } from "react";
 
 export function Header() {
   const [location] = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin, toggleRole } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
