@@ -3,9 +3,9 @@ import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { BeakerIcon, UsersIcon, CodeIcon } from "lucide-react";
 
 export function CommunityStats() {
-  const [labsCount, setLabsCount] = useState(16);
-  const [usersCount, setUsersCount] = useState(200);
-  const [projectsCount, setProjectsCount] = useState(78);
+  const [labsCount, setLabsCount] = useState(0);
+  const [usersCount, setUsersCount] = useState(0);
+  const [projectsCount, setProjectsCount] = useState(0);
   
   // Animate counting effect
   useEffect(() => {
@@ -15,7 +15,7 @@ export function CommunityStats() {
     
     let currentFrame = 0;
     
-    const targetLabsCount = 16;
+    const targetLabsCount = 216;
     const targetUsersCount = 200;
     const targetProjectsCount = 78;
     
@@ -43,29 +43,41 @@ export function CommunityStats() {
   }, []);
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <StatCard 
-        icon={<BeakerIcon className="h-6 w-6 text-[#88c9b7]" />}
-        value={labsCount}
-        label="Labs Completed"
-        color="[#88c9b7]"
-      />
+    <section className="py-12 mb-8">
+      <h2 className="font-orbitron text-2xl md:text-3xl text-center mb-8 text-white tracking-wide">Community Impact</h2>
       
-      <StatCard 
-        icon={<UsersIcon className="h-6 w-6 text-[#9ecfff]" />}
-        value={usersCount}
-        label="Active Technologists"
-        color="[#9ecfff]"
-        showPlus
-      />
-      
-      <StatCard 
-        icon={<CodeIcon className="h-6 w-6 text-[#bb86fc]" />}
-        value={projectsCount}
-        label="Projects Published"
-        color="[#bb86fc]"
-      />
-    </div>
+      <GlassmorphicCard className="p-6 md:p-8 relative overflow-hidden border border-[#1e293b]/50">
+        {/* Background blur effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/80 to-[#1e293b]/70 backdrop-blur-sm"></div>
+        
+        {/* Content */}
+        <div className="relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <StatCard 
+              icon={<BeakerIcon className="h-7 w-7" />}
+              value={labsCount}
+              label="Labs Completed"
+              colorClass="text-[#9ecfff] border-[#9ecfff]/30 bg-[#0f1c2e]"
+            />
+            
+            <StatCard 
+              icon={<UsersIcon className="h-7 w-7" />}
+              value={usersCount}
+              label="Active Members"
+              colorClass="text-[#88c9b7] border-[#88c9b7]/30 bg-[#0f1c2e]"
+              showPlus
+            />
+            
+            <StatCard 
+              icon={<CodeIcon className="h-7 w-7" />}
+              value={projectsCount}
+              label="Projects Published"
+              colorClass="text-[#a29eff] border-[#a29eff]/30 bg-[#0f1c2e]"
+            />
+          </div>
+        </div>
+      </GlassmorphicCard>
+    </section>
   );
 }
 
@@ -73,22 +85,20 @@ interface StatCardProps {
   icon: React.ReactNode;
   value: number;
   label: string;
-  color: string;
+  colorClass: string;
   showPlus?: boolean;
 }
 
-function StatCard({ icon, value, label, color, showPlus = false }: StatCardProps) {
+function StatCard({ icon, value, label, colorClass, showPlus = false }: StatCardProps) {
   return (
-    <GlassmorphicCard className="p-6 text-center flex flex-col items-center transition-all hover:shadow-[0_0_15px_rgba(30,41,59,0.5)]">
-      <div className={`mb-3 bg-${color}/10 p-3 rounded-full border border-${color}/30`}>
+    <div className={`flex flex-col items-center text-center py-6 px-4 rounded-xl border ${colorClass} transition-all`}>
+      <div className="mb-4">
         {icon}
       </div>
-      
-      <div className="font-orbitron text-3xl text-white mb-1">
+      <div className="font-orbitron text-4xl text-white tracking-wider mb-2">
         {showPlus ? value + "+" : value}
       </div>
-      
-      <div className="text-gray-400">{label}</div>
-    </GlassmorphicCard>
+      <div className="text-gray-400 uppercase text-xs tracking-wider">{label}</div>
+    </div>
   );
 }
