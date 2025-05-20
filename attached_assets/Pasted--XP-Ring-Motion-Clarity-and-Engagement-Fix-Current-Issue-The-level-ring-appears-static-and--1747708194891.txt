@@ -1,0 +1,113 @@
+🧿 XP Ring — Motion, Clarity, and Engagement Fix
+
+Current Issue:
+
+The level ring appears static and is unclear whether it's animated, interactive, or proportionally accurate
+
+Visually disconnected from the XP value and feels disconnected from the rest of the XP story
+
+✅ Desired Enhancements
+
+Constant Motion:
+
+Make the progress ring subtly animate in a slow clockwise motion to create a sense of rhythm and growth — even when static
+
+This adds a meditative, cyber-zen flow to the UI
+
+CSS (SVG or circular loader logic suggestion):
+
+css
+Copy
+Edit
+@keyframes rotate-ring {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.xp-ring-wrapper {
+  animation: rotate-ring 20s linear infinite;
+}
+Level Clarity:
+
+Keep the level number inside the circle, but:
+
+Increase spacing between LEVEL and number
+
+Reduce font size slightly for balance
+
+Consider adding “Level 2” as text outside the ring instead for cleaner design
+
+XP Progress Integration:
+
+Below or beside the ring, add a subtle animated bar or glow-pulse to represent XP progress numerically (e.g., 1250 XP / 2000 XP)
+
+Or: make the ring glow slightly brighter the closer to level-up (85%+)
+
+Optional Bonus (future scope):
+
+Add hover/click state to reveal:
+
+XP source breakdown (e.g. “600 XP from Labs, 650 from Projects”)
+
+Last badge earned
+
+📐 Responsive UX Notes
+
+Ring should animate fluidly on desktop
+
+Use fallback static ring for low-power mobile mode if needed
+
+🔔 Notification Bell UI Fix (Top Nav)
+
+Issue:
+The purple dot is detached from the bell icon and floats awkwardly (see screenshot). The interaction feels disconnected and lacks standard notification UX behavior.
+
+✅ Desired Behavior
+
+Notification Dot:
+
+Attach a small, centered dot to the top-right corner of the bell icon container
+
+Use a consistent notification badge color (e.g. #bb86fc or similar)
+
+The dot should only appear when there are unread notifications
+
+CSS Suggestion:
+
+css
+Copy
+Edit
+.notification-icon {
+  position: relative;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #bb86fc;
+  border-radius: 50%;
+}
+Notification Modal:
+
+Clicking the bell icon should toggle a modal dropdown panel (not hover)
+
+The modal should:
+
+Render a list of recent actions (likes, comments, follows, system announcements)
+
+Include a button or link: “View All in Dashboard”
+
+Be closable on outside click or escape key
+
+The modal should disappear when you click outside or re-click the bell
+
+Component Logic:
+
+☐ Use state to track open/closed (e.g., isNotificationsOpen)
+
+☐ Fetch mock data or hook to Supabase activity log later
+
+☐ Clear unread state after viewing modal

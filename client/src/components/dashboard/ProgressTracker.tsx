@@ -65,10 +65,8 @@ export function ProgressTracker({
           ) : (
             <GitForkIcon className="h-4 w-4 mr-2 text-[#88c9b7]" />
           )}
-          <Link href={`/${type}s/${id}`}>
-            <a className="font-medium hover:text-[#9ecfff] transition-colors">
-              {title}
-            </a>
+          <Link href={`/${type}s/${id}`} className="font-medium hover:text-[#9ecfff] transition-colors">
+            {title}
           </Link>
         </div>
         

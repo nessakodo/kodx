@@ -1,7 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
 
-// Very simple auth hook for development
+// Enhanced auth hook for development with persistent auth state
 export function useAuth() {
+  const queryClient = useQueryClient();
+  
   // Fixed data for our test user accounts
   const testUser = {
     id: "test-user-123",
@@ -25,23 +29,54 @@ export function useAuth() {
     totalXp: 5000,
   };
   
-  // Use the standard endpoint just to check if it's available
-  const { data, isLoading } = useQuery({
-    queryKey: ["/api/auth/user"],
-    enabled: false, // Don't actually run the query
+  // Use localStorage to track authentication state
+  const [authState, setAuthState] = useState(() => {
+    const savedState = localStorage.getItem("kodex_auth_state");
+    return savedState ? JSON.parse(savedState) : { isAuthenticated: true, isAdmin: false };
   });
   
-  // For development, we'll use our predefined user data
-  const isAdmin = window.location.pathname === "/admin";
-  const user = isAdmin ? adminUser : testUser;
+  // Set up mock data for dashboard endpoint
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      queryClient.setQueryData(["/api/dashboard"], MOCK_DASHBOARD_DATA);
+    }
+  }, [authState.isAuthenticated, queryClient]);
+  
+  // Get the current user based on auth state
+  const user = authState.isAdmin ? adminUser : testUser;
+  
+  // Login functions
+  const loginAsUser = () => {
+    const newState = { isAuthenticated: true, isAdmin: false };
+    localStorage.setItem("kodex_auth_state", JSON.stringify(newState));
+    setAuthState(newState);
+    window.location.href = "/dashboard";
+  };
+  
+  const loginAsAdmin = () => {
+    const newState = { isAuthenticated: true, isAdmin: true };
+    localStorage.setItem("kodex_auth_state", JSON.stringify(newState));
+    setAuthState(newState);
+    window.location.href = "/admin";
+  };
+  
+  // Logout function
+  const logout = () => {
+    const newState = { isAuthenticated: false, isAdmin: false };
+    localStorage.setItem("kodex_auth_state", JSON.stringify(newState));
+    setAuthState(newState);
+    // Clear any user-specific query cache
+    queryClient.clear();
+    window.location.href = "/";
+  };
   
   return {
     user,
     isLoading: false,
-    isAuthenticated: true, // Always authenticated for development
-    isAdmin,
-    loginAsUser: () => window.location.href = "/",
-    loginAsAdmin: () => window.location.href = "/admin",
-    logout: () => console.log("Logged out (simulated)"),
+    isAuthenticated: authState.isAuthenticated,
+    isAdmin: authState.isAdmin,
+    loginAsUser,
+    loginAsAdmin,
+    logout,
   };
 }

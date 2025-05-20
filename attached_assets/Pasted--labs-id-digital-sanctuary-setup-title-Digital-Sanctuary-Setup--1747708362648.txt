@@ -1,0 +1,111 @@
+{
+  "labs": [
+    {
+      "id": "digital-sanctuary-setup",
+      "title": "Digital Sanctuary Setup",
+      "level": "Beginner",
+      "xp": 25,
+      "estimated_time": "45 mins",
+      "video_url": "https://youtube.com/embed/sample1",
+      "timestamps": {
+        "00:00": "Intro",
+        "01:15": "Setting up encrypted storage",
+        "10:00": "Password manager walkthrough",
+        "20:00": "Secure browser configuration"
+      },
+      "tasks": [
+        "Install a password manager",
+        "Set up encrypted file storage",
+        "Configure privacy browser extensions"
+      ],
+      "quiz": [
+        {
+          "question": "What is the purpose of encrypted storage?",
+          "options": [
+            "Security",
+            "Speed",
+            "Compression"
+          ],
+          "answer": "Security"
+        }
+      ],
+      "badge_id": "badge-secure-base",
+      "devlog_prompt": "How did it feel to build your digital sanctuary? What practices will you keep using?"
+    },
+    {
+      "id": "secure-shell-basics",
+      "title": "Secure Shell Basics",
+      "level": "Beginner",
+      "xp": 30,
+      "estimated_time": "60 mins",
+      "video_url": "https://youtube.com/embed/sample2",
+      "timestamps": {
+        "00:00": "SSH basics",
+        "02:00": "Key authentication",
+        "12:30": "SCP and SFTP walkthrough"
+      },
+      "tasks": [
+        "Generate SSH key pair",
+        "Connect to remote server",
+        "Use SCP to transfer files"
+      ],
+      "quiz": [
+        {
+          "question": "What port does SSH use by default?",
+          "options": [
+            "21",
+            "22",
+            "80"
+          ],
+          "answer": "22"
+        }
+      ],
+      "badge_id": "badge-shell-access",
+      "devlog_prompt": "Describe your first time connecting with SSH. What did you learn about trust and access?"
+    }
+  ],
+  "projects": [
+    {
+      "id": "publish-cyber-sanctuary",
+      "title": "Publish Your Cyber Sanctuary",
+      "level": "Intermediate",
+      "xp": 40,
+      "estimated_time": "2\u20133 hours",
+      "video_url": "https://youtube.com/embed/sample3",
+      "repo_url": "https://github.com/nessakodo/cyber-sanctuary-template",
+      "timestamps": {
+        "00:00": "Intro to GitHub Pages",
+        "03:30": "Customizing the template",
+        "20:00": "Publishing live"
+      },
+      "tasks": [
+        "Fork the template repo",
+        "Customize your index.html",
+        "Push to GitHub Pages"
+      ],
+      "badge_id": "badge-publisher",
+      "devlog_prompt": "What values did you express in your published site? How does it represent your tech identity?"
+    },
+    {
+      "id": "command-line-devlog",
+      "title": "Command Line Devlog",
+      "level": "Intermediate",
+      "xp": 40,
+      "estimated_time": "2\u20134 hours",
+      "video_url": "https://youtube.com/embed/sample4",
+      "repo_url": "https://github.com/nessakodo/cli-devlog-template",
+      "timestamps": {
+        "00:00": "Command line tools",
+        "05:00": "Git journaling",
+        "15:00": "Exporting to markdown"
+      },
+      "tasks": [
+        "Clone CLI devlog repo",
+        "Use Git to track your thoughts",
+        "Export and style your markdown log"
+      ],
+      "badge_id": "badge-devlogger",
+      "devlog_prompt": "Reflect on your devlog. What surprised you when writing through the terminal?"
+    }
+  ]
+}
