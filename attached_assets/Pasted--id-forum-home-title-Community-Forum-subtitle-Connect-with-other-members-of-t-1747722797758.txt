@@ -1,0 +1,71 @@
+{
+  "id": "forum-home",
+  "title": "Community Forum",
+  "subtitle": "Connect with other members of the KODΞX community to share ideas, ask questions, and showcase your work.",
+  "actions": {
+    "create_post_cta": "Create Post",
+    "newsletter_cta": {
+      "title": "Join Our Newsletter",
+      "copy": "Get weekly insights on cybersecurity, ethical tech, and mindful computing.",
+      "placeholder": "Your email address",
+      "button": "Subscribe"
+    }
+  },
+  "featured": {
+    "title": "Featured Post",
+    "label": "Hot",
+    "post": {
+      "title": "How to secure your network with Quantum-resistant cryptography",
+      "author": "CyberSage",
+      "comments": 24,
+      "likes": 156
+    }
+  },
+  "trending_tags": {
+    "title": "Trending Tags",
+    "tags": [
+      { "label": "#quantum", "count": 42, "route": "/forum/tags/quantum" },
+      { "label": "#security", "count": 35, "route": "/forum/tags/security" },
+      { "label": "#ethical-hacking", "count": 29, "route": "/forum/tags/ethical-hacking" },
+      { "label": "#zero-knowledge", "count": 23, "route": "/forum/tags/zero-knowledge" },
+      { "label": "#mindfulness", "count": 18, "route": "/forum/tags/mindfulness" }
+    ]
+  },
+  "categories": {
+    "DISCUSSION": {
+      "label": "DISCUSSION",
+      "color": "#8b5cf6", 
+      "route": "/forum/categories/discussion"
+    },
+    "RESOURCES": {
+      "label": "RESOURCES",
+      "color": "#10b981",
+      "route": "/forum/categories/resources"
+    },
+    "SHOWCASE": {
+      "label": "SHOWCASE",
+      "color": "#facc15",
+      "route": "/forum/categories/showcase"
+    },
+    "QUESTIONS": {
+      "label": "QUESTIONS",
+      "color": "#3b82f6",
+      "route": "/forum/categories/questions"
+    },
+    "FEEDBACK": {
+      "label": "FEEDBACK",
+      "color": "#f87171",
+      "route": "/forum/categories/feedback"
+    },
+    "ANNOUNCEMENTS": {
+      "label": "ANNOUNCEMENTS",
+      "color": "#e879f9",
+      "route": "/forum/categories/announcements"
+    }
+  },
+  "empty_state": {
+    "message": "No posts found. Be the first to spark a conversation "
+  },
+  "search_placeholder": "Search posts...",
+  "category_filter_placeholder": "Category"
+}

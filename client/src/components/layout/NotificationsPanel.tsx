@@ -18,6 +18,7 @@ interface Notification {
 interface NotificationsPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onMarkAllAsRead?: () => void;
 }
 
 // Mock notifications - this would come from the API in a real app
@@ -68,7 +69,7 @@ const mockNotifications: Notification[] = [
   }
 ];
 
-export function NotificationsPanel({ isOpen, onClose, positionElement }: NotificationsPanelProps & { positionElement?: HTMLElement }) {
+export function NotificationsPanel({ isOpen, onClose, positionElement, onMarkAllAsRead }: NotificationsPanelProps & { positionElement?: HTMLElement }) {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [currentPage, setCurrentPage] = useState(1);
   const notificationsPerPage = 3;
@@ -90,6 +91,11 @@ export function NotificationsPanel({ isOpen, onClose, positionElement }: Notific
         read: true
       }))
     );
+    
+    // Call the parent callback to update the badge count in the header
+    if (onMarkAllAsRead) {
+      onMarkAllAsRead();
+    }
   };
   
   const markAsRead = (id: number) => {

@@ -30,6 +30,8 @@ export function Header() {
         setMobileMenuOpen(false);
         setUserMenuOpen(false);
       }
+      
+      // Don't close notifications panel here - it's handled by the KodexModal component
     };
     
     document.addEventListener("mousedown", handleClickOutside);
@@ -228,7 +230,8 @@ export function Header() {
           // When closed, mark all as read
           setUnreadNotifications(0);
         }}
-        positionElement={notificationBellRef.current}
+        positionElement={notificationBellRef.current as HTMLElement | undefined}
+        onMarkAllAsRead={() => setUnreadNotifications(0)}
       />
     </header>
   );
