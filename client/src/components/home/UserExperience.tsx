@@ -57,7 +57,7 @@ export function UserExperience() {
           </div>
           
           <div className="mt-12 flex justify-center">
-            <Link href="/labs">
+            <Link href="/resources">
               <Button 
                 className="px-6 py-3 h-auto border border-[#9ecfff]/30 bg-[#1e2535]/60 hover:bg-[#1e2535]/90 backdrop-blur-md transition-all font-medium tracking-wide flex items-center gap-2 text-gray-200"
               >

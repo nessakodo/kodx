@@ -46,8 +46,8 @@ export function Countdown() {
 
   return (
     <section className="text-center mb-16 px-4">
-      <div className="inline-block">
-        <GlassmorphicCard className="p-6 rounded-xl overflow-hidden relative">
+      <div className="container mx-auto max-w-screen-xl">
+        <GlassmorphicCard className="p-6 rounded-xl overflow-hidden relative mx-auto max-w-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-[#9ecfff]/5 to-[#88c9b7]/5"></div>
           
           <div className="relative z-10">

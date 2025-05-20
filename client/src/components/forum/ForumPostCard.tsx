@@ -106,9 +106,9 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
           </div>
           
           <Link href={`/forum/${post.id}`}>
-            <a className="text-sm text-[#9ecfff] font-medium group-hover:underline">
+            <span className="text-sm text-[#9ecfff] font-medium group-hover:underline cursor-pointer">
               Read More
-            </a>
+            </span>
           </Link>
         </div>
       </div>

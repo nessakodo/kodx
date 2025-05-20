@@ -326,6 +326,19 @@ a[role="button"]:hover,
   filter: drop-shadow(0 0 3px rgba(158, 207, 255, 0.3));
 }
 
+/* KODEX Logo styling */
+.kodex-logo {
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  position: relative;
+  text-shadow: 0 0 10px rgba(158, 207, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.kodex-logo:hover {
+  text-shadow: 0 0 15px rgba(158, 207, 255, 0.4), 0 0 30px rgba(187, 134, 252, 0.3);
+}
+
 /* Make sure tabs have no blue */
 [role="tab"][data-state="active"] {
   background-color: rgba(30, 37, 53, 0.7) !important;
