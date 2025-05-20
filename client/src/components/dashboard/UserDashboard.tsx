@@ -466,6 +466,7 @@ export function UserDashboard() {
             </div>
           </TabsContent>
         </Tabs>
+        )}
       </section>
       
       <section>
