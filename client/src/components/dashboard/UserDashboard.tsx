@@ -250,7 +250,7 @@ export function UserDashboard() {
       <section className="mb-8">
         <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
           <BookOpenIcon className="h-5 w-5 text-[#9ecfff]" />
-          Your Notes
+          Your Reflections
         </h2>
         <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
           {isLoading ? (
@@ -258,7 +258,7 @@ export function UserDashboard() {
               <Skeleton className="h-20 w-full" />
               <Skeleton className="h-20 w-full" />
             </div>
-          ) : (
+          ) : display.reflections && display.reflections.length > 0 ? (
             <>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -290,10 +290,32 @@ export function UserDashboard() {
               
               <div className="p-4 flex justify-center">
                 <Button variant="outline" className="btn-kodex">
-                  Show More Notes <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  Show More Reflections <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </div>
             </>
+          ) : (
+            <div className="p-6">
+              <div className="flex flex-col items-center justify-center py-8 px-4 space-y-4 text-center">
+                <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 p-4 rounded-full mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white">No reflections yet.</h3>
+                <p className="text-gray-400 max-w-md">
+                  When you complete Labs or Projects, you'll be prompted to journal your insights.
+                </p>
+                <p className="text-sm text-gray-500 italic">
+                  "Reflection makes experience meaningful. You'll know when it's time to pause and write."
+                </p>
+                <Link href="/forum">
+                  <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white mt-2">
+                    Browse Community Reflections
+                  </Button>
+                </Link>
+              </div>
+            </div>
           )}
         </div>
       </section>

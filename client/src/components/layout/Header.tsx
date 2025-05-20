@@ -82,7 +82,15 @@ export function Header() {
   // Handle logout
   const handleLogout = () => {
     setUserMenuOpen(false);
-    window.location.href = "/api/logout";
+    // Store a logout flag in session storage
+    sessionStorage.setItem('kodex_logout', 'true');
+    // Use client-side navigation instead of direct API call
+    setLocation('/');
+    // Clear auth state after a short delay
+    setTimeout(() => {
+      sessionStorage.removeItem('kodex_user');
+      window.location.reload();
+    }, 100);
   };
 
   // Handle admin login test
