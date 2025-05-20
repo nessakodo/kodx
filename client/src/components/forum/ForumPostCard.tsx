@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { HeartIcon, MessageSquareIcon } from "lucide-react";
+import { HeartIcon, MessageSquareIcon, Bookmark, BookmarkCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface User {
@@ -115,11 +115,26 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
             </span>
           </div>
           
-          <Link href={`/forum/${post.id}`}>
-            <a className="text-sm text-[#9ecfff] font-medium group-hover:underline">
-              Read More
-            </a>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href={`/forum/${post.id}`}>
+              <span className="text-sm text-[#9ecfff] font-medium group-hover:underline cursor-pointer">
+                Read More
+              </span>
+            </Link>
+            <button
+              className="text-gray-500 hover:text-[#9ecfff]"
+              aria-label={`Save post: ${post.title}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.dispatchEvent(new CustomEvent('savePost', { 
+                  detail: { postId: post.id }
+                }));
+              }}
+            >
+              <Bookmark className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </GlassmorphicCard>

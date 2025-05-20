@@ -310,7 +310,10 @@ export default function ForumPage() {
                   "Be the first to start a discussion in the community."}
               </p>
               {isAuthenticated && !searchTerm && !categoryFilter && (
-                <Button className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white">
+                <Button 
+                  className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+                  onClick={() => setIsCreatePostModalOpen(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" /> Create Post
                 </Button>
               )}
@@ -325,6 +328,90 @@ export default function ForumPage() {
         </div>
       </main>
       <Footer />
+      
+      {/* Create Post Modal */}
+      <KodexModal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        title="Create New Post"
+      >
+        <form onSubmit={handleCreatePost} className="space-y-4">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">Title</label>
+            <Input
+              id="title"
+              placeholder="Enter a title for your post"
+              value={newPost.title}
+              onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+              className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1">Category</label>
+            <Select 
+              value={newPost.category}
+              onValueChange={(value) => setNewPost({ ...newPost, category: value })}
+            >
+              <SelectTrigger className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1e2535] border-[#1e2535]">
+                <SelectItem value="discussion">Discussion</SelectItem>
+                <SelectItem value="resources">Resources</SelectItem>
+                <SelectItem value="showcase">Showcase</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label htmlFor="content" className="block text-sm font-medium text-gray-300 mb-1">Content</label>
+            <Textarea
+              id="content"
+              placeholder="Write your post content here..."
+              value={newPost.content}
+              onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+              className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50 min-h-[150px]"
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3 pt-4">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => setIsCreatePostModalOpen(false)}
+              className="border-[#1e2535] hover:bg-[#1e2535]/50 text-gray-300"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+            >
+              Publish Post
+            </Button>
+          </div>
+        </form>
+      </KodexModal>
+      
+      {/* Pagination */}
+      {filteredPosts.length > postsPerPage && (
+        <div className="flex justify-center mt-8 gap-2">
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <Button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`h-8 w-8 p-0 ${
+                currentPage === index + 1
+                  ? "bg-[#1e2535] border border-[#9ecfff]/40 text-[#9ecfff]"
+                  : "bg-[#1e2535]/30 hover:bg-[#1e2535]/50 text-gray-400"
+              }`}
+            >
+              {index + 1}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

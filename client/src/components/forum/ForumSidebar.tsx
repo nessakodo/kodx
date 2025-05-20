@@ -1,102 +1,105 @@
-import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { SendIcon, MessageSquareIcon, TagIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { BadgeCheck, Bookmark, TrendingUp, Users, Clock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "wouter";
 
 export function ForumSidebar() {
-  const [email, setEmail] = useState("");
-
-  const featuredPost = {
-    id: 1,
-    title: "How to secure your network with Quantum-resistant cryptography",
-    author: "CyberSage",
-    comments: 24,
-    likes: 156
-  };
-
-  const trendingTags = [
-    { name: "quantum", count: 42 },
-    { name: "security", count: 35 },
-    { name: "ethical-hacking", count: 29 },
-    { name: "zero-knowledge", count: 23 },
-    { name: "mindfulness", count: 18 },
-  ];
-
-  const handleNewsletterSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would send the email to your newsletter API
-    alert(`Thank you for subscribing with ${email}!`);
-    setEmail("");
-  };
-
+  const { isAuthenticated } = useAuth();
+  
   return (
     <div className="space-y-6">
-      {/* Newsletter Sign Up */}
-      <GlassmorphicCard className="p-6">
-        <h3 className="text-xl font-orbitron text-white mb-4">Join Our Newsletter</h3>
-        <p className="text-gray-400 text-sm mb-4">
-          Get weekly insights on cyber security, ethical tech, and mindful computing.
-        </p>
-        <form onSubmit={handleNewsletterSignup} className="space-y-3">
-          <Input
-            type="email"
-            placeholder="Your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-[#1e293b]/50 border-[#1e293b] focus:border-[#9ecfff]/50 focus:ring-0"
-            required
-          />
-          <Button 
-            type="submit" 
-            className="w-full bg-[#1e293b]/70 hover:bg-[#1e293b] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-[#9ecfff]"
-          >
-            Subscribe <SendIcon className="ml-2 h-4 w-4" />
-          </Button>
-        </form>
-      </GlassmorphicCard>
-
-      {/* Featured Post */}
-      <GlassmorphicCard className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-orbitron text-white">Featured Post</h3>
-          <Badge className="bg-[#bb86fc]/10 text-[#bb86fc] border border-[#bb86fc]/30">
-            Hot
-          </Badge>
-        </div>
-        <h4 className="text-md font-medium text-white mb-2">{featuredPost.title}</h4>
-        <div className="flex items-center text-sm text-gray-400 mb-3">
-          <span>By {featuredPost.author}</span>
-        </div>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
-          <div className="flex items-center">
-            <MessageSquareIcon className="mr-1 h-4 w-4 text-[#9ecfff]" />
-            {featuredPost.comments}
-          </div>
-          <div>
-            {featuredPost.likes} likes
-          </div>
-        </div>
-      </GlassmorphicCard>
-
-      {/* Trending Tags */}
-      <GlassmorphicCard className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TagIcon className="h-5 w-5 text-[#56ccf2]" />
-          <h3 className="text-xl font-orbitron text-white">Trending Tags</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {trendingTags.map(tag => (
-            <Badge 
-              key={tag.name}
-              className="py-1 px-3 bg-[#1e293b]/70 hover:bg-[#1e293b] text-white border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 cursor-pointer transition-all"
+      {/* Join Community Card */}
+      <GlassmorphicCard>
+        <div className="p-4 space-y-4">
+          <h3 className="font-orbitron text-xl tracking-wide">Join the Community</h3>
+          <p className="text-gray-400 text-sm">
+            Connect with fellow technologists, share your knowledge, and grow together.
+          </p>
+          {!isAuthenticated && (
+            <Button 
+              className="w-full bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+              asChild
             >
-              #{tag.name} <span className="ml-1 text-gray-400">({tag.count})</span>
-            </Badge>
-          ))}
+              <Link href="/api/login">Sign In</Link>
+            </Button>
+          )}
         </div>
       </GlassmorphicCard>
+      
+      {/* Forum Stats */}
+      <Card className="bg-[#1e2535]/30 border-[#1e2535] p-4 space-y-4">
+        <h3 className="font-orbitron text-lg">Forum Stats</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Users className="h-4 w-4 text-[#9ecfff]" />
+            <div>
+              <p className="text-sm text-gray-300">Active Members</p>
+              <p className="text-lg font-medium">1,245</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <TrendingUp className="h-4 w-4 text-[#88c9b7]" />
+            <div>
+              <p className="text-sm text-gray-300">Posts This Week</p>
+              <p className="text-lg font-medium">124</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Clock className="h-4 w-4 text-[#b166ff]" />
+            <div>
+              <p className="text-sm text-gray-300">Avg. Response Time</p>
+              <p className="text-lg font-medium">4.2 hours</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+      
+      {/* Quick Links */}
+      <Card className="bg-[#1e2535]/30 border-[#1e2535] p-4 space-y-4">
+        <h3 className="font-orbitron text-lg">Quick Links</h3>
+        <ul className="space-y-2 text-sm">
+          <li>
+            <Link href="/forum?category=discussion">
+              <span className="text-[#9ecfff] hover:underline cursor-pointer">Discussions</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/forum?category=resources">
+              <span className="text-[#88c9b7] hover:underline cursor-pointer">Resources</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/forum?category=showcase">
+              <span className="text-[#b166ff] hover:underline cursor-pointer">Project Showcases</span>
+            </Link>
+          </li>
+          {isAuthenticated && (
+            <li>
+              <Link href="/forum?saved=true">
+                <span className="flex items-center gap-1 text-gray-300 hover:text-[#9ecfff] hover:underline cursor-pointer">
+                  <Bookmark className="h-3 w-3" /> Saved Posts
+                </span>
+              </Link>
+            </li>
+          )}
+        </ul>
+      </Card>
+      
+      {/* Forum Guidelines */}
+      <Card className="bg-[#1e2535]/30 border-[#1e2535] p-4 space-y-4">
+        <h3 className="font-orbitron text-lg">Community Guidelines</h3>
+        <ul className="space-y-2 text-sm list-disc pl-5 text-gray-300">
+          <li>Be respectful and constructive</li>
+          <li>Give credit where credit is due</li>
+          <li>Share knowledge freely</li>
+          <li>Protect privacy and security</li>
+        </ul>
+        <Link href="/forum/guidelines">
+          <span className="text-xs text-[#9ecfff] hover:underline cursor-pointer">Read full guidelines</span>
+        </Link>
+      </Card>
     </div>
   );
 }
