@@ -3,6 +3,7 @@ import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { XIcon, TrophyIcon, BookIcon, CodeIcon } from "lucide-react";
+import { EmptyBadgesState } from "@/components/dashboard/EmptyStates";
 
 interface Badge {
   id: number;
@@ -82,10 +83,8 @@ export function BadgeSection({ badges, isLoading = false }: BadgeSectionProps) {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-6 text-center">
-              <p className="text-gray-500">
-                Complete labs and projects to earn badges!
-              </p>
+            <div className="col-span-full">
+              <EmptyBadgesState />
             </div>
           )}
         </div>

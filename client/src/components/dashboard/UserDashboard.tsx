@@ -221,17 +221,7 @@ export function UserDashboard() {
                     />
                   ))
                 ) : (
-                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
-                    <p className="text-gray-400 mb-6 text-center">You haven't started any projects yet. Take on a project challenge!</p>
-                    <Link href="/projects">
-                      <Button 
-                        variant="outline"
-                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
-                      >
-                        Browse Projects
-                      </Button>
-                    </Link>
-                  </div>
+                  <EmptyProjectsState />
                 )}
               </div>
             </TabsContent>
@@ -299,27 +289,7 @@ export function UserDashboard() {
               </div>
             </>
           ) : (
-            <div className="p-6">
-              <div className="flex flex-col items-center justify-center py-8 px-4 space-y-4 text-center">
-                <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 p-4 rounded-full mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-white">No reflections yet.</h3>
-                <p className="text-gray-400 max-w-md">
-                  When you complete Labs or Projects, you'll be prompted to journal your insights.
-                </p>
-                <p className="text-sm text-gray-500 italic">
-                  "Reflection makes experience meaningful. You'll know when it's time to pause and write."
-                </p>
-                <Link href="/forum">
-                  <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white mt-2">
-                    Browse Community Reflections
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            <EmptyReflectionsState />
           )}
         </div>
       </section>
