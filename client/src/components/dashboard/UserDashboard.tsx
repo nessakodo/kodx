@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { XpRingProgress } from "@/components/dashboard/XpRingProgress";
+import { DashboardXPRing } from "@/components/dashboard/DashboardXPRing";
 import { BadgeSection } from "@/components/dashboard/BadgeSection";
 import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
@@ -61,20 +62,21 @@ export function UserDashboard() {
         <div className="lg:col-span-1 space-y-8">
           {/* User Profile and XP */}
           <GlassmorphicCard className="p-8 flex flex-col items-center">
-            <XpRingProgress
-              xp={user.totalXp}
-              username={user.username}
-              profileImageUrl={user.profileImageUrl}
+            <DashboardXPRing
+              userXP={user.totalXp}
+              userLevel={level}
+              nextLevelXP={xpToNextLevel}
+              showExtraInfo={true}
             />
             
             <div className="text-center mt-2 mb-2">
+              <div className="text-lg font-medium text-white">{user.username}</div>
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <span className="w-2 h-2 rounded-full bg-[#56ccf2]"></span>
+                <span className="text-sm text-gray-400">Online</span>
+              </div>
               <div className="text-xs text-gray-500">
-                <span className="inline-flex items-center">
-                  <span className="w-3 h-3 rounded-full bg-[#56ccf2]/20 flex items-center justify-center mr-1">
-                    <span className="block w-1.5 h-1.5 rounded-full bg-[#56ccf2]"></span>
-                  </span>
-                  Started updating XpRingProgress component for gamification
-                </span>
+                Member since May 2025
               </div>
             </div>
           </GlassmorphicCard>
