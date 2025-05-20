@@ -1,142 +1,147 @@
-import { useState } from "react";
-import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogClose } from "@/components/ui/dialog";
-import { XIcon, TrophyIcon, BookIcon, CodeIcon } from "lucide-react";
-import { EmptyBadgesState } from "@/components/dashboard/EmptyStates";
+import React from 'react';
+import { Link } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { EmptyBadgesState } from './EmptyStates';
+import { Badge as BadgeType, BADGE_CATEGORY_COLORS } from '@shared/constants/badges';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface Badge {
-  id: number;
-  name: string;
-  description: string;
-  iconUrl?: string;
-  category: string;
-  earnedDate: string;
-}
-
-interface BadgeSectionProps {
-  badges: Badge[];
-  isLoading?: boolean;
-}
-
-export function BadgeSection({ badges, isLoading = false }: BadgeSectionProps) {
-  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
+export function BadgeSection() {
+  const { user, isAuthenticated } = useAuth();
   
-  // Get badge icon based on category
-  const getBadgeIcon = (category: string) => {
-    switch (category) {
-      case 'achievement':
-        return <TrophyIcon className="h-6 w-6 text-[#bb86fc]" />;
-      case 'learning':
-        return <BookIcon className="h-6 w-6 text-[#56ccf2]" />;
-      case 'development':
-        return <CodeIcon className="h-6 w-6 text-[#6fcf97]" />;
-      default:
-        return <TrophyIcon className="h-6 w-6 text-[#9ecfff]" />;
-    }
+  // Fetch user badges
+  const { data: userBadges = [] } = useQuery({
+    queryKey: ['/api/user-badges'],
+    enabled: isAuthenticated,
+  });
+  
+  // Format badge earned date
+  const formatEarnedDate = (timestamp: string) => {
+    if (!timestamp) return "";
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(timestamp));
   };
   
-  // Get badge background style based on category
-  const getBadgeStyle = (category: string) => {
-    switch (category) {
-      case 'achievement':
-        return "from-[#bb86fc]/20 to-transparent border-[#bb86fc]/30";
-      case 'learning':
-        return "from-[#56ccf2]/20 to-transparent border-[#56ccf2]/30";
-      case 'development':
-        return "from-[#6fcf97]/20 to-transparent border-[#6fcf97]/30";
-      default:
-        return "from-[#9ecfff]/20 to-transparent border-[#9ecfff]/30";
-    }
+  // Get badge styles & colors
+  const getBadgeStyle = (badge: BadgeType) => {
+    const categoryColor = BADGE_CATEGORY_COLORS[badge.category];
+    const textColor = categoryColor?.text || 'text-white';
+    
+    return {
+      borderColor: `var(--${badge.category}-color, rgba(158, 207, 255, 0.2))`,
+      textColor: textColor
+    };
   };
   
   return (
-    <>
-      <GlassmorphicCard className="p-6">
-        <h3 className="font-orbitron text-xl text-white mb-6">Achievement Badges</h3>
+    <section className="mb-10">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-orbitron text-2xl text-purple-300">Achievement Badges</h2>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {isLoading ? (
-            Array(4).fill(0).map((_, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <Skeleton className="h-16 w-16 rounded-full" />
-                <Skeleton className="h-4 w-20 mt-2" />
-              </div>
-            ))
-          ) : badges && badges.length > 0 ? (
-            badges.map((badge) => (
-              <div 
-                key={badge.id}
-                className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
-                onClick={() => setSelectedBadge(badge)}
-              >
-                <div 
-                  className={`h-20 w-20 rounded-full bg-gradient-to-br ${getBadgeStyle(badge.category)} border flex items-center justify-center`}
-                >
-                  {badge.iconUrl ? (
-                    <img src={badge.iconUrl} alt={badge.name} className="h-12 w-12" />
-                  ) : (
-                    getBadgeIcon(badge.category)
-                  )}
-                </div>
-                <span className="text-sm text-gray-300 mt-2 text-center">{badge.name}</span>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full">
-              <EmptyBadgesState />
-            </div>
-          )}
-        </div>
-      </GlassmorphicCard>
+        <Link href="/profile/badges">
+          <Button variant="outline" 
+            className="border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20">
+            Badge System
+          </Button>
+        </Link>
+      </div>
       
-      {/* Badge Detail Dialog */}
-      <Dialog open={!!selectedBadge} onOpenChange={(open) => !open && setSelectedBadge(null)}>
-        <DialogContent className="bg-[#1e2535] border border-[#1e293b] max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-orbitron text-xl flex items-center gap-2">
-              {selectedBadge && (
-                <>
-                  {selectedBadge.iconUrl ? (
-                    <img src={selectedBadge.iconUrl} alt={selectedBadge.name} className="h-6 w-6" />
-                  ) : (
-                    getBadgeIcon(selectedBadge.category)
-                  )}
-                  {selectedBadge.name}
-                </>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedBadge && (
-            <div className="space-y-4">
-              <div className="flex justify-center py-4">
-                <div 
-                  className={`h-24 w-24 rounded-full bg-gradient-to-br ${getBadgeStyle(selectedBadge.category)} border flex items-center justify-center`}
-                >
-                  {selectedBadge.iconUrl ? (
-                    <img src={selectedBadge.iconUrl} alt={selectedBadge.name} className="h-14 w-14" />
-                  ) : (
-                    getBadgeIcon(selectedBadge.category)
-                  )}
-                </div>
-              </div>
-              
-              <DialogDescription className="text-gray-400 text-base">
-                {selectedBadge.description}
-              </DialogDescription>
-              
-              <div className="text-sm text-gray-500 pt-2">
-                Earned on {new Date(selectedBadge.earnedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </div>
+      {userBadges.length > 0 ? (
+        <div>
+          {/* Recent badges carousel */}
+          <div className="overflow-x-auto hide-scrollbar pb-4">
+            <div className="flex space-x-4">
+              {userBadges.map((badge: BadgeType) => {
+                const styles = getBadgeStyle(badge);
+                
+                return (
+                  <TooltipProvider key={badge.id}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Card 
+                          className="flex-shrink-0 p-4 flex flex-col items-center justify-center w-32 h-40 border bg-[#0f172a]/70 hover:bg-[#1e2535]/40 transition-colors"
+                          style={{ borderColor: styles.borderColor }}
+                        >
+                          {/* Badge Icon */}
+                          <div className="w-16 h-16 rounded-full bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center mb-2">
+                            <span className={`text-2xl font-orbitron ${styles.textColor}`}>
+                              {badge.name.charAt(0)}
+                            </span>
+                          </div>
+                          
+                          <h3 className="text-sm font-orbitron text-center text-white mb-1 line-clamp-1">
+                            {badge.name}
+                          </h3>
+                          
+                          <Badge className={`${BADGE_CATEGORY_COLORS[badge.category].bg} ${BADGE_CATEGORY_COLORS[badge.category].text} text-xs truncate max-w-full`}>
+                            {badge.category}
+                          </Badge>
+                        </Card>
+                      </TooltipTrigger>
+                      
+                      <TooltipContent 
+                        side="bottom"
+                        className="max-w-xs border border-[#9ecfff]/20 bg-[#0f172a]/90 backdrop-blur-sm"
+                      >
+                        <h4 className="font-orbitron text-white mb-1">{badge.name}</h4>
+                        <p className="text-sm text-gray-300 mb-2">{badge.description}</p>
+                        {badge.timestampEarned && (
+                          <p className="text-xs text-gray-500">Earned {formatEarnedDate(badge.timestampEarned)}</p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
             </div>
-          )}
+          </div>
           
-          <DialogClose className="absolute right-4 top-4 text-gray-500 hover:text-white">
-            <XIcon className="h-4 w-4" />
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
-    </>
+          {/* Badge stats summary */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Total Badges</h4>
+              <p className="text-xl font-orbitron text-white">{userBadges.length}</p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Rarest Badge</h4>
+              <p className="text-xl font-orbitron text-amber-400">
+                {userBadges.find((b: BadgeType) => b.rarity === "legendary")?.name || 
+                 userBadges.find((b: BadgeType) => b.rarity === "epic")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "rare")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "uncommon")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "common")?.name || 
+                 "None"}
+              </p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Latest Badge</h4>
+              <p className="text-xl font-orbitron text-white line-clamp-1">
+                {userBadges[0]?.name || "None"}
+              </p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Most Common</h4>
+              <p className="text-xl font-orbitron text-white">
+                {Object.entries(userBadges.reduce((acc: any, badge: BadgeType) => {
+                  acc[badge.category] = (acc[badge.category] || 0) + 1;
+                  return acc;
+                }, {})).sort((a, b) => b[1] - a[1])[0]?.[0] || "None"}
+              </p>
+            </Card>
+          </div>
+        </div>
+      ) : (
+        <EmptyBadgesState />
+      )}
+    </section>
   );
 }

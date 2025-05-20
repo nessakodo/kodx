@@ -146,25 +146,45 @@ export const BADGES: Badge[] = [
 
 // Badge colors by category
 export const BADGE_CATEGORY_COLORS = {
-  labs: "bg-blue-500",
-  community: "bg-green-500",
-  meta: "bg-purple-500",
-  leveling: "bg-amber-500",
-  reflection: "bg-indigo-500",
-  projects: "bg-cyan-500",
-  security: "bg-red-500",
-  creativity: "bg-pink-500",
-  "mindful-tech": "bg-emerald-500",
-  quirky: "bg-fuchsia-500"
+  labs: { text: "text-indigo-400", bg: "bg-indigo-500/20", gradient: "rgba(99, 102, 241, 0.5)" },
+  community: { text: "text-green-400", bg: "bg-green-500/20", gradient: "rgba(52, 211, 153, 0.5)" },
+  meta: { text: "text-purple-400", bg: "bg-purple-500/20", gradient: "rgba(168, 85, 247, 0.5)" },
+  leveling: { text: "text-amber-400", bg: "bg-amber-500/20", gradient: "rgba(251, 191, 36, 0.5)" },
+  reflection: { text: "text-indigo-400", bg: "bg-indigo-500/20", gradient: "rgba(129, 140, 248, 0.5)" },
+  projects: { text: "text-cyan-400", bg: "bg-cyan-500/20", gradient: "rgba(6, 182, 212, 0.5)" },
+  security: { text: "text-red-400", bg: "bg-red-500/20", gradient: "rgba(248, 113, 113, 0.5)" },
+  creativity: { text: "text-pink-400", bg: "bg-pink-500/20", gradient: "rgba(244, 114, 182, 0.5)" },
+  "mindful-tech": { text: "text-emerald-400", bg: "bg-emerald-500/20", gradient: "rgba(52, 211, 153, 0.5)" },
+  quirky: { text: "text-fuchsia-400", bg: "bg-fuchsia-500/20", gradient: "rgba(217, 70, 239, 0.5)" }
 };
 
 // Badge glow by rarity
 export const BADGE_RARITY_EFFECTS = {
-  common: "border-gray-300",
-  uncommon: "border-blue-300 shadow-sm",
-  rare: "border-blue-400 shadow-md",
-  epic: "border-purple-500 shadow-lg animate-pulse",
-  legendary: "border-amber-500 shadow-xl animate-glow"
+  common: {
+    borderColor: "rgba(209, 213, 219, 0.3)",
+    glow: "none",
+    animation: "none"
+  },
+  uncommon: {
+    borderColor: "rgba(59, 130, 246, 0.3)",
+    glow: "0 0 10px rgba(59, 130, 246, 0.3)",
+    animation: "none"
+  },
+  rare: {
+    borderColor: "rgba(124, 58, 237, 0.3)",
+    glow: "0 0 15px rgba(124, 58, 237, 0.3)",
+    animation: "pulse 3s infinite"
+  },
+  epic: {
+    borderColor: "rgba(236, 72, 153, 0.3)",
+    glow: "0 0 20px rgba(236, 72, 153, 0.3)",
+    animation: "pulse 2s infinite"
+  },
+  legendary: {
+    borderColor: "rgba(245, 158, 11, 0.3)",
+    glow: "0 0 25px rgba(245, 158, 11, 0.3)",
+    animation: "pulse 1.5s infinite, rotate 20s linear infinite"
+  }
 };
 
 // Get badge by ID
