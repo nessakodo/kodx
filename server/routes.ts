@@ -200,10 +200,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Update user's total XP if they haven't already earned XP for this project
         if (!existingProgress.isCompleted && existingProgress.xpEarned !== project.xpReward) {
+          // Get current user first
+          const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+          
+          // Then update with calculated new total
           await db
             .update(users)
             .set({ 
-              totalXp: db.raw(`total_xp + ${project.xpReward}`),
+              totalXp: (currentUser?.totalXp || 0) + project.xpReward,
               updatedAt: new Date()
             })
             .where(eq(users.id, userId));
@@ -223,11 +227,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
           .returning();
         
+        // Get current user first
+        const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+        
         // Update user's total XP
         await db
           .update(users)
           .set({ 
-            totalXp: db.raw(`total_xp + ${project.xpReward}`),
+            totalXp: (currentUser?.totalXp || 0) + project.xpReward,
             updatedAt: new Date()
           })
           .where(eq(users.id, userId));
@@ -335,10 +342,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Count comments for each post
       const postsWithCounts = await Promise.all(
         posts.map(async ({ post, user }) => {
-          const [commentsCount] = await db
-            .select({ count: db.fn.count() })
+          // Get the count of comments for this post
+          const comments = await db
+            .select()
             .from(forumComments)
             .where(eq(forumComments.postId, post.id));
+          
+          const commentsCount = { count: comments.length };
           
           return {
             ...post,
@@ -512,7 +522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Decrement post likes count
         const [updated] = await db
           .update(forumPosts)
-          .set({ likes: db.raw(`likes - 1`) })
+          .set({ likes: existingLike ? Math.max(0, (post.likes || 0) - 1) : (post.likes || 0) })
           .where(eq(forumPosts.id, postId))
           .returning();
         
@@ -529,7 +539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Increment post likes count
         const [updated] = await db
           .update(forumPosts)
-          .set({ likes: db.raw(`likes + 1`) })
+          .set({ likes: (post.likes || 0) + 1 })
           .where(eq(forumPosts.id, postId))
           .returning();
         
