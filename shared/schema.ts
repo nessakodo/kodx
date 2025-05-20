@@ -30,6 +30,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   username: varchar("username").unique(),
   email: varchar("email").unique(),
+  password: varchar("password"), // Added password field for local authentication
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),

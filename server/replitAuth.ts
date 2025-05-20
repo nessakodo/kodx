@@ -3,6 +3,8 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { setupPassport, initializeTestUsers } from "./auth";
+import { hashPassword } from "./auth";
 
 // Simple mock authentication for development purposes
 // This will be replaced with proper Replit Auth integration in production
