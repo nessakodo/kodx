@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { DifficultyBadge } from "@/components/ui/difficulty-badge";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon, ArrowRightIcon, BeakerIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -79,15 +80,10 @@ export function LabCard({ lab, className }: LabCardProps) {
         <p className="text-gray-500 mb-4 flex-1">{lab.description}</p>
         
         <div className="flex items-center justify-between">
-          <Badge 
-            className={`text-xs uppercase tracking-wider bg-transparent px-2 py-1 rounded border ${difficultyStyle.border} ${difficultyStyle.text} font-orbitron letter-spacing-wide`}
-          >
-            {difficultyStyle.label}
-          </Badge>
+          <DifficultyBadge level={lab.difficulty} />
           
           <Link href={`/labs/${lab.id}`}>
-            <div className="inline-flex items-center px-3 py-1 rounded bg-[#1e2535]/50 border border-[#9ecfff]/20 
-              text-[#9ecfff] text-sm hover:bg-[#1e2535]/80 hover:border-[#9ecfff]/30 transition-all">
+            <div className="btn-kodex inline-flex items-center px-3 py-1 rounded text-sm">
               {isInProgress ? "Continue" : "Start"} Lab <ArrowRightIcon className="ml-1 h-3 w-3" />
             </div>
           </Link>

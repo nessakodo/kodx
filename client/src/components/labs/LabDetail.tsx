@@ -550,12 +550,14 @@ export function LabDetail() {
               </GlassmorphicCard>
               
               {/* Quiz section */}
-              <QuizSection 
-                quiz={currentSection.quiz.questions}
-                sectionTitle={currentSection.title}
-                onQuizPassed={() => handleQuizPassed(currentSection.id)}
-                minPassPercentage={currentSection.quiz.pass_threshold}
-              />
+              {currentSection && (
+                <QuizSection 
+                  quiz={currentSection.quiz.questions}
+                  sectionTitle={currentSection.title}
+                  onQuizPassed={() => handleQuizPassed(currentSection.id)}
+                  minPassPercentage={currentSection.quiz.pass_threshold}
+                />
+              )}
               
               {/* Notes section */}
               <GlassmorphicCard className="p-6">
