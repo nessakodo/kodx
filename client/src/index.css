@@ -12,6 +12,63 @@
   letter-spacing: 0.1em !important;
 }
 
+/* Badge category colors */
+:root {
+  --labs-color: rgba(99, 102, 241, 0.3);
+  --community-color: rgba(52, 211, 153, 0.3);
+  --meta-color: rgba(168, 85, 247, 0.3);
+  --leveling-color: rgba(251, 191, 36, 0.3);
+  --reflection-color: rgba(129, 140, 248, 0.3);
+  --projects-color: rgba(6, 182, 212, 0.3);
+  --security-color: rgba(248, 113, 113, 0.3);
+  --creativity-color: rgba(244, 114, 182, 0.3);
+  --mindful-tech-color: rgba(52, 211, 153, 0.3);
+  --quirky-color: rgba(217, 70, 239, 0.3);
+}
+
+/* XP Ring glow effect */
+.ring-color-glow circle:nth-child(2) {
+  filter: drop-shadow(0 0 3px rgba(158, 207, 255, 0.5));
+}
+
+/* Badge animations */
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(158, 207, 255, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(158, 207, 255, 0.5); }
+  100% { box-shadow: 0 0 5px rgba(158, 207, 255, 0.3); }
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* Internet Explorer and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Hover glow effect for logo and badges */
+.kodex-logo {
+  position: relative;
+  transition: text-shadow 0.3s ease;
+}
+
+.kodex-logo:hover, .hover-glow:hover {
+  text-shadow: 0 0 8px rgba(158, 207, 255, 0.7);
+}
+
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;

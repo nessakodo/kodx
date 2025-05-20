@@ -1,24 +1,373 @@
 import { useQuery } from "@tanstack/react-query";
-import { XpRingProgress } from "@/components/dashboard/XpRingProgress";
-import { DashboardXPRing } from "@/components/dashboard/DashboardXPRing";
+import { useState } from "react";
+import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+
+// Components
+import { XPRing } from "@/components/dashboard/XPRing";
 import { BadgeSection } from "@/components/dashboard/BadgeSection";
-import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
-import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { ForumActivitySection } from "@/components/dashboard/ForumActivitySection";
+import { ActivitySection } from "@/components/dashboard/ActivitySection";
+import { NotesSection } from "@/components/notes/NotesSection";
+import { LevelUpModal } from "@/components/modals/LevelUpModal";
+import { BadgeModal } from "@/components/modals/BadgeModal";
+
+// UI Components
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/hooks/useAuth";
-import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
-import { Progress } from "@/components/ui/progress";
-import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon, BookmarkIcon } from "lucide-react";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
-import { Link } from "wouter";
+
+// Utils and Constants
+import { calculateLevel, calculateLevelProgress, getXpForNextLevel } from "@shared/constants/levels";
+import { Badge as BadgeType } from "@shared/constants/badges";
+
+// Empty States
+import { 
+  EmptyLabsState, 
+  EmptyProjectsState, 
+  EmptyBadgesState, 
+  EmptyNotesState,
+  EmptyActivityState
+} from "@/components/dashboard/EmptyStates";
+
+// Icons
+import { 
+  Search,
+  BookOpen,
+  ChevronRight,
+  BookOpenCheck,
+  Code,
+  Award,
+  FileText,
+  Activity
+} from "lucide-react";
+
+// Define interfaces for component props and dashboard data
+interface DashboardData {
+  totalXp: number;
+  labProgress: any[];
+  projectProgress: any[];
+  badges: BadgeType[];
+  notes: any[];
+}
+
+// Simple progress interface
+interface Progress {
+  id: number;
+  completedPercent: number;
+  updatedAt?: string;
+  [key: string]: any;
+}
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
+  const [levelUpModalOpen, setLevelUpModalOpen] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState<any>(null);
+  const [badgeModalOpen, setBadgeModalOpen] = useState(false);
   
+  // Fetch dashboard data with user progress
+  const { data: dashboardData = {}, isLoading: isDashboardLoading } = useQuery({
+    queryKey: ['/api/dashboard'],
+    enabled: isAuthenticated,
+  });
+  
+  // Fetch latest badges
+  const { data: userBadges = [], isLoading: isBadgesLoading } = useQuery({
+    queryKey: ['/api/user-badges'],
+    enabled: isAuthenticated,
+  });
+  
+  // Default data if not yet available
+  const defaultData = {
+    totalXp: 0,
+    labProgress: [],
+    projectProgress: [],
+    badges: [],
+    notes: []
+  };
+  
+  // Merge dashboard data with defaults
+  const dashboard = {
+    ...defaultData,
+    ...(dashboardData || {})
+  };
+  
+  // Calculate level and progress
+  const currentXp = dashboard.totalXp || 0;
+  const currentLevel = calculateLevel(currentXp);
+  const progress = calculateLevelProgress(currentXp);
+  
+  // Handle unauthenticated state
+  if (!isAuthenticated) {
+    return (
+      <div className="container max-w-7xl mx-auto py-12">
+        <div className="flex flex-col items-center justify-center text-center">
+          <h2 className="text-2xl font-orbitron text-white mb-6">Sign in to view your dashboard</h2>
+          <p className="text-gray-300 mb-8 max-w-md">Access your personalized learning experience, track progress, and unlock achievements</p>
+          <Link href="/api/login">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              Sign In
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="container max-w-7xl mx-auto py-8">
+      {/* Welcome Section with XP Ring */}
+      <div className="mb-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-orbitron text-white mb-2">
+              Welcome back, <span className="text-blue-400">{user?.username || 'Explorer'}</span>
+            </h1>
+            <p className="text-gray-300 mb-4">
+              Continue your journey toward digital enlightenment
+            </p>
+            
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                variant="outline" 
+                className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20"
+              >
+                <BookOpenCheck className="h-4 w-4 mr-2" />
+                Resume Learning
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
+              >
+                <Code className="h-4 w-4 mr-2" />
+                My Projects
+              </Button>
+              
+              <Button 
+                variant="outline"
+                className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                My Notes
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <XPRing 
+              totalXp={currentXp}
+              size="lg"
+              showTooltip={true}
+            />
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-400">
+                {currentXp} XP Total
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Dashboard Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Progress */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Labs & Projects Progress Tabs */}
+          <Tabs defaultValue="labs" className="w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-orbitron text-2xl text-indigo-300">
+                Your Progress
+              </h2>
+              <TabsList className="bg-[#0f172a] border border-[#1e293b]">
+                <TabsTrigger 
+                  value="labs"
+                  className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+                >
+                  Labs
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="projects"
+                  className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white"
+                >
+                  Projects
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="labs">
+              {isDashboardLoading ? (
+                <Card className="border border-[#1e293b] bg-[#0c1527]/50 p-6">
+                  <div className="space-y-4">
+                    {[1, 2].map(i => (
+                      <div key={i} className="flex">
+                        <div className="w-full">
+                          <div className="h-6 bg-[#1e293b]/50 rounded mb-2 w-3/4 animate-pulse" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-1 animate-pulse" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-1 animate-pulse w-2/3" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-3 w-1/2 animate-pulse" />
+                          <div className="h-2 bg-[#1e293b]/50 rounded w-full animate-pulse" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ) : dashboard.labProgress && dashboard.labProgress.length > 0 ? (
+                <Card className="border border-[#1e293b] bg-[#0c1527]/50">
+                  <div className="divide-y divide-[#1e293b]">
+                    {dashboard.labProgress.map((progress: any) => (
+                      <div key={progress.id} className="p-6">
+                        <div className="mb-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-medium text-white">{progress.lab?.title || 'Unknown Lab'}</h3>
+                            <Badge className="bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                              {progress.completedPercent}% Complete
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-300 mb-3">{progress.lab?.description || 'No description available'}</p>
+                        </div>
+                        
+                        <div className="w-full bg-[#1e293b] rounded-full h-2 mb-3">
+                          <div 
+                            className="bg-indigo-600 h-2 rounded-full" 
+                            style={{ width: `${progress.completedPercent}%` }}
+                          />
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-400">
+                            Last activity: {progress.updatedAt ? new Date(progress.updatedAt).toLocaleDateString() : 'Never'}
+                          </span>
+                          <Link href={`/labs/${progress.labId}`}>
+                            <Button 
+                              size="sm"
+                              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                            >
+                              Continue
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="p-4 border-t border-[#1e293b] text-center">
+                    <Link href="/labs">
+                      <Button variant="outline" className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20">
+                        Explore More Labs
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              ) : (
+                <EmptyLabsState />
+              )}
+            </TabsContent>
+            
+            <TabsContent value="projects">
+              {isDashboardLoading ? (
+                <Card className="border border-[#1e293b] bg-[#0c1527]/50 p-6">
+                  <div className="space-y-4">
+                    {[1, 2].map(i => (
+                      <div key={i} className="flex">
+                        <div className="w-full">
+                          <div className="h-6 bg-[#1e293b]/50 rounded mb-2 w-3/4 animate-pulse" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-1 animate-pulse" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-1 animate-pulse w-2/3" />
+                          <div className="h-4 bg-[#1e293b]/50 rounded mb-3 w-1/2 animate-pulse" />
+                          <div className="h-2 bg-[#1e293b]/50 rounded w-full animate-pulse" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ) : dashboard.projectProgress && dashboard.projectProgress.length > 0 ? (
+                <Card className="border border-[#1e293b] bg-[#0c1527]/50">
+                  <div className="divide-y divide-[#1e293b]">
+                    {dashboard.projectProgress.map((progress: any) => (
+                      <div key={progress.id} className="p-6">
+                        <div className="mb-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-medium text-white">{progress.project?.title || 'Unknown Project'}</h3>
+                            <Badge className="bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
+                              {progress.completedPercent}% Complete
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-300 mb-3">{progress.project?.description || 'No description available'}</p>
+                        </div>
+                        
+                        <div className="w-full bg-[#1e293b] rounded-full h-2 mb-3">
+                          <div 
+                            className="bg-cyan-600 h-2 rounded-full" 
+                            style={{ width: `${progress.completedPercent}%` }}
+                          />
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-400">
+                            Last activity: {progress.updatedAt ? new Date(progress.updatedAt).toLocaleDateString() : 'Never'}
+                          </span>
+                          <Link href={`/projects/${progress.projectId}`}>
+                            <Button 
+                              size="sm"
+                              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                            >
+                              Continue
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="p-4 border-t border-[#1e293b] text-center">
+                    <Link href="/projects">
+                      <Button variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20">
+                        Explore More Projects
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              ) : (
+                <EmptyProjectsState />
+              )}
+            </TabsContent>
+          </Tabs>
+          
+          {/* Badges Section */}
+          <BadgeSection badges={userBadges} isLoading={isBadgesLoading} />
+          
+          {/* Notes Section */}
+          <NotesSection limit={3} />
+        </div>
+        
+        {/* Right Column - Activity & Forum */}
+        <div className="space-y-8">
+          {/* Activity Section */}
+          <ActivitySection limit={4} />
+          
+          {/* Forum Activity */}
+          <ForumActivitySection />
+        </div>
+      </div>
+      
+      {/* Modals */}
+      <LevelUpModal 
+        level={currentLevel} 
+        open={levelUpModalOpen} 
+        onOpenChange={setLevelUpModalOpen} 
+      />
+      
+      <BadgeModal 
+        badge={selectedBadge} 
+        open={badgeModalOpen} 
+        onOpenChange={setBadgeModalOpen} 
+      />
+    </div>
+  );
+}
   // Fetch dashboard data
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ["/api/dashboard"],
@@ -31,8 +380,15 @@ export function UserDashboard() {
     enabled: isAuthenticated,
   });
   
-  // Use mock data when no real data is available
-  const display = dashboardData || MOCK_DASHBOARD_DATA;
+  // Check if user is new (no progress data yet)
+  const isNewUser = !dashboardData || (
+    (!dashboardData.labProgress || dashboardData.labProgress.length === 0) &&
+    (!dashboardData.projectProgress || dashboardData.projectProgress.length === 0) &&
+    (!dashboardData.badges || dashboardData.badges.length === 0)
+  );
+  
+  // Use appropriate data based on user status
+  const display = dashboardData || (isNewUser ? EMPTY_DASHBOARD_DATA : MOCK_DASHBOARD_DATA);
   
   // Calculate level and progress
   const level = calculateLevel(user?.totalXp || 0);
@@ -99,6 +455,8 @@ export function UserDashboard() {
                   </div>
                 ))}
               </div>
+            ) : isNewUser ? (
+              <EmptyActivityState />
             ) : (
               <div className="space-y-3">
                 <div className="flex items-start gap-3 py-2 border-b border-gray-800">
@@ -180,17 +538,7 @@ export function UserDashboard() {
                     />
                   ))
                 ) : (
-                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
-                    <p className="text-gray-400 mb-6 text-center">You haven't started any labs yet. Explore our labs to begin your journey!</p>
-                    <Link href="/labs">
-                      <Button 
-                        variant="outline"
-                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
-                      >
-                        Browse Labs
-                      </Button>
-                    </Link>
-                  </div>
+                  <EmptyLabsState />
                 )}
               </div>
             </TabsContent>
@@ -217,17 +565,7 @@ export function UserDashboard() {
                     />
                   ))
                 ) : (
-                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
-                    <p className="text-gray-400 mb-6 text-center">You haven't started any projects yet. Take on a project challenge!</p>
-                    <Link href="/projects">
-                      <Button 
-                        variant="outline"
-                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
-                      >
-                        Browse Projects
-                      </Button>
-                    </Link>
-                  </div>
+                  <EmptyProjectsState />
                 )}
               </div>
             </TabsContent>
@@ -250,7 +588,7 @@ export function UserDashboard() {
       <section className="mb-8">
         <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
           <BookOpenIcon className="h-5 w-5 text-[#9ecfff]" />
-          Your Notes
+          Your Reflections
         </h2>
         <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
           {isLoading ? (
@@ -258,7 +596,7 @@ export function UserDashboard() {
               <Skeleton className="h-20 w-full" />
               <Skeleton className="h-20 w-full" />
             </div>
-          ) : (
+          ) : display.reflections && display.reflections.length > 0 ? (
             <>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -290,10 +628,12 @@ export function UserDashboard() {
               
               <div className="p-4 flex justify-center">
                 <Button variant="outline" className="btn-kodex">
-                  Show More Notes <ChevronDownIcon className="h-4 w-4 ml-1" />
+                  Show More Reflections <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </div>
             </>
+          ) : (
+            <EmptyReflectionsState />
           )}
         </div>
       </section>
@@ -303,21 +643,24 @@ export function UserDashboard() {
           <MessageSquareIcon className="h-5 w-5 text-[#9ecfff]" />
           Your Forum Activity
         </h2>
-        <Tabs defaultValue="posts" className="h-full">
-          <TabsList className="grid grid-cols-2 bg-[#1e293b]/30 mb-4 w-[240px]">
-            <TabsTrigger 
-              value="posts"
-              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
-            >
-              Your Posts
-            </TabsTrigger>
-            <TabsTrigger 
-              value="saved"
-              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
-            >
-              Saved Posts
-            </TabsTrigger>
-          </TabsList>
+        {isNewUser ? (
+          <EmptyForumActivityState />
+        ) : (
+          <Tabs defaultValue="posts" className="h-full">
+            <TabsList className="grid grid-cols-2 bg-[#1e293b]/30 mb-4 w-[240px]">
+              <TabsTrigger 
+                value="posts"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Your Posts
+              </TabsTrigger>
+              <TabsTrigger 
+                value="saved"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Saved Posts
+              </TabsTrigger>
+            </TabsList>
           
           <TabsContent value="posts" className="h-full">
             <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
@@ -460,6 +803,7 @@ export function UserDashboard() {
             </div>
           </TabsContent>
         </Tabs>
+        )}
       </section>
       
       <section>

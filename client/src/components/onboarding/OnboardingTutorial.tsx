@@ -1,301 +1,125 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import { useAuth } from '@/hooks/useAuth';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { 
-  BookOpen, 
-  Code, 
-  Award, 
-  Lightbulb, 
-  Shield, 
-  Brain, 
-  Users,
-  CheckCircle2,
-  ArrowRight,
-  ArrowLeft,
-  Settings
-} from 'lucide-react';
+import { ONBOARDING_STEPS } from '@shared/constants/onboarding';
 
-const avatarOptions = [
-  { id: 'default', image: '/avatars/default.png', name: 'Default' },
-  { id: 'cyber1', image: '/avatars/cyber1.png', name: 'Cyber 1' },
-  { id: 'cyber2', image: '/avatars/cyber2.png', name: 'Cyber 2' },
-  { id: 'zen1', image: '/avatars/zen1.png', name: 'Zen 1' },
-  { id: 'zen2', image: '/avatars/zen2.png', name: 'Zen 2' },
-  { id: 'tech1', image: '/avatars/tech1.png', name: 'Tech 1' },
-  { id: 'tech2', image: '/avatars/tech2.png', name: 'Tech 2' },
-  { id: 'balance1', image: '/avatars/balance1.png', name: 'Balance 1' },
-];
+interface OnboardingTutorialProps {
+  isOpen: boolean;
+  onComplete: () => void;
+  onSkip: () => void;
+}
 
-const OnboardingTutorial: React.FC = () => {
+export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({ 
+  isOpen,
+  onComplete,
+  onSkip
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [open, setOpen] = useState(true);
-  const [selectedAvatar, setSelectedAvatar] = useState('default');
-  const [customUsername, setCustomUsername] = useState('');
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const { user } = useAuth();
   const [, setLocation] = useLocation();
-
-  // Complete onboarding mutation
-  const { mutate: completeOnboarding, isPending } = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/user/onboarding', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      setOpen(false);
+  
+  useEffect(() => {
+    // Reset to first step when modal opens
+    if (isOpen) {
+      setCurrentStep(0);
     }
-  });
-
-  const steps = [
-    {
-      title: "Welcome to KODΞX",
-      description: "Your journey into mindful technology begins here. Let's get you set up with a few quick steps.",
-      content: (
-        <div className="text-center space-y-6 py-4">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] rounded-full flex items-center justify-center">
-            <Shield className="w-12 h-12 text-white" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold">Digital Security & Mindful Tech</h3>
-            <p className="text-gray-400 max-w-md mx-auto">
-              KODΞX is your guide to mastering digital security while maintaining a balanced relationship with technology.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Choose Your Avatar",
-      description: "Select an avatar that represents you in the digital realm.",
-      content: (
-        <div className="py-4">
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {avatarOptions.map((avatar) => (
-              <div 
-                key={avatar.id}
-                className={`relative cursor-pointer transition-all ${
-                  selectedAvatar === avatar.id 
-                    ? 'scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background' 
-                    : 'opacity-70 hover:opacity-100'
-                }`}
-                onClick={() => setSelectedAvatar(avatar.id)}
-              >
-                <Avatar className="w-16 h-16 mx-auto">
-                  <AvatarImage src={avatar.image} />
-                  <AvatarFallback>{avatar.name[0]}</AvatarFallback>
-                </Avatar>
-                {selectedAvatar === avatar.id && (
-                  <CheckCircle2 className="w-5 h-5 text-primary absolute -top-2 -right-2" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Personalize Your Profile",
-      description: "You can customize your username or keep your current one.",
-      content: (
-        <div className="py-4 space-y-4">
-          <div className="flex items-center space-x-4">
-            <Avatar className="w-16 h-16">
-              <AvatarImage src={avatarOptions.find(a => a.id === selectedAvatar)?.image} />
-              <AvatarFallback>{user?.username?.[0] || '?'}</AvatarFallback>
-            </Avatar>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input 
-                id="username" 
-                placeholder={user?.username || "Your username"} 
-                value={customUsername}
-                onChange={(e) => setCustomUsername(e.target.value)}
-                className="max-w-xs"
-              />
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Your Interests",
-      description: "Select topics you're interested in exploring on KODΞX.",
-      content: (
-        <div className="py-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { id: 'security', label: 'Digital Security', icon: <Shield className="w-4 h-4 mr-2" /> },
-              { id: 'mindfulness', label: 'Tech Mindfulness', icon: <Brain className="w-4 h-4 mr-2" /> },
-              { id: 'coding', label: 'Coding & Projects', icon: <Code className="w-4 h-4 mr-2" /> },
-              { id: 'privacy', label: 'Privacy Protection', icon: <Lightbulb className="w-4 h-4 mr-2" /> },
-              { id: 'community', label: 'Community Learning', icon: <Users className="w-4 h-4 mr-2" /> },
-              { id: 'achievements', label: 'Achievements & Growth', icon: <Award className="w-4 h-4 mr-2" /> },
-            ].map((interest) => (
-              <div key={interest.id} className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  id={interest.id}
-                  checked={selectedInterests.includes(interest.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedInterests([...selectedInterests, interest.id]);
-                    } else {
-                      setSelectedInterests(selectedInterests.filter(i => i !== interest.id));
-                    }
-                  }}
-                  className="rounded text-primary border-gray-700 bg-gray-800 focus:ring-primary"
-                />
-                <Label 
-                  htmlFor={interest.id}
-                  className="flex items-center cursor-pointer font-normal"
-                >
-                  {interest.icon}
-                  {interest.label}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Let's Begin",
-      description: "You're all set to start your journey with KODΞX.",
-      content: (
-        <div className="py-4 space-y-6 text-center">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] rounded-full flex items-center justify-center">
-            <CheckCircle2 className="w-12 h-12 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold mb-2">Ready to explore?</h3>
-            <p className="text-gray-400 max-w-md mx-auto">
-              You'll find labs, projects, and a community ready to support your growth. Earn badges and XP as you progress!
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
-            <div className="text-center">
-              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
-                <BookOpen className="w-6 h-6 text-blue-400" />
-              </div>
-              <p className="text-sm">Interactive Labs</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
-                <Code className="w-6 h-6 text-green-400" />
-              </div>
-              <p className="text-sm">Hands-on Projects</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
-                <Award className="w-6 h-6 text-purple-400" />
-              </div>
-              <p className="text-sm">Earn Badges</p>
-            </div>
-          </div>
-        </div>
-      )
-    }
-  ];
-
+  }, [isOpen]);
+  
+  if (!isOpen) return null;
+  
+  const step = ONBOARDING_STEPS[currentStep];
+  
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+    if (currentStep < ONBOARDING_STEPS.length - 1) {
+      setCurrentStep(prev => prev + 1);
     } else {
-      // Submit onboarding data
-      completeOnboarding({
-        avatarId: selectedAvatar,
-        username: customUsername || undefined,
-        interests: selectedInterests
-      });
+      // Complete onboarding
+      onComplete();
     }
   };
-
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  
+  const handleActionClick = () => {
+    // Handle navigation based on action (optional)
+    switch (step.action) {
+      case "Explore Labs":
+        onComplete();
+        setLocation('/labs');
+        break;
+      case "See Projects":
+        onComplete();
+        setLocation('/projects');
+        break;
+      case "Visit Forum":
+        onComplete();
+        setLocation('/forum');
+        break;
+      case "View Resources":
+        onComplete();
+        setLocation('/resources');
+        break;
+      default:
+        handleNext();
     }
   };
-
-  const handleSkip = () => {
-    completeOnboarding({
-      completed: true
-    });
-  };
-
+  
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md sm:max-w-lg border-0 bg-black/30 backdrop-blur-xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-            {steps[currentStep].title}
-          </DialogTitle>
-          <DialogDescription>
-            {steps[currentStep].description}
-          </DialogDescription>
-        </DialogHeader>
-
-        {steps[currentStep].content}
-
-        <DialogFooter className="flex justify-between items-center">
-          <div>
-            {currentStep > 0 && (
-              <Button
-                variant="ghost"
-                onClick={handlePrevious}
-                disabled={isPending}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 backdrop-blur-sm">
+      <div className="animate-fade-in relative max-w-lg w-full rounded-xl overflow-hidden">
+        {/* Cyber-zen background with layered effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] to-[#0f1729] z-0"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJncmlkIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMjAgMCBMIDAgMCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxZjJlNDkiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIiAvPjwvc3ZnPg==')] opacity-20 z-1"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#9ecfff]/5 via-transparent to-transparent z-2"></div>
+        
+        {/* Glowing border */}
+        <div className="absolute inset-0 rounded-xl border border-[#9ecfff]/30 z-3 
+          shadow-[0_0_15px_rgba(158,207,255,0.1)]"></div>
+        
+        <div className="relative z-10 p-6 md:p-8">
+          {/* Progress indicator */}
+          <div className="w-full flex items-center justify-between mb-6">
+            <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] rounded-full transition-all duration-500"
+                style={{ width: `${((currentStep + 1) / ONBOARDING_STEPS.length) * 100}%` }}
+              ></div>
+            </div>
+            <span className="ml-4 text-gray-400 text-sm">
+              {currentStep + 1}/{ONBOARDING_STEPS.length}
+            </span>
           </div>
-          <div className="flex gap-2">
-            {currentStep < steps.length - 1 && (
-              <Button
-                variant="ghost"
-                onClick={handleSkip}
-                disabled={isPending}
+          
+          {/* Content */}
+          <div className="mb-8">
+            <h2 className="font-orbitron text-2xl text-[#9ecfff] mb-3">{step.title}</h2>
+            <p className="text-gray-300">{step.body}</p>
+          </div>
+          
+          {/* Navigation */}
+          <div className="flex justify-between items-center">
+            {step.skippable ? (
+              <button 
+                onClick={onSkip}
+                className="text-sm text-gray-400 hover:text-white transition-colors"
               >
-                Skip
-              </Button>
+                Skip Tour
+              </button>
+            ) : (
+              <div></div> // Empty div for spacing
             )}
-            <Button
-              onClick={handleNext}
-              disabled={isPending}
-              className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90"
+            
+            <button
+              onClick={handleActionClick}
+              className="relative overflow-hidden px-6 py-2.5 rounded-lg font-medium 
+                text-white transition-all duration-300
+                bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90"
             >
-              {currentStep === steps.length - 1 ? (
-                isPending ? "Saving..." : "Start Exploring"
-              ) : (
-                <>
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+              {/* Subtle glow behind button */}
+              <span className="absolute inset-0 flex justify-center items-center blur-sm opacity-50 bg-[#9ecfff]"></span>
+              
+              {/* Button content */}
+              <span className="relative z-10">{step.action}</span>
+            </button>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 };
-
-export default OnboardingTutorial;

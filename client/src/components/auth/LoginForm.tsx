@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,19 +37,21 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsLoading(true);
     
     try {
-      const result = await apiRequest("/api/login", {
+      const response = await apiRequest("/api/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
       });
+      
+      const result = await response.json();
       
       if (result.success) {
         toast({
           title: "Login Successful",
-          description: "Welcome back to KODΞX",
+          description: "Welcome back to KOD-X WORLD!",
         });
-        
-        // Refresh user data
-        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
         
         // Call the onSuccess callback if provided
         if (onSuccess) {
@@ -57,7 +59,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         }
         
         // Navigate to dashboard after successful login
-        setLocation("/dashboard");
+        navigate("/dashboard");
       } else {
         toast({
           title: "Login Failed",
@@ -158,7 +160,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             className="text-blue-500 hover:text-blue-400"
             onClick={(e) => {
               e.preventDefault();
-              setLocation("/signup");
+              navigate("/signup");
             }}
           >
             Create an account

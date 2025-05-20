@@ -82,7 +82,8 @@ export function Header() {
   // Handle logout
   const handleLogout = () => {
     setUserMenuOpen(false);
-    window.location.href = "/api/logout";
+    // Use direct navigation to API logout endpoint
+    window.location.href = '/api/logout';
   };
 
   // Handle admin login test
@@ -207,6 +208,25 @@ export function Header() {
                         </div>
                       </Link>
                       
+                      {/* Show Admin Panel option only for admin users */}
+                      {user?.role === 'admin' && (
+                        <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
+                          <Link 
+                            href="/admin"
+                            className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                              <ShieldIcon className="h-4 w-4 text-[#9ecfff]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <div className="font-medium">Admin Panel</div>
+                              <div className="text-xs text-gray-500">Manage KOD-X WORLD</div>
+                            </div>
+                          </Link>
+                        </div>
+                      )}
+                      
                       <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
                         <button 
                           className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#ff9e9e]/10 hover:text-[#ff9e9e] transition-colors"
@@ -218,21 +238,6 @@ export function Header() {
                           <div className="flex-1 text-left">
                             <div className="font-medium">Sign Out</div>
                             <div className="text-xs text-gray-500">End your current session</div>
-                          </div>
-                        </button>
-                      </div>
-                      
-                      <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
-                        <button 
-                          className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
-                          onClick={handleAdminTest}
-                        >
-                          <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
-                            <ShieldIcon className="h-4 w-4 text-[#9ecfff]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="font-medium">Admin Test</div>
-                            <div className="text-xs text-gray-500">Test admin panel</div>
                           </div>
                         </button>
                       </div>
