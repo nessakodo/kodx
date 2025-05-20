@@ -86,7 +86,7 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
             </div>
           </div>
           <Badge 
-            className="forum-tag bg-[#1e293b]/60 text-gray-300 border border-[#1e293b] text-xs px-2 py-1 rounded-full hover:border-[#9ecfff]/20 transition-all uppercase tracking-wider"
+            className={`forum-tag tag-${post.category.toLowerCase()} text-xs px-2 py-1 rounded-full uppercase tracking-wider`}
           >
             {post.category}
           </Badge>

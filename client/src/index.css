@@ -235,10 +235,39 @@ html, body {
   padding: 0.25rem 0.5rem;
   border-radius: 9999px;
   transition: all 0.2s ease;
+  position: relative;
 }
 
-.forum-tag:hover {
-  border-color: rgba(158, 207, 255, 0.2);
+.forum-tag:hover, .forum-tag:focus {
+  border-color: rgba(158, 207, 255, 0.4);
+  box-shadow: 0 0 8px rgba(158, 207, 255, 0.3);
+  text-shadow: 0 0 4px rgba(158, 207, 255, 0.3);
+}
+
+/* Category-specific tag colors */
+.tag-discussion {
+  border-color: rgba(158, 207, 255, 0.3);
+  color: #9ecfff;
+}
+
+.tag-question {
+  border-color: rgba(111, 207, 151, 0.3);
+  color: #6fcf97;
+}
+
+.tag-devlog {
+  border-color: rgba(177, 102, 255, 0.3);
+  color: #b166ff;
+}
+
+.tag-announcement {
+  border-color: rgba(255, 184, 108, 0.3);
+  color: #ffb86c;
+}
+
+.tag-resource {
+  border-color: rgba(207, 102, 121, 0.3);
+  color: #cf6679;
 }
 
 /* Consistent card styles */

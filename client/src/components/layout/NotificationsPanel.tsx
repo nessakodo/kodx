@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { KodexModal } from "@/components/ui/kodex-modal";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { BellIcon, CheckIcon, CalendarIcon, BookIcon, AwardIcon, MessageSquareIcon } from "lucide-react";
+import { BellIcon, CheckIcon, CalendarIcon, BookIcon, AwardIcon, MessageSquareIcon, ArrowRightIcon } from "lucide-react";
 import { Link } from "wouter";
 
 interface Notification {
@@ -69,10 +68,10 @@ const mockNotifications: Notification[] = [
   }
 ];
 
-export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps) {
+export function NotificationsPanel({ isOpen, onClose, positionElement }: NotificationsPanelProps & { positionElement?: HTMLElement }) {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [currentPage, setCurrentPage] = useState(1);
-  const notificationsPerPage = 5;
+  const notificationsPerPage = 3;
   
   const unreadCount = notifications.filter(n => !n.read).length;
   
@@ -146,9 +145,14 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
       onClose={onClose}
       title="Notifications"
       size="sm"
+      position={{
+        element: positionElement,
+        placement: "bottom",
+        offset: 5
+      }}
     >
-      <div className="space-y-4">
-        <div className="flex justify-between items-center mb-4">
+      <div className="space-y-3 max-h-[80vh]">
+        <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="bg-[#1e2535]/70 text-white px-2 py-1">
               {unreadCount} New
@@ -170,12 +174,12 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
           </Button>
         </div>
         
-        <div className="divide-y divide-[#1e2535]">
+        <div className="divide-y divide-[#1e2535] max-h-[50vh] overflow-y-auto">
           {currentNotifications.length > 0 ? (
             currentNotifications.map(notification => (
               <div
                 key={notification.id}
-                className={`py-3 ${!notification.read ? 'bg-[#1e2535]/30' : ''} transition-colors`}
+                className={`py-3 ${!notification.read ? 'bg-[#1e2535]/30' : ''} transition-colors cursor-pointer hover:bg-[#1e2535]/60`}
                 onClick={() => markAsRead(notification.id)}
               >
                 <div className="flex gap-3">
@@ -198,9 +202,13 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
                     </p>
                     {notification.link && (
                       <Link href={notification.link}>
-                        <a className="text-xs text-[#9ecfff] hover:underline">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 px-2 py-0 text-xs text-[#9ecfff] hover:text-white"
+                        >
                           View details
-                        </a>
+                        </Button>
                       </Link>
                     )}
                     {!notification.read && (
@@ -221,7 +229,7 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
         </div>
         
         {totalPages > 1 && (
-          <div className="flex justify-center gap-2 pt-3 mt-3 border-t border-[#1e2535]">
+          <div className="flex justify-center gap-2 pt-2 mt-2 border-t border-[#1e2535]">
             {Array.from({ length: totalPages }).map((_, index) => (
               <Button
                 key={index}
@@ -240,26 +248,16 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
           </div>
         )}
         
-        <div className="flex justify-center pt-2 mt-2">
+        <div className="flex justify-center pt-2 border-t border-[#1e2535]">
           <Link href="/dashboard/notifications">
-            <a className="text-sm text-[#9ecfff] hover:underline flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 text-sm text-[#9ecfff] hover:text-white flex items-center gap-1"
+            >
               View all in dashboard
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-1 h-3 w-3"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </a>
+              <ArrowRightIcon className="h-3 w-3" />
+            </Button>
           </Link>
         </div>
       </div>

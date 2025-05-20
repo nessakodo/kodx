@@ -111,7 +111,7 @@ export default function ForumPage() {
                 <div className="flex flex-wrap gap-2">
                   {searchTerm && (
                     <Badge 
-                      className="forum-tag flex items-center gap-1 cursor-pointer"
+                      className="forum-tag tag-question flex items-center gap-1 cursor-pointer"
                       onClick={() => setSearchTerm("")}
                     >
                       Search: {searchTerm}
@@ -120,7 +120,7 @@ export default function ForumPage() {
                   )}
                   {categoryFilter && (
                     <Badge 
-                      className="forum-tag flex items-center gap-1 cursor-pointer"
+                      className={`forum-tag tag-${categoryFilter.toLowerCase()} flex items-center gap-1 cursor-pointer`}
                       onClick={() => setCategoryFilter("")}
                     >
                       Category: {categoryFilter}

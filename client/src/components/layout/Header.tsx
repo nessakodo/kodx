@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,6 +7,7 @@ import { BellIcon, LogOutIcon, MenuIcon, SettingsIcon, XIcon } from "lucide-reac
 import { NotificationsPanel } from "./NotificationsPanel";
 import { calculateLevel } from "@/lib/utils";
 import { KodexModal } from "@/components/ui/kodex-modal";
+import { Badge } from "@/components/ui/badge";
 
 export function Header() {
   const { user, isAuthenticated } = useAuth();
@@ -17,6 +18,9 @@ export function Header() {
   
   // Mocked unread notifications count - would come from the API in a real app
   const [unreadNotifications, setUnreadNotifications] = useState(3);
+  
+  // Ref for notification bell button to position the dropdown
+  const notificationBellRef = useRef<HTMLButtonElement>(null);
   
   // Close menus when clicking outside
   useEffect(() => {
@@ -62,8 +66,8 @@ export function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/">
-              <span className="font-orbitron text-xl tracking-wider bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent">
-                KOD<span className="text-white">•</span>X
+              <span className="font-orbitron text-xl tracking-wider bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent hover-glow kodex-logo">
+                KOD<span className="text-[#9ecfff]">•</span>X
               </span>
             </Link>
           </div>
@@ -91,16 +95,19 @@ export function Header() {
               <>
                 {/* Notifications Button */}
                 <Button
+                  ref={notificationBellRef}
                   variant="ghost"
                   size="icon"
                   className="relative"
                   onClick={() => {
-                    setNotificationsOpen(true);
+                    setNotificationsOpen(!notificationsOpen);
                   }}
                 >
                   <BellIcon className="h-5 w-5" />
                   {unreadNotifications > 0 && (
-                    <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-[#9ecfff]"></span>
+                    <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-[#9ecfff] text-[0.6rem]">
+                      {unreadNotifications}
+                    </Badge>
                   )}
                 </Button>
                 
@@ -221,6 +228,7 @@ export function Header() {
           // When closed, mark all as read
           setUnreadNotifications(0);
         }}
+        positionElement={notificationBellRef.current}
       />
     </header>
   );

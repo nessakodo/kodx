@@ -1,93 +1,151 @@
-import React, { useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useState, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface KodexModalProps {
+export interface KodexModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  title: string;
+  size?: "sm" | "md" | "lg" | "full";
+  showCloseButton?: boolean;
+  position?: {
+    element?: HTMLElement;
+    placement?: "top" | "bottom" | "left" | "right";
+    offset?: number;
+  };
   children: React.ReactNode;
   className?: string;
-  size?: "sm" | "md" | "lg" | "full";
 }
 
 export function KodexModal({
   isOpen,
   onClose,
   title,
+  size = "md",
+  showCloseButton = true,
+  position,
   children,
   className,
-  size = "md",
 }: KodexModalProps) {
+  const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   
-  // Handle click outside to close
+  // Size classes based on the size prop
+  const sizeClasses = {
+    sm: "max-w-md",
+    md: "max-w-lg",
+    lg: "max-w-2xl",
+    full: "max-w-[95vw] sm:max-w-[90vw] h-[90vh]",
+  };
+  
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+    setMounted(true);
+    
+    // Add ESC key listener for closing the modal
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
     
-    // Handle escape key to close
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-    
+    // Prevent scrolling when modal is open
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscKey);
-      // Prevent scrolling when modal is open
+      document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
     }
     
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-      // Restore scrolling when modal is closed
+      document.removeEventListener("keydown", handleEsc);
       document.body.style.overflow = "auto";
     };
   }, [isOpen, onClose]);
   
-  // Size classes
-  const sizeClasses = {
-    sm: "max-w-md",
-    md: "max-w-2xl",
-    lg: "max-w-4xl",
-    full: "max-w-none w-full h-full rounded-none",
+  // Calculate position based on the trigger element
+  const getPositionStyles = () => {
+    if (!position?.element || !mounted) return {};
+    
+    const rect = position.element.getBoundingClientRect();
+    const offset = position.offset || 8;
+    
+    switch (position.placement) {
+      case "top":
+        return {
+          bottom: `${window.innerHeight - rect.top + offset}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: "translateX(-50%)",
+        };
+      case "right":
+        return {
+          left: `${rect.right + offset}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: "translateY(-50%)",
+        };
+      case "left":
+        return {
+          right: `${window.innerWidth - rect.left + offset}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: "translateY(-50%)",
+        };
+      case "bottom":
+      default:
+        return {
+          top: `${rect.bottom + offset}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: "translateX(-50%)",
+        };
+    }
   };
   
-  if (!isOpen) return null;
+  if (!mounted) return null;
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div 
+    <div 
+      className={`fixed inset-0 z-50 flex ${
+        position ? "items-start" : "items-center"
+      } justify-center ${isOpen ? "visible" : "invisible"}`}
+      aria-modal="true"
+      role="dialog"
+    >
+      {/* Backdrop overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 ${
+          isOpen ? "animate-in fade-in-0" : "animate-out fade-out-0"
+        } transition-opacity duration-200`}
+        onClick={onClose}
+      />
+      
+      {/* Modal content */}
+      <div
         ref={modalRef}
         className={cn(
-          "relative flex flex-col bg-[#0e1424]/95 border border-[#9ecfff]/20 shadow-lg",
-          "rounded-lg overflow-hidden animate-in fade-in-50 duration-300",
+          "kodex-modal",
           sizeClasses[size],
+          "w-full max-h-[90vh] overflow-auto flex flex-col",
+          "transition-all duration-200",
+          isOpen
+            ? "animate-in fade-in-0 zoom-in-95"
+            : "animate-out fade-out-0 zoom-out-95",
+          position ? "absolute" : "relative",
           className
         )}
+        style={position ? getPositionStyles() : {}}
       >
-        <div className="flex items-center justify-between p-4 border-b border-[#9ecfff]/10">
-          {title && (
-            <h2 className="font-orbitron text-lg tracking-wider">{title}</h2>
+        {/* Modal header */}
+        <div className="kodex-modal-header flex items-center justify-between">
+          <h2 className="text-lg font-orbitron text-white">{title}</h2>
+          {showCloseButton && (
+            <button
+              className="kodex-modal-close"
+              onClick={onClose}
+              aria-label="Close modal"
+            >
+              <X className="h-4 w-4" />
+            </button>
           )}
-          <button
-            onClick={onClose}
-            className="ml-auto flex items-center justify-center rounded-full w-8 h-8 transition-colors hover:bg-[#9ecfff]/10"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
         
-        <div className="p-4 overflow-auto">
-          {children}
-        </div>
+        {/* Modal body */}
+        <div className="flex-1 overflow-auto">{children}</div>
       </div>
     </div>
   );
