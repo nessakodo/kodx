@@ -1,225 +1,169 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { calculateLevel, calculateLevelProgress, getXpForNextLevel } from '@shared/constants/levels';
+import React, { useState } from 'react';
 import { 
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger 
 } from '@/components/ui/tooltip';
+import { calculateLevel, calculateLevelProgress, getXpForNextLevel } from '@shared/constants/levels';
 
 interface XPRingProps {
   totalXp: number;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  showLevel?: boolean;
   showTooltip?: boolean;
+  showLevel?: boolean;
   className?: string;
-  onLevelUp?: (level: number) => void;
 }
 
 export function XPRing({ 
-  totalXp = 0, 
-  size = 'md', 
-  showLevel = true,
+  totalXp, 
+  size = 'md',
   showTooltip = true,
-  className = '',
-  onLevelUp
+  showLevel = true,
+  className = ''
 }: XPRingProps) {
-  const [prevXp, setPrevXp] = useState(totalXp);
-  const [isLevelingUp, setIsLevelingUp] = useState(false);
-  const [animationPercent, setAnimationPercent] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
   
   // Calculate level and progress
-  const level = calculateLevel(totalXp);
+  const currentLevel = calculateLevel(totalXp);
   const progress = calculateLevelProgress(totalXp);
-  const xpForNext = getXpForNextLevel(totalXp);
-  const xpNeeded = xpForNext - totalXp;
+  const nextLevelXp = getXpForNextLevel(currentLevel);
+  const currentLevelXp = nextLevelXp - Math.ceil(nextLevelXp * (progress / 100));
+  const xpToNextLevel = nextLevelXp - currentLevelXp;
   
-  // Size mappings
-  const sizeMap = {
+  // Size configurations
+  const sizeConfig = {
     sm: {
-      width: 40,
-      strokeWidth: 3,
-      fontSize: 'text-xs',
-      padding: 'p-1'
+      ring: 'w-16 h-16',
+      fontSize: 'text-lg',
+      strokeWidth: 4,
+      levelFontSize: 'text-xs'
     },
     md: {
-      width: 60,
-      strokeWidth: 4,
-      fontSize: 'text-sm',
-      padding: 'p-2'
+      ring: 'w-24 h-24',
+      fontSize: 'text-2xl',
+      strokeWidth: 5,
+      levelFontSize: 'text-sm'
     },
     lg: {
-      width: 80,
-      strokeWidth: 5,
-      fontSize: 'text-base',
-      padding: 'p-3'
+      ring: 'w-32 h-32',
+      fontSize: 'text-3xl',
+      strokeWidth: 6,
+      levelFontSize: 'text-base'
     },
     xl: {
-      width: 120,
-      strokeWidth: 6,
-      fontSize: 'text-lg',
-      padding: 'p-4'
+      ring: 'w-40 h-40',
+      fontSize: 'text-4xl',
+      strokeWidth: 8,
+      levelFontSize: 'text-lg'
     }
   };
   
-  const { width, strokeWidth, fontSize, padding } = sizeMap[size];
-  const radius = (width / 2) - (strokeWidth * 2);
+  // Calculate SVG parameters
+  const radius = 50;
   const circumference = 2 * Math.PI * radius;
-  const dash = (progress / 100) * circumference;
-  const gap = circumference - dash;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
   
-  // Handle XP changes and level up animation
-  useEffect(() => {
-    if (prevXp > 0 && totalXp > prevXp && calculateLevel(totalXp) > calculateLevel(prevXp)) {
-      // Level up occurred!
-      setIsLevelingUp(true);
-      
-      // Animate from 0 to 100%
-      let startTime: number;
-      const animateFill = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const duration = 1500; // 1.5 seconds for full animation
-        
-        // Calculate progress (0 to 100)
-        const currentPercent = Math.min(100, (elapsed / duration) * 100);
-        setAnimationPercent(currentPercent);
-        
-        if (currentPercent < 100) {
-          requestAnimationFrame(animateFill);
-        } else {
-          // Animation complete
-          setTimeout(() => {
-            setIsLevelingUp(false);
-            if (onLevelUp) onLevelUp(level);
-          }, 500);
-        }
-      };
-      
-      requestAnimationFrame(animateFill);
-    }
-    
-    setPrevXp(totalXp);
-  }, [totalXp, prevXp, level, onLevelUp]);
+  // Color based on level
+  const getColorClass = () => {
+    if (currentLevel < 5) return 'text-blue-400';
+    if (currentLevel < 10) return 'text-purple-400';
+    if (currentLevel < 20) return 'text-pink-400';
+    if (currentLevel < 35) return 'text-amber-400';
+    return 'text-emerald-400';
+  };
   
-  // Calculate glow color based on level
   const getGlowColor = () => {
-    if (level < 5) return 'rgba(96, 165, 250, 0.5)'; // blue
-    if (level < 10) return 'rgba(167, 139, 250, 0.5)'; // purple
-    if (level < 20) return 'rgba(244, 114, 182, 0.5)'; // pink
-    if (level < 35) return 'rgba(251, 191, 36, 0.5)'; // amber
-    return 'rgba(52, 211, 153, 0.5)'; // emerald
+    if (currentLevel < 5) return 'rgba(96, 165, 250, 0.6)';
+    if (currentLevel < 10) return 'rgba(167, 139, 250, 0.6)';
+    if (currentLevel < 20) return 'rgba(244, 114, 182, 0.6)';
+    if (currentLevel < 35) return 'rgba(251, 191, 36, 0.6)';
+    return 'rgba(52, 211, 153, 0.6)';
   };
   
-  // Get text color class based on level
-  const getTextColorClass = () => {
-    if (level < 5) return 'text-blue-300';
-    if (level < 10) return 'text-purple-300';
-    if (level < 20) return 'text-pink-300';
-    if (level < 35) return 'text-amber-300';
-    return 'text-emerald-300';
-  };
+  const levelColorClass = getColorClass();
+  const currentClassConfig = sizeConfig[size];
   
-  // No XP state
-  if (totalXp <= 0) {
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div 
-              className={`relative flex items-center justify-center ${padding} ${className}`}
-              style={{ width: width, height: width }}
-            >
-              <svg width={width} height={width} className="rotate-[-90deg]">
-                <circle
-                  cx={width / 2}
-                  cy={width / 2}
-                  r={radius}
-                  fill="none"
-                  stroke="rgba(30, 41, 59, 0.5)"
-                  strokeWidth={strokeWidth}
-                  strokeDasharray={`${circumference} ${0}`}
-                />
-              </svg>
-              <div className="absolute flex items-center justify-center">
-                <span className={`font-orbitron ${fontSize} text-gray-400`}>0</span>
-              </div>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <div className="text-sm">
-              <p className="font-medium text-white mb-1">No XP yet</p>
-              <p className="text-gray-300">Embark on your first challenge to start earning XP</p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
+  // Animation classes for hover effect
+  const hoverAnimationClass = isHovering ? 'scale-105' : 'scale-100';
   
-  // Render normal ring or level up animation
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div 
-            className={`relative flex items-center justify-center ${padding} ${className} cursor-help`}
-            style={{ width: width, height: width }}
-          >
-            <svg width={width} height={width} className="rotate-[-90deg] ring-color-glow">
-              {/* Background circle */}
-              <circle
-                cx={width / 2}
-                cy={width / 2}
-                r={radius}
-                fill="none"
-                stroke="rgba(30, 41, 59, 0.5)"
-                strokeWidth={strokeWidth}
-              />
-              
-              {/* Progress circle - normal or level up animation */}
-              <circle
-                cx={width / 2}
-                cy={width / 2}
-                r={radius}
-                fill="none"
-                stroke={getGlowColor()}
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${isLevelingUp ? (animationPercent / 100) * circumference : dash} ${isLevelingUp ? circumference - (animationPercent / 100) * circumference : gap}`}
-                className={isLevelingUp ? "transition-none" : "transition-all duration-700 ease-out"}
-                style={{
-                  filter: `drop-shadow(0 0 3px ${getGlowColor()})`,
-                }}
-              />
-            </svg>
-            
-            {/* Level number */}
-            {showLevel && (
-              <div className="absolute flex items-center justify-center">
-                <span className={`font-orbitron ${fontSize} ${getTextColorClass()}`}>
-                  {level}
-                </span>
-              </div>
-            )}
-          </div>
-        </TooltipTrigger>
-        
-        {showTooltip && (
-          <TooltipContent side="right" className="border border-[#9ecfff]/20 bg-[#0f172a]/90 backdrop-blur-sm">
-            <div className="text-sm">
-              <div className="flex justify-between items-center mb-1">
-                <p className="font-medium text-white">Level {level}</p>
-                <p className={getTextColorClass()}>{progress}%</p>
-              </div>
-              <p className="text-gray-300 mb-1">Total XP: {totalXp}</p>
-              <p className="text-gray-400 text-xs">
-                {xpNeeded} XP needed for Level {level + 1}
-              </p>
-            </div>
-          </TooltipContent>
+  // Render tooltip content
+  const tooltipContent = (
+    <div className="text-center p-2">
+      <p className="font-bold text-white">Level {currentLevel}</p>
+      <p className="text-sm text-gray-300">
+        {totalXp === 0 ? (
+          "No XP yet, embark on your first journey!"
+        ) : (
+          <>XP: {currentLevelXp} / {xpToNextLevel} to next level</>
         )}
+      </p>
+    </div>
+  );
+  
+  const ringContent = (
+    <div 
+      className={`relative ${currentClassConfig.ring} transition-transform duration-300 ${hoverAnimationClass} ${className}`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      {/* Background Circle */}
+      <svg className="w-full h-full" viewBox="0 0 120 120">
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          fill="transparent"
+          stroke="rgba(30, 41, 59, 0.5)"
+          strokeWidth={currentClassConfig.strokeWidth}
+          className="opacity-30"
+        />
+        
+        {/* Progress Circle with Glow */}
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          fill="transparent"
+          stroke={getGlowColor()}
+          strokeWidth={currentClassConfig.strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          transform="rotate(-90 60 60)"
+          className={`transition-all duration-500 ${isHovering ? 'filter drop-shadow-glow' : ''}`}
+          style={{ 
+            filter: isHovering ? `drop-shadow(0 0 5px ${getGlowColor()})` : 'none',
+            transition: 'all 0.3s ease-in-out'
+          }}
+        />
+      </svg>
+      
+      {/* Level Number */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className={`font-orbitron ${currentClassConfig.fontSize} ${levelColorClass}`}>
+          {currentLevel}
+        </span>
+        {showLevel && (
+          <span className={`${currentClassConfig.levelFontSize} text-gray-400 font-semibold -mt-1`}>
+            LEVEL
+          </span>
+        )}
+      </div>
+    </div>
+  );
+  
+  // Wrap with tooltip if showTooltip is true
+  return showTooltip ? (
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          {ringContent}
+        </TooltipTrigger>
+        <TooltipContent side="top" className="bg-[#0f172a] border-[#1e293b]">
+          {tooltipContent}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  );
+  ) : ringContent;
 }
