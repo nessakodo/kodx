@@ -85,7 +85,7 @@ export async function initializeTestUsers() {
       
       // Update admin user password if needed for testing
       const adminUser = await storage.getUserByUsername('admin');
-      if (adminUser && !adminUser.password) {
+      if (adminUser) {
         const adminPassword = await hashPassword('admin1234!');
         await db.update(users)
           .set({ password: adminPassword })
@@ -119,6 +119,20 @@ export async function initializeTestUsers() {
       lastName: 'User',
       profileImageUrl: 'https://ui-avatars.com/api/?name=Admin+User&background=F44336&color=fff',
       totalXp: 9950,
+      role: 'admin',
+    });
+    
+    // Also make sure we have a separate admin account for the admin panel
+    const adminTestPassword = await hashPassword('admin1234!');
+    await db.insert(users).values({
+      id: 'admin-test-001',
+      username: 'admintest',
+      email: 'admintest@kodexzen.com',
+      password: adminTestPassword,
+      firstName: 'Admin',
+      lastName: 'Test',
+      profileImageUrl: 'https://ui-avatars.com/api/?name=Admin+Test&background=9C27B0&color=fff',
+      totalXp: 8500,
       role: 'admin',
     });
     console.log('Admin user created');
