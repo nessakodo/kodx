@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { RepoLinkEditor } from "@/components/projects/RepoLinkEditor";
 import { 
   GithubIcon, 
   PlayCircleIcon, 
@@ -338,11 +339,12 @@ export function ProjectDetail() {
                     key={index}
                     className="flex items-start gap-3"
                   >
-                    <Checkbox
+                    <input
+                      type="checkbox"
                       id={`task-${index}`}
                       checked={completedTasks.includes(`task-${index}`)}
-                      onCheckedChange={() => toggleTaskCompletion(index)}
-                      className="mt-1 data-[state=checked]:bg-[#6fcf97] data-[state=checked]:text-white border-[#6fcf97]/50"
+                      onChange={() => toggleTaskCompletion(index)}
+                      className="kodex-checkbox mt-1"
                     />
                     <label 
                       htmlFor={`task-${index}`}
@@ -358,8 +360,16 @@ export function ProjectDetail() {
                 ))}
               </div>
               
+              {/* Repository Link Section */}
+              <div className="border-t border-[#1e293b] mt-6 pt-6">
+                <RepoLinkEditor 
+                  projectId={project.id} 
+                  initialRepoUrl={project.repository?.fork_url} 
+                />
+              </div>
+              
               {isCompleted && (
-                <div className="text-center p-4 bg-[#6fcf97]/10 border border-[#6fcf97]/30 rounded-lg">
+                <div className="text-center p-4 bg-[#6fcf97]/10 border border-[#6fcf97]/30 rounded-lg mt-6">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#6fcf97]/20 mb-2">
                     <CheckCircleIcon className="h-6 w-6 text-[#6fcf97]" />
                   </div>
