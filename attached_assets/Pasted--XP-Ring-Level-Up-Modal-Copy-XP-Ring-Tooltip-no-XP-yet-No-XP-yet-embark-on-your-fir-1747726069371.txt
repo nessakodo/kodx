@@ -1,0 +1,25 @@
+## XP Ring + Level-Up Modal Copy
+
+* **XP Ring Tooltip (no XP yet):** "No XP yet – embark on your first lab to begin your journey."
+* **XP Ring Tooltip (in progress):** "Level 1 – 45% complete. Keep going to level up your skills!"
+* **XP Ring Tooltip (near level up):** "Almost there! Only 5 XP to reach the next level."
+* **Level-Up Modal Title:** "✨ Level Up!"
+* **Level-Up Modal Message:** "Congratulations, you’ve ascended to **Level 2**. Your power grows – keep designing the future!"
+
+## Achievement Descriptions + Unlock Criteria
+
+* **First Lab Complete** – *You completed your first lab – the journey begins.* *(Unlocked by finishing Lab 1.)*
+* **Cycle 1 Complete** – *A full revolution – you’ve conquered all core labs.* *(Unlocked by completing the first cycle of labs.)*
+* **Hello World** – *You posted your first message and found your voice in the community.* *(Unlocked by making your first forum post.)*
+* **Community Builder** – *You nurtured connections and sparked conversations in the community.* *(Unlocked by making 5 forum posts or replies.)*
+* **First Project Complete** – *You built and shared your first project with the community.* *(Unlocked by completing your first guided project.)*
+* **Reflection Sage** – *You paused to reflect after each lab, gaining wisdom along the way.* *(Unlocked by writing a reflection for every lab.)*
+* **Bug Finder** – *You spotted a glitch in the matrix and helped us improve.* *(Unlocked by reporting a valid bug or issue.)*
+* **Creator** – *Honors the visionaries building the KODEX WORLD platform.* *(Unlocked by being an official KODEX creator/admin.)*
+
+## Avatar/Profile Onboarding Messages
+
+* **Profile Setup Intro:** "Let’s get your profile set up for the journey ahead."
+* **Username Prompt:** "Choose a username that reflects your creative self."
+* **Avatar Prompt:** "Select an avatar that reflects your digital aura."
+* **First Login Welcome:** "Welcome to KODEX WORLD, \[Name]. Let’s design the future and decode the past together."

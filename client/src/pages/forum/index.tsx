@@ -53,15 +53,17 @@ export default function ForumPage() {
       
     const matchesCategory = categoryFilter === "" || categoryFilter === "all" || post.category === categoryFilter;
     
-    const matchesTag = tagFilter === "" || 
-      (post.tags && post.tags.some((tag: string) => {
-        // Strip the # if present in either string for comparison
-        const normalizedTag = tag.startsWith('#') ? tag.toLowerCase() : `#${tag.toLowerCase()}`;
-        const normalizedFilter = tagFilter.startsWith('#') ? tagFilter.toLowerCase() : `#${tagFilter.toLowerCase()}`;
-        return normalizedTag === normalizedFilter;
+    const matchesTags = tagFilters.length === 0 || 
+      (post.tags && tagFilters.every(filter => {
+        return post.tags.some((tag: string) => {
+          // Strip the # if present in either string for comparison
+          const normalizedTag = tag.startsWith('#') ? tag.toLowerCase() : `#${tag.toLowerCase()}`;
+          const normalizedFilter = filter.startsWith('#') ? filter.toLowerCase() : `#${filter.toLowerCase()}`;
+          return normalizedTag === normalizedFilter;
+        });
       }));
     
-    return matchesSearch && matchesCategory && matchesTag;
+    return matchesSearch && matchesCategory && matchesTags;
   }) : [];
   
   // Get unique categories for filter dropdown
@@ -139,7 +141,7 @@ export default function ForumPage() {
             </div>
             
             {/* Active Filters Display */}
-            {(searchTerm || categoryFilter || tagFilter) && (
+            {(searchTerm || categoryFilter || tagFilters.length > 0) && (
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span className="text-sm text-gray-400">Active filters:</span>
                 <div className="flex flex-wrap gap-2">
@@ -166,22 +168,23 @@ export default function ForumPage() {
                       <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
-                  {tagFilter && (
+                  {tagFilters.map(tag => (
                     <Badge 
+                      key={tag}
                       className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 flex items-center gap-1 cursor-pointer"
-                      onClick={() => setTagFilter("")}
+                      onClick={() => setTagFilters(prev => prev.filter(t => t !== tag))}
                     >
                       <TagIcon className="h-3 w-3 mr-1" />
-                      {tagFilter}
+                      {tag}
                       <span className="ml-1 text-xs">×</span>
                     </Badge>
-                  )}
+                  ))}
                   <Badge 
                     className="forum-tag bg-[#1e293b]/80 text-[#ff5c5c] border border-[#1e293b] flex items-center gap-1 hover:border-[#ff5c5c]/20 cursor-pointer"
                     onClick={() => {
                       setSearchTerm("");
                       setCategoryFilter("");
-                      setTagFilter("");
+                      setTagFilters([]);
                     }}
                   >
                     Clear All
@@ -243,7 +246,18 @@ export default function ForumPage() {
           
           {/* Sidebar */}
           <div className="md:col-span-1">
-            <ForumSidebar />
+            <ForumSidebar 
+              selectedTags={tagFilters} 
+              onTagSelect={(tag) => {
+                if (tagFilters.includes(tag)) {
+                  // If tag is already selected, remove it
+                  setTagFilters(prev => prev.filter(t => t !== tag));
+                } else {
+                  // If tag is not selected, add it
+                  setTagFilters(prev => [...prev, tag]);
+                }
+              }}
+            />
           </div>
         </div>
       </main>

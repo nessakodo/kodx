@@ -2,13 +2,19 @@ import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { SendIcon, MessageSquareIcon, TagIcon, HeartIcon } from "lucide-react";
-import { Link } from "wouter";
+import { useState, useEffect } from "react";
+import { SendIcon, MessageSquareIcon, TagIcon, HeartIcon, PlusIcon, ChevronRightIcon } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { TRENDING_TAGS } from "@/lib/mockData";
 
-export function ForumSidebar() {
+interface ForumSidebarProps {
+  onTagSelect?: (tag: string) => void;
+  selectedTags?: string[];
+}
+
+export function ForumSidebar({ onTagSelect, selectedTags = [] }: ForumSidebarProps) {
   const [email, setEmail] = useState("");
+  const [location] = useLocation();
 
   const featuredPost = {
     id: 1,
@@ -90,15 +96,26 @@ export function ForumSidebar() {
           <h3 className="text-xl font-orbitron text-white">Trending Tags</h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {TRENDING_TAGS.map(tag => (
-            <Link key={tag.label} href={tag.route}>
+          {TRENDING_TAGS.map(tag => {
+            const isSelected = selectedTags.includes(tag.label);
+            return (
               <Badge 
-                className="py-1 px-3 bg-[#1e293b]/70 hover:bg-[#1e293b] text-white border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 cursor-pointer transition-all"
+                key={tag.label}
+                onClick={() => onTagSelect && onTagSelect(tag.label)}
+                className={`py-1 px-3 ${
+                  isSelected 
+                    ? "bg-[#1e293b] text-[#9ecfff] border-[#9ecfff]/60" 
+                    : "bg-[#1e293b]/70 text-white border-[#9ecfff]/20 hover:border-[#9ecfff]/40"
+                } border cursor-pointer transition-all`}
               >
+                {isSelected && <PlusIcon className="h-3 w-3 mr-1 rotate-45" />}
                 {tag.label} <span className="ml-1 text-gray-400">({tag.count})</span>
               </Badge>
-            </Link>
-          ))}
+            );
+          })}
+        </div>
+        <div className="mt-4 text-xs text-gray-400">
+          <p>Click tags to filter. Select multiple for more specific results.</p>
         </div>
       </GlassmorphicCard>
     </div>
