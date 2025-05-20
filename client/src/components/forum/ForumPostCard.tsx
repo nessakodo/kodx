@@ -2,8 +2,12 @@ import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { HeartIcon, MessageSquareIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { HeartIcon, MessageSquareIcon, BookmarkIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { FORUM_CATEGORIES } from "@/lib/mockData";
 
 interface User {
   id: string;
@@ -17,10 +21,12 @@ interface ForumPost {
   title: string;
   content: string;
   category: string;
+  tags?: string[];
   likes: number;
   createdAt: string;
   user: User;
   commentsCount?: number;
+  isFeatured?: boolean;
 }
 
 interface ForumPostCardProps {

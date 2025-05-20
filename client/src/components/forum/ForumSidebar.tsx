@@ -3,7 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { SendIcon, MessageSquareIcon, TagIcon } from "lucide-react";
+import { SendIcon, MessageSquareIcon, TagIcon, HeartIcon } from "lucide-react";
+import { Link } from "wouter";
+import { TRENDING_TAGS } from "@/lib/mockData";
 
 export function ForumSidebar() {
   const [email, setEmail] = useState("");
@@ -15,14 +17,6 @@ export function ForumSidebar() {
     comments: 24,
     likes: 156
   };
-
-  const trendingTags = [
-    { name: "quantum", count: 42 },
-    { name: "security", count: 35 },
-    { name: "ethical-hacking", count: 29 },
-    { name: "zero-knowledge", count: 23 },
-    { name: "mindfulness", count: 18 },
-  ];
 
   const handleNewsletterSignup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,15 +63,24 @@ export function ForumSidebar() {
         <div className="flex items-center text-sm text-gray-400 mb-3">
           <span>By {featuredPost.author}</span>
         </div>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
           <div className="flex items-center">
             <MessageSquareIcon className="mr-1 h-4 w-4 text-[#9ecfff]" />
             {featuredPost.comments}
           </div>
-          <div>
-            {featuredPost.likes} likes
+          <div className="flex items-center">
+            <HeartIcon className="mr-1 h-4 w-4 text-rose-500" />
+            {featuredPost.likes}
           </div>
         </div>
+        <Link href="/forum/post/1">
+          <Button 
+            className="w-full bg-[#1e293b]/70 hover:bg-[#1e293b] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white text-xs"
+            size="sm"
+          >
+            Read More
+          </Button>
+        </Link>
       </GlassmorphicCard>
 
       {/* Trending Tags */}
@@ -87,13 +90,14 @@ export function ForumSidebar() {
           <h3 className="text-xl font-orbitron text-white">Trending Tags</h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {trendingTags.map(tag => (
-            <Badge 
-              key={tag.name}
-              className="py-1 px-3 bg-[#1e293b]/70 hover:bg-[#1e293b] text-white border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 cursor-pointer transition-all"
-            >
-              #{tag.name} <span className="ml-1 text-gray-400">({tag.count})</span>
-            </Badge>
+          {TRENDING_TAGS.map(tag => (
+            <Link key={tag.label} href={tag.route}>
+              <Badge 
+                className="py-1 px-3 bg-[#1e293b]/70 hover:bg-[#1e293b] text-white border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 cursor-pointer transition-all"
+              >
+                {tag.label} <span className="ml-1 text-gray-400">({tag.count})</span>
+              </Badge>
+            </Link>
           ))}
         </div>
       </GlassmorphicCard>

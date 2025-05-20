@@ -1,0 +1,124 @@
+{
+  "id": "resources-digital-literacy",
+  "title": "Essential Resources for Digital Literacy & Tech Fluency",
+  "level": "Open to All",
+  "xp_reward": 30,
+  "description": "Curated tools, guides, and community links to help you skill up in digital literacy, coding, cybersecurity, and creative tech. Each resource is crafted or selected to empower your journey as a digital creator and security-aware technologist in 2025 and beyond.",
+  "categories": [
+    {
+      "name": "\ud83d\udcd8 Foundational Digital Skills",
+      "items": [
+        {
+          "title": "Internet Basics & Online Safety (PDF)",
+          "type": "pdf",
+          "link": "https://example.com/internet_basics_guide.pdf",
+          "description": "Understand how the internet works, protect your privacy, and navigate the web securely."
+        },
+        {
+          "title": "Digital Fluency in 2025 (YouTube Series)",
+          "type": "video",
+          "link": "https://www.youtube.com/@nessakodo",
+          "timestamps": [
+            {
+              "time": "00:00",
+              "title": "Why Digital Literacy Matters"
+            },
+            {
+              "time": "04:40",
+              "title": "Core Concepts: Identity, Privacy, Media"
+            },
+            {
+              "time": "10:15",
+              "title": "Practical Walkthrough: Passwords, 2FA, VPNs"
+            },
+            {
+              "time": "18:50",
+              "title": "Reflection + Journal Prompts"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udcbb Learn to Code",
+      "items": [
+        {
+          "title": "freeCodeCamp Developer Curriculum",
+          "type": "link",
+          "link": "https://www.freecodecamp.org/learn",
+          "description": "From HTML and JS to backend and data structures, freeCodeCamp is your friend for full-stack self-teaching."
+        },
+        {
+          "title": "Creative Coding with p5.js (PDF + Project Templates)",
+          "type": "pdf",
+          "link": "https://example.com/creative_coding_guide.pdf",
+          "description": "Learn to express yourself with code using the p5.js library. Art, design, and interactivity combined."
+        }
+      ]
+    },
+    {
+      "name": "\ud83d\udd10 Cybersecurity & Digital Sovereignty",
+      "items": [
+        {
+          "title": "Beginner\u2019s Guide to Ethical Hacking (YouTube)",
+          "type": "video",
+          "link": "https://www.youtube.com/@nessakodo",
+          "timestamps": [
+            {
+              "time": "00:00",
+              "title": "Intro to Cybersecurity"
+            },
+            {
+              "time": "03:15",
+              "title": "How to Think Like a Hacker"
+            },
+            {
+              "time": "08:30",
+              "title": "Safe Practice Environments"
+            },
+            {
+              "time": "14:00",
+              "title": "Start Your First Bug Bounty"
+            }
+          ]
+        },
+        {
+          "title": "Digital Sovereignty Workbook (Download)",
+          "type": "pdf",
+          "link": "https://example.com/digital_sovereignty_workbook.pdf",
+          "description": "Reflective workbook helping you align digital habits with values, tech stack with sovereignty."
+        }
+      ]
+    },
+    {
+      "name": "\ud83c\udf10 Communities & Ongoing Learning",
+      "items": [
+        {
+          "title": "KODEX Discord",
+          "type": "link",
+          "link": "https://discord.gg/6xyj2xshxY",
+          "description": "Join our cyber-zen crew to stay inspired, get support, and share your builds."
+        },
+        {
+          "title": "Digital Garden of Tools & Templates (Notion)",
+          "type": "link",
+          "link": "https://www.notion.so/",
+          "description": "A living database of rituals, creative tech templates, and flow systems for learning in rhythm."
+        }
+      ]
+    }
+  ],
+  "completion": {
+    "message": "\ud83c\udf31 You've explored the core resources. Which ones will you plant into your learning garden?",
+    "post_cta": "Share which resource helped you most in the KODEX Forum or suggest your own."
+  },
+  "forum_devlog_template": {
+    "title": "Reflections on Digital Literacy & Learning",
+    "tags": [
+      "resources",
+      "learning",
+      "digital-literacy"
+    ],
+    "body_placeholder": "Which resources resonated most? What did you explore or build after diving in?"
+  }
+}
