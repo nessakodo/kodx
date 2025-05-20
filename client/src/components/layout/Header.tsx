@@ -93,31 +93,29 @@ export function Header() {
                     >
                       <Avatar>
                         <AvatarImage
-                          src={user?.profileImageUrl || ""}
-                          alt={user?.username || ""}
+                          src={user.profileImageUrl}
+                          alt={user.username}
                         />
                         <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-                          {user?.username?.[0]?.toUpperCase() || "U"}
+                          {user.username[0].toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      {user?.totalXp && (
-                        <div className="absolute -bottom-1 -right-1 bg-[#5cdc96] text-xs px-1 rounded text-black font-semibold">
-                          {user.totalXp}
-                        </div>
-                      )}
+                      <div className="absolute -bottom-1 -right-1 bg-[#5cdc96] text-xs px-1 rounded text-black font-semibold">
+                        {user.totalXp}
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard">Dashboard</Link>
                     </DropdownMenuItem>
-                    {user?.role === "admin" && (
+                    {isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link href="/admin">Admin Panel</Link>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem asChild>
-                      <a href="/api/logout">Sign Out</a>
+                    <DropdownMenuItem>
+                      <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Sign Out</a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -163,18 +161,18 @@ export function Header() {
               ))}
               {!isAuthenticated ? (
                 <>
-                  <a
-                    href="/api/login"
-                    className="text-gray-300 hover:text-[#9ecfff] py-2"
+                  <button
+                    onClick={loginAsUser}
+                    className="text-gray-300 hover:text-[#9ecfff] py-2 flex"
                   >
                     Sign In
-                  </a>
-                  <a
-                    href="/api/login"
-                    className="text-[#9ecfff] hover:text-[#9ecfff] py-2"
+                  </button>
+                  <button
+                    onClick={loginAsAdmin}
+                    className="text-[#9ecfff] hover:text-[#cae6ff] py-2 flex"
                   >
-                    Create Account
-                  </a>
+                    Admin Access
+                  </button>
                 </>
               ) : (
                 <>
@@ -185,7 +183,7 @@ export function Header() {
                   >
                     Dashboard
                   </Link>
-                  {user?.role === "admin" && (
+                  {isAdmin && (
                     <Link 
                       href="/admin"
                       className="text-gray-300 hover:text-[#9ecfff] py-2"
@@ -194,12 +192,12 @@ export function Header() {
                       Admin Panel
                     </Link>
                   )}
-                  <a
-                    href="/api/logout"
-                    className="text-gray-300 hover:text-[#9ecfff] py-2"
+                  <button
+                    onClick={logout}
+                    className="text-gray-300 hover:text-[#9ecfff] py-2 flex"
                   >
                     Sign Out
-                  </a>
+                  </button>
                 </>
               )}
             </nav>

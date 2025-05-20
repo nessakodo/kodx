@@ -29,7 +29,7 @@ export function FeaturedModules() {
   }
 
   return (
-    <section className="mb-16 px-4">
+    <section className="mb-16 mt-16 pt-8 px-4">
       <div className="flex justify-between items-center mb-8">
         <h2 className="font-orbitron text-2xl tracking-wider uppercase">
           Featured <span className="bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">Modules</span>
