@@ -36,10 +36,11 @@ export function FeaturedModules() {
         </h2>
         
         <div className="flex gap-4">
-          <Link href="/labs">
-            <a className="text-[#9ecfff] hover:underline flex items-center gap-1">
-              View all <ArrowRightIcon size={14} />
-            </a>
+          <Link 
+            href="/labs" 
+            className="text-[#9ecfff] hover:underline flex items-center gap-1"
+          >
+            View all <ArrowRightIcon size={14} />
           </Link>
         </div>
       </div>
