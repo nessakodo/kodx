@@ -18,6 +18,8 @@ import DashboardPage from "@/pages/dashboard";
 import SettingsPage from "@/pages/settings";
 import AdminPage from "@/pages/admin";
 import ResourcesPage from "@/pages/resources";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
 
 function Router() {
   return (
@@ -25,6 +27,10 @@ function Router() {
       {/* Main pages */}
       <Route path="/" component={Home} />
       <Route path="/resources" component={ResourcesPage} />
+      
+      {/* Authentication routes */}
+      <Route path="/login" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
       
       {/* Lab routes */}
       <Route path="/labs" component={LabsPage} />
