@@ -22,6 +22,11 @@ import {
   EmptyReflectionsState,
   EmptyXPState 
 } from "@/components/dashboard/EmptyStates";
+import {
+  EmptyActivityState,
+  EmptyNotificationsState,
+  EmptyForumActivityState
+} from "@/components/dashboard/EmptyActivityState";
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
@@ -113,6 +118,8 @@ export function UserDashboard() {
                   </div>
                 ))}
               </div>
+            ) : isNewUser ? (
+              <EmptyActivityState />
             ) : (
               <div className="space-y-3">
                 <div className="flex items-start gap-3 py-2 border-b border-gray-800">
@@ -299,21 +306,24 @@ export function UserDashboard() {
           <MessageSquareIcon className="h-5 w-5 text-[#9ecfff]" />
           Your Forum Activity
         </h2>
-        <Tabs defaultValue="posts" className="h-full">
-          <TabsList className="grid grid-cols-2 bg-[#1e293b]/30 mb-4 w-[240px]">
-            <TabsTrigger 
-              value="posts"
-              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
-            >
-              Your Posts
-            </TabsTrigger>
-            <TabsTrigger 
-              value="saved"
-              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
-            >
-              Saved Posts
-            </TabsTrigger>
-          </TabsList>
+        {isNewUser ? (
+          <EmptyForumActivityState />
+        ) : (
+          <Tabs defaultValue="posts" className="h-full">
+            <TabsList className="grid grid-cols-2 bg-[#1e293b]/30 mb-4 w-[240px]">
+              <TabsTrigger 
+                value="posts"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Your Posts
+              </TabsTrigger>
+              <TabsTrigger 
+                value="saved"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Saved Posts
+              </TabsTrigger>
+            </TabsList>
           
           <TabsContent value="posts" className="h-full">
             <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
