@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Badge } from "@/components/ui/badge";
-import { StarIcon, ArrowRightIcon } from "lucide-react";
+import { StarIcon, ArrowRightIcon, BeakerIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Lab {
@@ -10,6 +10,7 @@ interface Lab {
   description: string;
   difficulty: string;
   xpReward: number;
+  progress?: number;
 }
 
 interface LabCardProps {
@@ -19,25 +20,25 @@ interface LabCardProps {
 
 export function LabCard({ lab, className }: LabCardProps) {
   // Define difficulty badge styling
-  const difficultyStyles = {
+  const difficultyColors = {
     beginner: {
-      gradientClasses: "from-[#9ecfff]/10 to-[#88c9b7]/10",
-      borderClasses: "border-[#9ecfff]/20",
+      border: "border-[#6fcf97]/30",
+      text: "text-[#6fcf97]",
       label: "Beginner"
     },
     intermediate: {
-      gradientClasses: "from-[#b166ff]/10 to-[#9ecfff]/10",
-      borderClasses: "border-[#b166ff]/20",
+      border: "border-[#56ccf2]/30",
+      text: "text-[#56ccf2]",
       label: "Intermediate"
     },
     advanced: {
-      gradientClasses: "from-[#ff5c5c]/10 to-[#b166ff]/10",
-      borderClasses: "border-[#ff5c5c]/20",
+      border: "border-[#bb86fc]/30",
+      text: "text-[#bb86fc]",
       label: "Advanced"
     }
   };
 
-  const difficultyStyle = difficultyStyles[lab.difficulty as keyof typeof difficultyStyles] || difficultyStyles.beginner;
+  const difficultyStyle = difficultyColors[lab.difficulty as keyof typeof difficultyColors] || difficultyColors.beginner;
 
   // Image placeholders based on difficulty
   const imagePlaceholders = {
@@ -47,11 +48,13 @@ export function LabCard({ lab, className }: LabCardProps) {
   };
 
   const imageSrc = imagePlaceholders[lab.difficulty as keyof typeof imagePlaceholders] || imagePlaceholders.beginner;
+  
+  // Check if the lab is in progress
+  const isInProgress = lab.progress && lab.progress > 0;
 
   return (
     <GlassmorphicCard 
       className={cn("overflow-hidden flex flex-col h-full transition-all hover:border-[#9ecfff]/30 group", className)}
-      hoverEffect
     >
       <div className="relative">
         <img 
@@ -59,8 +62,8 @@ export function LabCard({ lab, className }: LabCardProps) {
           alt={lab.title} 
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-4 left-4 bg-[#1e2535]/80 backdrop-blur text-xs px-3 py-1 rounded-full">
-          LAB {lab.id.toString().padStart(2, '0')}
+        <div className="absolute top-4 left-4 bg-[#1e2535]/80 backdrop-blur text-xs px-3 py-1 rounded-full flex items-center gap-1">
+          <BeakerIcon className="h-3 w-3 text-[#9ecfff]" /> LAB {lab.id.toString().padStart(2, '0')}
         </div>
         <div className="absolute top-4 right-4 flex gap-1">
           <Badge 
@@ -77,15 +80,16 @@ export function LabCard({ lab, className }: LabCardProps) {
         
         <div className="flex items-center justify-between">
           <Badge 
-            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${difficultyStyle.gradientClasses} px-2 py-1 rounded border ${difficultyStyle.borderClasses}`}
+            className={`text-xs uppercase tracking-wider bg-transparent px-2 py-1 rounded border ${difficultyStyle.border} ${difficultyStyle.text} font-orbitron letter-spacing-wide`}
           >
             {difficultyStyle.label}
           </Badge>
           
           <Link href={`/labs/${lab.id}`}>
-            <a className="text-sm text-[#9ecfff] font-medium group-hover:underline flex items-center">
-              Start Lab <ArrowRightIcon className="ml-1 h-3 w-3" />
-            </a>
+            <div className="inline-flex items-center px-3 py-1 rounded bg-[#1e2535]/50 border border-[#9ecfff]/20 
+              text-[#9ecfff] text-sm hover:bg-[#1e2535]/80 hover:border-[#9ecfff]/30 transition-all">
+              {isInProgress ? "Continue" : "Start"} Lab <ArrowRightIcon className="ml-1 h-3 w-3" />
+            </div>
           </Link>
         </div>
       </div>

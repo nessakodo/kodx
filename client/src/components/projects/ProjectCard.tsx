@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Badge } from "@/components/ui/badge";
-import { StarIcon, ArrowRightIcon, GitForkIcon } from "lucide-react";
+import { StarIcon, ArrowRightIcon, GithubIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Project {
@@ -11,6 +11,7 @@ interface Project {
   repoUrl: string;
   difficulty: string;
   xpReward: number;
+  progress?: number;
 }
 
 interface ProjectCardProps {
@@ -20,25 +21,25 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, className }: ProjectCardProps) {
   // Define difficulty badge styling
-  const difficultyStyles = {
+  const difficultyColors = {
     beginner: {
-      gradientClasses: "from-[#9ecfff]/10 to-[#88c9b7]/10",
-      borderClasses: "border-[#9ecfff]/20",
+      border: "border-[#6fcf97]/30",
+      text: "text-[#6fcf97]",
       label: "Beginner"
     },
     intermediate: {
-      gradientClasses: "from-[#b166ff]/10 to-[#9ecfff]/10",
-      borderClasses: "border-[#b166ff]/20",
+      border: "border-[#56ccf2]/30",
+      text: "text-[#56ccf2]",
       label: "Intermediate"
     },
     advanced: {
-      gradientClasses: "from-[#ff5c5c]/10 to-[#b166ff]/10",
-      borderClasses: "border-[#ff5c5c]/20",
+      border: "border-[#bb86fc]/30",
+      text: "text-[#bb86fc]",
       label: "Advanced"
     }
   };
 
-  const difficultyStyle = difficultyStyles[project.difficulty as keyof typeof difficultyStyles] || difficultyStyles.beginner;
+  const difficultyStyle = difficultyColors[project.difficulty as keyof typeof difficultyColors] || difficultyColors.beginner;
 
   // Image placeholders based on difficulty
   const imagePlaceholders = {
@@ -49,10 +50,12 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
 
   const imageSrc = imagePlaceholders[project.difficulty as keyof typeof imagePlaceholders] || imagePlaceholders.intermediate;
 
+  // Check if the project is in progress
+  const isInProgress = project.progress && project.progress > 0;
+
   return (
     <GlassmorphicCard 
       className={cn("overflow-hidden flex flex-col h-full transition-all hover:border-[#9ecfff]/30 group", className)}
-      hoverEffect
     >
       <div className="relative">
         <img 
@@ -78,24 +81,27 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         
         <div className="flex items-center justify-between">
           <Badge 
-            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${difficultyStyle.gradientClasses} px-2 py-1 rounded border ${difficultyStyle.borderClasses}`}
+            className={`text-xs uppercase tracking-wider bg-transparent px-2 py-1 rounded border ${difficultyStyle.border} ${difficultyStyle.text} font-orbitron letter-spacing-wide`}
           >
             {difficultyStyle.label}
           </Badge>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a 
               href={project.repoUrl} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-sm text-[#88c9b7] hover:underline flex items-center"
+              title="Fork on GitHub"
+              aria-label="Fork on GitHub"
+              className="text-gray-400 hover:text-white transition-colors flex items-center justify-center h-8 w-8 bg-[#1e2535]/50 rounded-full border border-[#9ecfff]/10 hover:border-[#9ecfff]/30"
             >
-              <GitForkIcon className="mr-1 h-3 w-3" /> Repo
+              <GithubIcon className="h-4 w-4" />
             </a>
             <Link href={`/projects/${project.id}`}>
-              <a className="text-sm text-[#9ecfff] font-medium group-hover:underline flex items-center">
-                Start Project <ArrowRightIcon className="ml-1 h-3 w-3" />
-              </a>
+              <div className="inline-flex items-center px-3 py-1 rounded bg-[#1e2535]/50 border border-[#9ecfff]/20 
+                text-[#9ecfff] text-sm hover:bg-[#1e2535]/80 hover:border-[#9ecfff]/30 transition-all">
+                {isInProgress ? "Continue" : "Start"} Project <ArrowRightIcon className="ml-1 h-3 w-3" />
+              </div>
             </Link>
           </div>
         </div>
