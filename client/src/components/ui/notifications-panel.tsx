@@ -80,6 +80,7 @@ export function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps)
       onClose={onClose}
       title="Notifications"
       size="md"
+      position="right"
     >
       <div className="flex justify-between items-center mb-4 border-b border-[#1e293b] pb-2">
         <div className="text-sm text-gray-400">
