@@ -131,26 +131,29 @@ export function Header() {
                       className="absolute right-0 mt-2 w-48 py-2 bg-[#1e2535] border border-[#9ecfff]/10 rounded-md shadow-xl z-50"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Link href="/dashboard">
-                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white">
-                          Dashboard
-                        </a>
+                      <Link 
+                        href="/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white"
+                      >
+                        Dashboard
                       </Link>
-                      <Link href="/settings">
-                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white">
-                          <span className="flex items-center">
-                            <SettingsIcon className="h-4 w-4 mr-2" />
-                            Settings
-                          </span>
-                        </a>
+                      <Link 
+                        href="/settings"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white"
+                      >
+                        <span className="flex items-center">
+                          <SettingsIcon className="h-4 w-4 mr-2" />
+                          Settings
+                        </span>
                       </Link>
-                      <Link href="/api/logout">
-                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white border-t border-[#9ecfff]/10 mt-1 pt-1">
-                          <span className="flex items-center">
-                            <LogOutIcon className="h-4 w-4 mr-2" />
-                            Sign Out
-                          </span>
-                        </a>
+                      <Link 
+                        href="/api/logout"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white border-t border-[#9ecfff]/10 mt-1 pt-1"
+                      >
+                        <span className="flex items-center">
+                          <LogOutIcon className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </span>
                       </Link>
                     </div>
                   )}
@@ -158,14 +161,13 @@ export function Header() {
               </>
             ) : (
               // Login Button for non-authenticated users
-              <Link href="/api/login">
-                <Button 
-                  variant="outline" 
-                  className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
-                >
-                  Sign In
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
+                onClick={() => window.location.href = "/api/login"}
+              >
+                Sign In
+              </Button>
             )}
             
             {/* Mobile Menu Button */}
@@ -200,10 +202,11 @@ export function Header() {
             ))}
             
             {isAuthenticated && (
-              <Link href="/dashboard">
-                <a className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-[#1e2535]/50">
-                  Dashboard
-                </a>
+              <Link 
+                href="/dashboard"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+              >
+                Dashboard
               </Link>
             )}
           </div>

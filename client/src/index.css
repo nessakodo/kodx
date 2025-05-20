@@ -318,6 +318,18 @@ a[role="button"]:hover,
   flex-direction: column;
 }
 
+/* Badge container to prevent layout shifts */
+.badge-container {
+  position: relative;
+  height: 120px;
+  width: 120px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem;
+}
+
 /* Media queries for responsive design */
 @media (max-width: 768px) {
   .container {
