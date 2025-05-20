@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { XpRingProgress } from "@/components/dashboard/XpRingProgress";
+import { BadgeSection } from "@/components/dashboard/BadgeSection";
 import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
-import { useEffect } from "react";
+import { Progress } from "@/components/ui/progress";
+import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon } from "lucide-react";
+import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
+import { Link } from "wouter";
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
@@ -22,12 +26,21 @@ export function UserDashboard() {
   // Use mock data when no real data is available
   const display = dashboardData || MOCK_DASHBOARD_DATA;
   
+  // Calculate level and progress
+  const level = calculateLevel(user?.totalXp || 0);
+  const nextLevel = level + 1;
+  const progressToNextLevel = calculateLevelProgress(user?.totalXp || 0);
+  const xpToNextLevel = Math.pow(nextLevel, 2) * 500;
+  const currentLevelXp = Math.pow(level, 2) * 500;
+  const xpNeeded = xpToNextLevel - currentLevelXp;
+  const xpProgress = Math.round(((user?.totalXp || 0) - currentLevelXp) / xpNeeded * 100);
+  
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <h2 className="text-2xl font-orbitron mb-6">Sign in to view your dashboard</h2>
         <Button
-          className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+          className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
         >
           Sign In
         </Button>
@@ -38,41 +51,80 @@ export function UserDashboard() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        <div className="lg:col-span-1">
-          <GlassmorphicCard className="p-8 flex flex-col items-center h-full">
+        <div className="lg:col-span-1 space-y-8">
+          {/* User Profile and XP */}
+          <GlassmorphicCard className="p-8 flex flex-col items-center">
             <XpRingProgress
               xp={user.totalXp}
               username={user.username}
               profileImageUrl={user.profileImageUrl}
             />
             
-            <div className="mt-6 w-full">
-              <h3 className="font-orbitron text-lg text-center mb-4">Achievement Badges</h3>
-              <div className="flex flex-wrap justify-center gap-3">
-                {isLoading ? (
-                  Array(3).fill(0).map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-16 rounded-full" />
-                  ))
-                ) : display.badges && display.badges.length > 0 ? (
-                  display.badges.map((badge: any) => (
-                    <div 
-                      key={badge.id}
-                      className="flex flex-col items-center"
-                    >
-                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 flex items-center justify-center">
-                        {badge.iconUrl ? (
-                          <img src={badge.iconUrl} alt={badge.name} className="h-10 w-10" />
-                        ) : (
-                          <span className="text-2xl">🏆</span>
-                        )}
-                      </div>
-                      <span className="text-xs text-gray-400 mt-1">{badge.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center text-sm">Complete labs and projects to earn badges!</p>
-                )}
+            <div className="w-full mt-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Level {level}</span>
+                <span className="text-gray-400">Level {nextLevel}</span>
               </div>
+              <Progress value={xpProgress} className="h-2 bg-[#1e293b] border border-[#1e293b]" />
+              <div className="text-center text-xs text-gray-500">
+                {xpNeeded - ((user?.totalXp || 0) - currentLevelXp)} XP until next level
+              </div>
+            </div>
+          </GlassmorphicCard>
+          
+          {/* Recent Activity Section */}
+          <GlassmorphicCard className="p-6">
+            <h3 className="font-orbitron text-xl text-white mb-4 flex items-center gap-2">
+              <ArrowRightCircleIcon className="h-5 w-5 text-[#9ecfff]" />
+              Recent Activity
+            </h3>
+            {isLoading ? (
+              <div className="space-y-4">
+                {Array(3).fill(0).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-64" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 py-2 border-b border-gray-800">
+                  <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#9ecfff]/20 text-[#9ecfff]">
+                    <TrophyIcon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300">You earned the <span className="text-[#9ecfff]">Beginner's Mind</span> badge for completing your first lab.</p>
+                    <p className="text-xs text-gray-500">2 days ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 py-2 border-b border-gray-800">
+                  <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#6fcf97]/20 text-[#6fcf97]">
+                    <CheckCircleIcon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300">You completed <span className="text-[#6fcf97]">2/5</span> tasks in <span className="text-[#9ecfff]">Quantum Computing Basics</span>.</p>
+                    <p className="text-xs text-gray-500">3 days ago</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 py-2">
+                  <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#56ccf2]/20 text-[#56ccf2]">
+                    <RocketIcon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300">You started the <span className="text-[#56ccf2]">Mindful Meditation App</span> project.</p>
+                    <p className="text-xs text-gray-500">5 days ago</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="mt-4 text-center">
+              <Button variant="link" size="sm" className="text-[#9ecfff]">
+                View All Activity
+              </Button>
             </div>
           </GlassmorphicCard>
         </div>
@@ -84,13 +136,13 @@ export function UserDashboard() {
               <TabsList className="grid grid-cols-2 bg-[#1e293b]/30">
                 <TabsTrigger 
                   value="labs"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9ecfff]/20 data-[state=active]:to-[#88c9b7]/20 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+                  className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
                 >
                   Labs
                 </TabsTrigger>
                 <TabsTrigger 
                   value="projects"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9ecfff]/20 data-[state=active]:to-[#88c9b7]/20 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+                  className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
                 >
                   Projects
                 </TabsTrigger>
@@ -121,12 +173,14 @@ export function UserDashboard() {
                 ) : (
                   <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
                     <p className="text-gray-400 mb-6 text-center">You haven't started any labs yet. Explore our labs to begin your journey!</p>
-                    <Button 
-                      variant="outline"
-                      className="bg-gradient-to-r from-[#9ecfff]/10 to-[#88c9b7]/10 hover:from-[#9ecfff]/20 hover:to-[#88c9b7]/20"
-                    >
-                      Browse Labs
-                    </Button>
+                    <Link href="/labs">
+                      <Button 
+                        variant="outline"
+                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
+                      >
+                        Browse Labs
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -156,12 +210,14 @@ export function UserDashboard() {
                 ) : (
                   <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
                     <p className="text-gray-400 mb-6 text-center">You haven't started any projects yet. Take on a project challenge!</p>
-                    <Button 
-                      variant="outline"
-                      className="bg-gradient-to-r from-[#9ecfff]/10 to-[#88c9b7]/10 hover:from-[#9ecfff]/20 hover:to-[#88c9b7]/20"
-                    >
-                      Browse Projects
-                    </Button>
+                    <Link href="/projects">
+                      <Button 
+                        variant="outline"
+                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
+                      >
+                        Browse Projects
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -170,53 +226,16 @@ export function UserDashboard() {
         </div>
       </div>
       
+      {/* Badges Section */}
       <section className="mb-8">
-        <h2 className="font-orbitron text-2xl mb-6">Recent Activity</h2>
-        <GlassmorphicCard className="p-6">
-          {isLoading ? (
-            <div className="space-y-4">
-              {Array(3).fill(0).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-64" />
-                    <Skeleton className="h-3 w-32" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 py-2 border-b border-gray-800">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#9ecfff]/20 text-[#9ecfff]">
-                  🏆
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-300">You earned the <span className="text-[#9ecfff]">Beginner's Mind</span> badge for completing your first lab.</p>
-                  <p className="text-xs text-gray-500">2 days ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 py-2 border-b border-gray-800">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-green-500/20 text-green-500">
-                  ✓
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-300">You completed <span className="text-green-500">2/5</span> tasks in <span className="text-[#9ecfff]">Quantum Computing Basics</span>.</p>
-                  <p className="text-xs text-gray-500">3 days ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 py-2">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#88c9b7]/20 text-[#88c9b7]">
-                  🚀
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-300">You started the <span className="text-[#88c9b7]">Mindful Meditation App</span> project.</p>
-                  <p className="text-xs text-gray-500">5 days ago</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </GlassmorphicCard>
+        <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
+          <TrophyIcon className="h-5 w-5 text-[#9ecfff]" />
+          Achievement Badges
+        </h2>
+        <BadgeSection 
+          badges={display.badges || []}
+          isLoading={isLoading}
+        />
       </section>
       
       <section>
@@ -224,46 +243,58 @@ export function UserDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <GlassmorphicCard className="p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
-              <Badge className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30">Lab</Badge>
-              <Badge className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30">Intermediate</Badge>
+              <Badge className="bg-transparent text-[#56ccf2] border border-[#56ccf2]/30">Lab</Badge>
+              <Badge className="bg-transparent text-[#bb86fc] border border-[#bb86fc]/30">Intermediate</Badge>
             </div>
             <h3 className="font-orbitron text-lg mb-2">Neural Network Foundations</h3>
             <p className="text-gray-400 text-sm mb-4 flex-1">Build a simple neural network from scratch and understand the math behind it.</p>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500">750 XP</span>
-              <Button variant="outline" className="h-8 px-3 text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/30">
-                Start Lab
-              </Button>
+              <Link href="/labs/2">
+                <Button 
+                  className="h-8 px-3 text-xs bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#56ccf2]/20 hover:border-[#56ccf2]/40 text-white"
+                >
+                  Start Lab
+                </Button>
+              </Link>
             </div>
           </GlassmorphicCard>
           
           <GlassmorphicCard className="p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
-              <Badge className="bg-green-500/20 text-green-400 hover:bg-green-500/30">Project</Badge>
-              <Badge className="bg-red-500/20 text-red-400 hover:bg-red-500/30">Advanced</Badge>
+              <Badge className="bg-transparent text-[#6fcf97] border border-[#6fcf97]/30">Project</Badge>
+              <Badge className="bg-transparent text-[#bb86fc] border border-[#bb86fc]/30">Advanced</Badge>
             </div>
             <h3 className="font-orbitron text-lg mb-2">Decentralized AI Marketplace</h3>
             <p className="text-gray-400 text-sm mb-4 flex-1">Build a platform for trading AI models on a decentralized network.</p>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500">1500 XP</span>
-              <Button variant="outline" className="h-8 px-3 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/30">
-                Start Project
-              </Button>
+              <Link href="/projects/2">
+                <Button 
+                  className="h-8 px-3 text-xs bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#6fcf97]/20 hover:border-[#6fcf97]/40 text-white"
+                >
+                  Start Project
+                </Button>
+              </Link>
             </div>
           </GlassmorphicCard>
           
           <GlassmorphicCard className="p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
-              <Badge className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">Community</Badge>
-              <Badge className="bg-[#88c9b7]/20 text-[#88c9b7] hover:bg-[#88c9b7]/30">Discussion</Badge>
+              <Badge className="bg-transparent text-[#9ecfff] border border-[#9ecfff]/30">Community</Badge>
+              <Badge className="bg-transparent text-[#6fcf97] border border-[#6fcf97]/30">Discussion</Badge>
             </div>
             <h3 className="font-orbitron text-lg mb-2">Balancing Tech & Mindfulness</h3>
             <p className="text-gray-400 text-sm mb-4 flex-1">Join the discussion on techniques for maintaining mindfulness while coding.</p>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500">24 Comments</span>
-              <Button variant="outline" className="h-8 px-3 text-xs bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/30">
-                Join Discussion
-              </Button>
+              <Link href="/forum/1">
+                <Button 
+                  className="h-8 px-3 text-xs bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
+                >
+                  Join Discussion
+                </Button>
+              </Link>
             </div>
           </GlassmorphicCard>
         </div>

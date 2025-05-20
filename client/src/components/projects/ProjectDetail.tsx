@@ -1,400 +1,378 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/hooks/useAuth";
-import { StarIcon, GitForkIcon, PlayIcon, BookOpenIcon } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { XPRing } from "@/components/ui/xp-ring";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import ReactMarkdown from 'react-markdown';
+import { 
+  GithubIcon, 
+  PlayCircleIcon, 
+  CheckCircleIcon, 
+  CodeIcon,
+  ClipboardIcon,
+  StarIcon,
+  BookmarkIcon,
+  ClockIcon
+} from "lucide-react";
 
 interface Task {
   id: string;
   description: string;
 }
 
+interface VideoTimestamp {
+  time: string;
+  title: string;
+}
+
+interface Repository {
+  fork_url: string;
+  cta: string;
+}
+
 export function ProjectDetail() {
-  const { id } = useParams<{ id: string }>();
-  const { user, isAuthenticated } = useAuth();
-  const { toast } = useToast();
-  const [notes, setNotes] = useState("");
+  const { isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState("overview");
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-  const [markdownContent, setMarkdownContent] = useState<string>("");
-
-  // Fetch project details
-  const { data: project, isLoading: isProjectLoading } = useQuery({
-    queryKey: [`/api/projects/${id}`],
-    enabled: !!id,
-  });
-
-  // Fetch user's progress for this project
-  const { data: progress, isLoading: isProgressLoading } = useQuery({
-    queryKey: [`/api/dashboard`],
-    enabled: !!isAuthenticated && !!id,
-  });
-
-  // Fetch markdown content
-  useEffect(() => {
-    if (project && project.content) {
-      // In a real implementation, we would fetch the markdown file
-      // For now, we'll use a placeholder
-      setMarkdownContent(`
-# ${project.title}
-
-${project.description}
-
-## Getting Started
-
-1. Fork the repository to your own GitHub account
-2. Clone the repository to your local machine
-3. Install the dependencies
-4. Start working on the project tasks
-
-## Project Tasks
-
-${getTasksFromProject(project).map(task => `- ${task.description}`).join('\n')}
-
-## Resources
-
-- [GitHub Repository](${project.repoUrl})
-- [Documentation](#)
-      `);
-    }
-  }, [project]);
-
-  // Mock function to extract tasks from project data
-  const getTasksFromProject = (project: any) => {
-    // In a real implementation, tasks would come from the API
-    return [
-      { id: "task1", description: "Fork the repository" },
-      { id: "task2", description: "Clone the project locally" },
-      { id: "task3", description: "Complete the core functionality" },
-      { id: "task4", description: "Add tests for your implementation" },
-      { id: "task5", description: "Submit a pull request" }
-    ];
-  };
-
-  // Initialize project progress
-  useEffect(() => {
-    if (progress && progress.projectProgress) {
-      const projectProgress = progress.projectProgress.find(
-        (p: any) => p.project.id === parseInt(id as string)
-      );
-      
-      if (projectProgress) {
-        setNotes(projectProgress.progress.notes || "");
-        setCompletedTasks(projectProgress.progress.completedTasks || []);
+  const [notes, setNotes] = useState("");
+  
+  // Mock project data - would come from API in real implementation
+  const { data: project, isLoading, error } = useQuery({
+    queryKey: ["/api/projects/1"],
+    // This would be replaced with real API data
+    initialData: {
+      id: "proj-password-manager",
+      title: "Build Your Own Password Manager",
+      level: "Beginner",
+      xp_reward: 40,
+      description: "Create a local password manager app using JavaScript, secure storage patterns, and a minimal UI with encryption best practices.",
+      objectives: {
+        overview: [
+          "Build a user-friendly password entry interface",
+          "Securely store and retrieve credentials using localStorage or IndexedDB",
+          "Enable clipboard copy and password visibility toggle",
+          "Implement save/load/delete logic with clean UI feedback"
+        ]
+      },
+      video: {
+        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        timestamps: [
+          { time: "00:00", title: "Project Intro" },
+          { time: "01:25", title: "Setting up HTML/CSS" },
+          { time: "05:40", title: "JavaScript encryption logic" },
+          { time: "12:10", title: "UI hooks and button interactions" },
+          { time: "18:45", title: "Finishing touches" }
+        ]
+      },
+      tasks: [
+        "Set up base HTML and CSS structure",
+        "Add form inputs for site/account and password fields",
+        "Use Web Crypto API or a JS library to encrypt password data",
+        "Store and retrieve encrypted data using localStorage or IndexedDB",
+        "Implement copy-to-clipboard and password visibility toggle",
+        "Style the interface with dark theme and finalize layout",
+        "Deploy the finished version to GitHub Pages"
+      ],
+      repository: {
+        fork_url: "https://github.com/nessakodo/password-manager-starter",
+        cta: "Fork this starter repo to begin your build."
       }
     }
-  }, [progress, id]);
-
-  // Complete project mutation
-  const completeMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/projects/${id}/complete`, {}),
-    onSuccess: () => {
-      toast({
-        title: "Project completed!",
-        description: `You've earned ${project?.xpReward} XP!`,
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to complete project. Please try again.",
-        variant: "destructive",
-      });
-    },
   });
-
-  // Update progress mutation
-  const updateProgressMutation = useMutation({
-    mutationFn: (data: { notes?: string; completedTasks?: string[] }) => 
-      apiRequest("POST", `/api/projects/${id}/progress`, data),
-    onSuccess: () => {
-      toast({
-        title: "Progress updated",
-        description: "Your progress has been saved.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update progress. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Calculate progress percentage
-  const calculateProgress = () => {
-    const tasks = getTasksFromProject(project);
-    if (tasks.length === 0) return 0;
-    return Math.round((completedTasks.length / tasks.length) * 100);
-  };
-
-  const handleTaskToggle = (taskId: string) => {
-    const updatedTasks = completedTasks.includes(taskId)
-      ? completedTasks.filter(id => id !== taskId)
-      : [...completedTasks, taskId];
+  
+  const toggleTaskCompletion = (taskIndex: number) => {
+    const taskId = `task-${taskIndex}`;
     
-    setCompletedTasks(updatedTasks);
-    updateProgressMutation.mutate({ completedTasks: updatedTasks });
+    if (completedTasks.includes(taskId)) {
+      setCompletedTasks(completedTasks.filter(id => id !== taskId));
+    } else {
+      setCompletedTasks([...completedTasks, taskId]);
+    }
   };
-
+  
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNotes(e.target.value);
   };
-
-  const handleSaveNotes = () => {
-    updateProgressMutation.mutate({ notes });
+  
+  const saveNotes = () => {
+    // In a real app, this would save to the API/backend
+    // For now, we'll just show a success message
+    alert("Notes saved successfully!");
   };
-
-  const handleCompleteProject = () => {
-    completeMutation.mutate();
-  };
-
-  // Get user progress for this project
-  const userProjectProgress = progress?.projectProgress?.find(
-    (p: any) => p.project.id === parseInt(id as string)
-  );
-
-  const isCompleted = userProjectProgress?.progress.isCompleted;
-
-  if (isProjectLoading) {
+  
+  const progress = project ? Math.round((completedTasks.length / project.tasks.length) * 100) : 0;
+  const isCompleted = project && completedTasks.length === project.tasks.length;
+  
+  if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-2/3">
-            <Skeleton className="h-[400px] w-full rounded-xl mb-6" />
-            <Skeleton className="h-8 w-64 mb-4" />
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-          <div className="md:w-1/3">
-            <Skeleton className="h-[400px] w-full rounded-xl" />
-          </div>
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-3/4" />
+        <Skeleton className="h-6 w-1/2" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-96 md:col-span-2" />
+          <Skeleton className="h-96 md:col-span-1" />
         </div>
       </div>
     );
   }
-
-  if (!project) {
+  
+  if (error || !project) {
     return (
-      <div className="container mx-auto py-16 px-4 text-center">
+      <div className="text-center py-16">
+        <div className="h-16 w-16 mx-auto text-[#ff5c5c] mb-6">
+          <CodeIcon className="h-16 w-16" />
+        </div>
         <h2 className="text-2xl font-orbitron mb-4">Project Not Found</h2>
-        <p className="text-gray-500 mb-8">The project you're looking for doesn't exist or has been removed.</p>
-        <Button asChild>
-          <a href="/projects">Back to Projects</a>
-        </Button>
+        <p className="text-gray-500 mb-8">We couldn't find the project you're looking for.</p>
       </div>
     );
   }
-
-  const tasks = getTasksFromProject(project);
-
+  
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Main Content */}
-        <div className="lg:w-2/3">
-          <GlassmorphicCard className="mb-8 overflow-hidden">
-            {/* Project header */}
-            <div className="relative h-56 bg-[#1e2535]">
-              {project.videoUrl ? (
-                <iframe 
-                  className="w-full h-full"
-                  src={project.videoUrl}
-                  title={project.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <img 
-                    src="https://images.unsplash.com/photo-1629654297299-c8506221ca97" 
-                    alt={project.title}
-                    className="w-full h-full object-cover opacity-70"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Button 
-                      size="icon" 
-                      variant="outline" 
-                      className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20"
-                    >
-                      <PlayIcon className="h-8 w-8 text-white" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+    <div className="container mx-auto px-4 py-8">
+      {/* Project header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-orbitron text-white mb-2">{project.title}</h1>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Badge className="bg-transparent text-[#6fcf97] border border-[#6fcf97]/30">
+              {project.level}
+            </Badge>
+            <div className="flex items-center gap-1 text-[#9ecfff]">
+              <StarIcon className="h-4 w-4" />
+              <span>{project.xp_reward} XP</span>
             </div>
-
-            {/* Project info */}
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-orbitron mb-2">{project.title}</h1>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge className="bg-[#1e2535]/80 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                      <StarIcon className="h-3 w-3 text-[#9ecfff]" /> {project.xpReward} XP
-                    </Badge>
-                    <Badge 
-                      className={`text-xs uppercase tracking-wider bg-gradient-to-r from-[#b166ff]/10 to-[#9ecfff]/10 px-2 py-1 rounded border border-[#b166ff]/20`}
-                    >
-                      {project.difficulty.charAt(0).toUpperCase() + project.difficulty.slice(1)}
-                    </Badge>
+          </div>
+        </div>
+        
+        <div className="flex gap-3">
+          <a 
+            href={project.repository.fork_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#1e2535]/70 border border-[#9ecfff]/20 text-white hover:bg-[#1e2535] hover:border-[#9ecfff]/40 transition-all"
+          >
+            <GithubIcon className="h-4 w-4" />
+            Fork Repository
+          </a>
+          
+          <Button 
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded ${
+              isCompleted 
+                ? "bg-[#6fcf97]/20 text-[#6fcf97] border border-[#6fcf97]/40" 
+                : "bg-[#1e2535]/70 border border-[#9ecfff]/20 text-white hover:bg-[#1e2535] hover:border-[#9ecfff]/40"
+            }`}
+            disabled={isCompleted}
+          >
+            {isCompleted ? (
+              <>
+                <CheckCircleIcon className="h-4 w-4" />
+                Completed
+              </>
+            ) : (
+              <>
+                <PlayCircleIcon className="h-4 w-4" />
+                {completedTasks.length > 0 ? "Continue Project" : "Start Project"}
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Main content */}
+        <div className="md:col-span-2 space-y-6">
+          <Tabs 
+            defaultValue="overview" 
+            value={activeTab} 
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-2 w-full bg-[#1e293b]/30">
+              <TabsTrigger 
+                value="overview"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="video"
+                className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+              >
+                Tutorial Video
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="mt-6">
+              <GlassmorphicCard className="p-6">
+                <h2 className="text-xl font-orbitron mb-4">Project Description</h2>
+                <p className="text-gray-400 mb-6">{project.description}</p>
+                
+                <h3 className="text-lg font-medium mb-3">Objectives</h3>
+                <ul className="list-disc pl-5 mb-6 space-y-2">
+                  {project.objectives.overview.map((objective, index) => (
+                    <li key={index} className="text-gray-400">{objective}</li>
+                  ))}
+                </ul>
+                
+                <h3 className="text-lg font-medium mb-3">What You'll Learn</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-start gap-2">
+                    <div className="h-6 w-6 rounded-full bg-[#9ecfff]/20 flex items-center justify-center text-[#9ecfff]">
+                      <ClipboardIcon className="h-3 w-3" />
+                    </div>
+                    <span className="text-gray-400">Secure data storage techniques</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-6 w-6 rounded-full bg-[#9ecfff]/20 flex items-center justify-center text-[#9ecfff]">
+                      <ClipboardIcon className="h-3 w-3" />
+                    </div>
+                    <span className="text-gray-400">Browser encryption APIs</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-6 w-6 rounded-full bg-[#9ecfff]/20 flex items-center justify-center text-[#9ecfff]">
+                      <ClipboardIcon className="h-3 w-3" />
+                    </div>
+                    <span className="text-gray-400">Modern form handling</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="h-6 w-6 rounded-full bg-[#9ecfff]/20 flex items-center justify-center text-[#9ecfff]">
+                      <ClipboardIcon className="h-3 w-3" />
+                    </div>
+                    <span className="text-gray-400">Responsive UI design</span>
                   </div>
                 </div>
                 
-                <a 
-                  href={project.repoUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="flex items-center gap-2 px-4 py-2 bg-[#1e2535]/80 border border-[#88c9b7]/30 rounded-lg hover:bg-[#1e2535] transition-colors"
-                >
-                  <GitForkIcon className="h-4 w-4 text-[#88c9b7]" />
-                  <span className="text-[#88c9b7]">Fork Repository</span>
-                </a>
-              </div>
-
-              <p className="text-gray-400 mb-6">{project.description}</p>
-
-              <Tabs defaultValue="content" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="content" className="font-orbitron">Project Content</TabsTrigger>
-                  <TabsTrigger value="notes" className="font-orbitron">Your Notes</TabsTrigger>
-                </TabsList>
-                <TabsContent value="content" className="mt-4">
-                  <div className="prose prose-invert prose-sm md:prose-base max-w-none prose-pre:bg-[#1e2535] prose-pre:border prose-pre:border-[#9ecfff]/20 prose-code:text-[#9ecfff] prose-headings:font-orbitron">
-                    <ReactMarkdown>
-                      {markdownContent}
-                    </ReactMarkdown>
-                  </div>
-                </TabsContent>
-                <TabsContent value="notes" className="mt-4">
-                  {isAuthenticated ? (
-                    <>
-                      <Textarea 
-                        placeholder="Write your notes here..."
-                        className="min-h-[200px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                        value={notes}
-                        onChange={handleNotesChange}
-                      />
-                      <Button 
-                        className="mt-4 bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
-                        onClick={handleSaveNotes}
-                        disabled={updateProgressMutation.isPending}
-                      >
-                        {updateProgressMutation.isPending ? "Saving..." : "Save Notes"}
-                      </Button>
-                    </>
-                  ) : (
-                    <div className="text-center py-8">
-                      <BookOpenIcon className="mx-auto h-12 w-12 text-gray-500 mb-4" />
-                      <h3 className="text-xl font-orbitron mb-2">Sign In to Take Notes</h3>
-                      <p className="text-gray-500 mb-4">Track your progress and take notes as you work through this project.</p>
-                      <Button asChild>
-                        <a href="/api/login">Sign In</a>
-                      </Button>
+                <div className="border-t border-gray-800 pt-4">
+                  <h3 className="text-lg font-medium mb-3">Repository Information</h3>
+                  <p className="text-gray-400 mb-4">{project.repository.cta}</p>
+                  <a 
+                    href={project.repository.fork_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#1e2535]/70 border border-[#9ecfff]/20 text-white hover:bg-[#1e2535] hover:border-[#9ecfff]/40 transition-all text-sm"
+                  >
+                    <GithubIcon className="h-4 w-4" />
+                    View Starter Repository
+                  </a>
+                </div>
+              </GlassmorphicCard>
+            </TabsContent>
+            
+            <TabsContent value="video" className="mt-6">
+              <GlassmorphicCard className="p-6">
+                <div className="aspect-video bg-black mb-6 flex items-center justify-center">
+                  <iframe 
+                    src={project.video.url.replace('watch?v=', 'embed/')}
+                    title={`${project.title} Tutorial Video`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                
+                <h3 className="text-lg font-medium mb-3">Video Timestamps</h3>
+                <div className="space-y-2">
+                  {project.video.timestamps.map((timestamp, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-[#1e293b]/50 cursor-pointer transition-colors"
+                    >
+                      <ClockIcon className="h-4 w-4 text-[#9ecfff]" />
+                      <span className="text-[#9ecfff] font-mono">{timestamp.time}</span>
+                      <span className="text-gray-400">{timestamp.title}</span>
                     </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </div>
+                  ))}
+                </div>
+              </GlassmorphicCard>
+            </TabsContent>
+          </Tabs>
+          
+          {/* Project notes section */}
+          <GlassmorphicCard className="p-6">
+            <h2 className="text-xl font-orbitron mb-4">Project Notes</h2>
+            <p className="text-gray-400 mb-4">
+              Capture your insights, issues, and reflections as you go. Your notes will be saved and suggested for your devlog on completion.
+            </p>
+            <Textarea 
+              value={notes}
+              onChange={handleNotesChange}
+              placeholder="Write your project notes here..."
+              className="bg-[#1e293b]/50 border-[#1e293b] focus:border-[#9ecfff]/50 min-h-[150px] mb-4"
+            />
+            <Button 
+              onClick={saveNotes}
+              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
+            >
+              <BookmarkIcon className="h-4 w-4 mr-2" />
+              Save Notes
+            </Button>
           </GlassmorphicCard>
         </div>
-
+        
         {/* Sidebar */}
-        <div className="lg:w-1/3">
-          <GlassmorphicCard className="sticky top-24 overflow-hidden">
-            <div className="p-6 border-b border-[#9ecfff]/10">
-              <h3 className="font-orbitron text-white text-lg mb-4 uppercase">Project Tasks</h3>
+        <div className="md:col-span-1">
+          <GlassmorphicCard className="p-6 sticky top-24">
+            <h2 className="text-xl font-orbitron mb-4">Your Progress</h2>
+            <div className="flex flex-col space-y-6">
+              <div>
+                <div className="flex justify-between mb-2 text-sm">
+                  <span className="text-gray-400">{completedTasks.length} of {project.tasks.length} tasks</span>
+                  <span className="text-[#9ecfff]">{progress}%</span>
+                </div>
+                <div className="w-full h-2 bg-[#1e293b] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#9ecfff] to-[#6fcf97] rounded-full"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
               
-              {isAuthenticated ? (
-                <>
-                  <div className="space-y-4 mb-6">
-                    {tasks.map((task) => (
-                      <div className="flex items-center" key={task.id}>
-                        <Checkbox 
-                          id={task.id} 
-                          className="border-[#9ecfff]/50 text-[#9ecfff] data-[state=checked]:bg-[#9ecfff]" 
-                          checked={completedTasks.includes(task.id)}
-                          onCheckedChange={() => handleTaskToggle(task.id)}
-                          disabled={isCompleted || !isAuthenticated}
-                        />
-                        <label 
-                          htmlFor={task.id} 
-                          className={`ml-2 text-sm ${completedTasks.includes(task.id) ? 'text-gray-500 line-through' : 'text-gray-300'}`}
-                        >
-                          {task.description}
-                        </label>
-                      </div>
-                    ))}
+              <div className="space-y-3">
+                {project.tasks.map((task, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-start gap-3"
+                  >
+                    <Checkbox
+                      id={`task-${index}`}
+                      checked={completedTasks.includes(`task-${index}`)}
+                      onCheckedChange={() => toggleTaskCompletion(index)}
+                      className="mt-1 data-[state=checked]:bg-[#6fcf97] data-[state=checked]:text-white border-[#6fcf97]/50"
+                    />
+                    <label 
+                      htmlFor={`task-${index}`}
+                      className={`text-sm cursor-pointer ${
+                        completedTasks.includes(`task-${index}`) 
+                          ? 'text-gray-500 line-through' 
+                          : 'text-gray-300'
+                      }`}
+                    >
+                      {task}
+                    </label>
                   </div>
-                  
-                  <div className="flex items-center">
-                    <XPRing percentage={calculateProgress()} size="md" className="mr-4" />
-                    
-                    <div>
-                      <div className="text-sm text-gray-500">Completion</div>
-                      {isCompleted ? (
-                        <div>
-                          <span className="text-[#5cdc96] font-semibold">{project.xpReward} XP</span>
-                          <span className="text-gray-500 text-sm"> earned</span>
-                        </div>
-                      ) : (
-                        <div>
-                          <span className="text-[#9ecfff] font-semibold">0 XP</span>
-                          <span className="text-gray-500 text-sm"> / {project.xpReward} XP</span>
-                        </div>
-                      )}
-                    </div>
+                ))}
+              </div>
+              
+              {isCompleted && (
+                <div className="text-center p-4 bg-[#6fcf97]/10 border border-[#6fcf97]/30 rounded-lg">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#6fcf97]/20 mb-2">
+                    <CheckCircleIcon className="h-6 w-6 text-[#6fcf97]" />
                   </div>
-                </>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-gray-500 mb-4">Sign in to track your progress and earn XP.</p>
-                  <Button asChild>
-                    <a href="/api/login">Sign In</a>
+                  <h3 className="text-lg font-medium text-[#6fcf97] mb-1">Project Completed!</h3>
+                  <p className="text-sm text-gray-400">
+                    You've earned {project.xp_reward} XP. Would you like to publish your devlog to the forum?
+                  </p>
+                  <Button className="mt-3 bg-[#6fcf97]/20 text-[#6fcf97] border border-[#6fcf97]/40 hover:bg-[#6fcf97]/30">
+                    Publish Devlog
                   </Button>
                 </div>
               )}
             </div>
-            
-            {isAuthenticated && (
-              <div className="p-6">
-                <Button 
-                  className="w-full py-3 h-auto bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30 font-medium"
-                  onClick={handleCompleteProject}
-                  disabled={completeMutation.isPending || isCompleted || completedTasks.length < tasks.length}
-                >
-                  {isCompleted 
-                    ? "Project Completed ✓" 
-                    : completeMutation.isPending 
-                      ? "Completing..." 
-                      : completedTasks.length < tasks.length 
-                        ? "Complete All Tasks First" 
-                        : "Complete Project"}
-                </Button>
-                
-                {isCompleted && (
-                  <div className="mt-4 p-3 bg-[#5cdc96]/10 border border-[#5cdc96]/30 rounded-lg text-center">
-                    <p className="text-[#5cdc96] text-sm">
-                      Congratulations! You've completed this project and earned {project.xpReward} XP.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
           </GlassmorphicCard>
         </div>
       </div>

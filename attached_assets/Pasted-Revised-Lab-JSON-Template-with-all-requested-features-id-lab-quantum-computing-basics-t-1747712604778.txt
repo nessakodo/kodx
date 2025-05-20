@@ -1,0 +1,117 @@
+Revised Lab JSON Template (with all requested features):
+
+{
+"id": "lab-quantum-computing-basics",
+"title": "Quantum Computing Basics",
+"level": "Beginner",
+"xp_reward": 500,
+"description": "Learn the fundamentals of quantum computing and create your first quantum circuit.",
+"video_url": "https://youtube.com/example",
+"sections": [
+{
+"id": "sec-intro",
+"title": "Introduction",
+"timestamp": "0:00",
+"quiz": {
+"questions": [...],
+"pass_threshold": 80,
+"xp_reward": 50
+},
+"tasks": [
+"Watch introduction video",
+"Complete the intro quiz"
+]
+},
+{
+"id": "sec-core",
+"title": "Core Concepts",
+"timestamp": "3:42",
+"quiz": {
+"questions": [...],
+"pass_threshold": 80,
+"xp_reward": 100
+},
+"tasks": [
+"Study core theory",
+"Pass section quiz"
+]
+},
+{
+"id": "sec-practice",
+"title": "Practice",
+"timestamp": "12:30",
+"quiz": {
+"questions": [...],
+"pass_threshold": 80,
+"xp_reward": 150
+},
+"tasks": [
+"Implement the circuit",
+"Verify results",
+"Pass practice quiz"
+]
+},
+{
+"id": "sec-summary",
+"title": "Final Review",
+"timestamp": "18:45",
+"quiz": {
+"questions": [...],
+"pass_threshold": 80,
+"xp_reward": 200
+},
+"tasks": [
+"Submit final review",
+"Pass final quiz"
+]
+}
+],
+"completion_requirements": {
+"all_quizzes_passed": true
+},
+"completion_logic": {
+"type": "modal",
+"title": "🎉 Lab Complete!",
+"message": "You’ve completed all sections of this lab.",
+"show_level_up_if_unlocked": true,
+"aggregate_notes": true,
+"forum_prompt": {
+"title": "Devlog – Reflections on Quantum Computing Basics",
+"tags": ["devlog", "quantum", "beginner"],
+"body_from_notes": true,
+"cta": "Would you like to post your notes to the forum?"
+}
+},
+"note_settings": {
+"per_section_notes": true,
+"global_lab_notes_aggregation": true,
+"pagination_enabled": true
+}
+}
+
+🔧 Key Features This Unlocks:
+
+✅ Each section has its own quiz + XP reward
+✅ Passing a quiz auto-checks tasks
+✅ Progress bar can reflect % of sections completed
+✅ Lab is only marked “complete” if all section quizzes passed
+✅ Completion triggers:
+
+XP awarding
+
+Level-up detection
+
+Note aggregation
+
+Forum devlog suggestion
+
+🧠 Implementation Reminder for Devs:
+
+Notes should be tied to user_id + lab_id + section_id
+
+Completion state should persist in UserLabProgress table
+
+Dashboard view should fetch paginated notes and badge/xp updates
+
+Forum devlog submission uses endpoint: /api/forum-posts with prefill template
+

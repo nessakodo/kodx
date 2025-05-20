@@ -1,0 +1,146 @@
+{
+    "id": "lab-quantum-computing-basics",
+    "title": "Quantum Computing Basics",
+    "level": "Beginner",
+    "xp_reward": 500,
+    "description": "Learn the fundamentals of quantum computing and create your first quantum circuit.",
+    "video_url": "https://youtube.com/example",
+    "sections": [
+        {
+            "id": "sec-intro",
+            "title": "Introduction",
+            "timestamp": "0:00",
+            "quiz": {
+                "questions": [
+                    {
+                        "question": "What is a qubit?",
+                        "options": [
+                            "A classical bit",
+                            "A unit of classical data",
+                            "A quantum bit",
+                            "A byte"
+                        ],
+                        "answer": "A quantum bit"
+                    },
+                    {
+                        "question": "Which principle allows a qubit to be in multiple states at once?",
+                        "options": [
+                            "Superposition",
+                            "Entanglement",
+                            "Uncertainty",
+                            "Relativity"
+                        ],
+                        "answer": "Superposition"
+                    }
+                ],
+                "pass_threshold": 80,
+                "xp_reward": 50
+            },
+            "tasks": [
+                "Watch introduction video",
+                "Complete the intro quiz"
+            ]
+        },
+        {
+            "id": "sec-core",
+            "title": "Core Concepts",
+            "timestamp": "3:42",
+            "quiz": {
+                "questions": [
+                    {
+                        "question": "What is entanglement in quantum computing?",
+                        "options": [
+                            "Two qubits behaving independently",
+                            "Qubits sharing the same memory",
+                            "A quantum connection where the state of one qubit affects another",
+                            "A form of encryption"
+                        ],
+                        "answer": "A quantum connection where the state of one qubit affects another"
+                    }
+                ],
+                "pass_threshold": 80,
+                "xp_reward": 100
+            },
+            "tasks": [
+                "Study core theory",
+                "Pass section quiz"
+            ]
+        },
+        {
+            "id": "sec-practice",
+            "title": "Practice",
+            "timestamp": "12:30",
+            "quiz": {
+                "questions": [
+                    {
+                        "question": "Which gate puts a qubit into superposition?",
+                        "options": [
+                            "X",
+                            "Z",
+                            "H (Hadamard)",
+                            "CNOT"
+                        ],
+                        "answer": "H (Hadamard)"
+                    }
+                ],
+                "pass_threshold": 80,
+                "xp_reward": 150
+            },
+            "tasks": [
+                "Implement the circuit",
+                "Verify results",
+                "Pass practice quiz"
+            ]
+        },
+        {
+            "id": "sec-summary",
+            "title": "Final Review",
+            "timestamp": "18:45",
+            "quiz": {
+                "questions": [
+                    {
+                        "question": "What is the main advantage of quantum over classical computing?",
+                        "options": [
+                            "Higher power consumption",
+                            "Faster arithmetic operations",
+                            "Parallelism through superposition and entanglement",
+                            "Better graphics processing"
+                        ],
+                        "answer": "Parallelism through superposition and entanglement"
+                    }
+                ],
+                "pass_threshold": 80,
+                "xp_reward": 200
+            },
+            "tasks": [
+                "Submit final review",
+                "Pass final quiz"
+            ]
+        }
+    ],
+    "completion_requirements": {
+        "all_quizzes_passed": true
+    },
+    "completion_logic": {
+        "type": "modal",
+        "title": "\ud83c\udf89 Lab Complete!",
+        "message": "You\u2019ve completed all sections of this lab.",
+        "show_level_up_if_unlocked": true,
+        "aggregate_notes": true,
+        "forum_prompt": {
+            "title": "Devlog \u2013 Reflections on Quantum Computing Basics",
+            "tags": [
+                "devlog",
+                "quantum",
+                "beginner"
+            ],
+            "body_from_notes": true,
+            "cta": "Would you like to post your notes to the forum?"
+        }
+    },
+    "note_settings": {
+        "per_section_notes": true,
+        "global_lab_notes_aggregation": true,
+        "pagination_enabled": true
+    }
+}
