@@ -52,39 +52,84 @@ export async function setupAuth(app: Express) {
     done(null, user);
   });
   
-  // Development routes for authentication
-  app.get("/api/login", (req, res) => {
-    // For development, automatically create and log in a test user
-    const testUser = {
+  // Test users for development
+  const testUsers = {
+    regular: {
       id: "test-user-123",
       email: "test@example.com",
       firstName: "Test",
       lastName: "User",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff",
       role: "user",
-      totalXp: 1250, // Adding XP for user profile display
-      username: "testuser", // Add username for display
-    };
+      totalXp: 1250,
+      username: "testuser",
+    },
+    experienced: {
+      id: "test-user-456",
+      email: "advanced@example.com", 
+      firstName: "Advanced",
+      lastName: "User",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Advanced+User&background=9C27B0&color=fff",
+      role: "user",
+      totalXp: 5750,
+      username: "advanceduser",
+    },
+    admin: {
+      id: "admin-789",
+      email: "admin@example.com",
+      firstName: "Admin",
+      lastName: "User",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=F44336&color=fff",
+      role: "admin",
+      totalXp: 9950,
+      username: "adminuser",
+    }
+  };
+  
+  // Development routes for authentication
+  app.get("/api/login", (req, res) => {
+    const userType = req.query.type || "regular";
+    const userToLogin = testUsers[userType as keyof typeof testUsers] || testUsers.regular;
     
-    console.log("Logging in test user:", testUser);
+    console.log(`Logging in ${userToLogin.role} user:`, userToLogin);
     
     // Save this user in the database
-    storage.upsertUser(testUser)
+    storage.upsertUser(userToLogin)
       .then((user) => {
         console.log("User saved in database:", user);
-        req.login(testUser, (err) => {
+        req.login(userToLogin, (err) => {
           if (err) {
             console.error("Login error:", err);
             return res.status(500).json({ message: "Login failed" });
           }
           console.log("User logged in successfully");
-          // Send success response instead of redirect for debugging
-          return res.redirect("/?loggedIn=true");
+          const redirectUrl = typeof req.query.redirect === 'string' ? req.query.redirect : "/?loggedIn=true";
+          return res.redirect(redirectUrl);
         });
       })
       .catch(err => {
         console.error("User creation error:", err);
         res.status(500).json({ message: "Failed to create test user" });
+      });
+  });
+  
+  app.get("/api/auth/admin", (req, res) => {
+    const adminUser = testUsers.admin;
+    
+    storage.upsertUser(adminUser)
+      .then((user) => {
+        req.login(adminUser, (err) => {
+          if (err) {
+            console.error("Admin login error:", err);
+            return res.status(500).json({ message: "Admin login failed" });
+          }
+          console.log("Admin logged in successfully");
+          return res.redirect("/admin?adminLoggedIn=true");
+        });
+      })
+      .catch(err => {
+        console.error("Admin creation error:", err);
+        res.status(500).json({ message: "Failed to create admin user" });
       });
   });
   
