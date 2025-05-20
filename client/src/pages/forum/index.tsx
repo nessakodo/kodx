@@ -9,16 +9,26 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus, SearchIcon, FilterIcon, X } from "lucide-react";
-import { MOCK_FORUM_POSTS } from "@/lib/mockData";
+import { AlertCircle, Plus, SearchIcon, FilterIcon, X, TagIcon } from "lucide-react";
+import { MOCK_FORUM_POSTS, FORUM_CATEGORIES } from "@/lib/mockData";
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function ForumPage() {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [tagFilter, setTagFilter] = useState("");
+  const [location] = useLocation();
+  
+  // Check if we're navigating from a tag route and set the filter
+  useEffect(() => {
+    if (location.startsWith('/forum/tags/')) {
+      const tag = location.split('/').pop() || "";
+      setTagFilter(`#${tag}`);
+    }
+  }, [location]);
   
   // Prefill the query cache with mock data
   useEffect(() => {
@@ -35,19 +45,24 @@ export default function ForumPage() {
   // Use mock data when real data is not available
   const allPosts = forumPosts || MOCK_FORUM_POSTS;
   
-  // Filter posts based on search term and category
-  const filteredPosts = allPosts.filter((post: any) => {
+  // Filter posts based on search term, category and tag
+  const filteredPosts = Array.isArray(allPosts) ? allPosts.filter((post: any) => {
     const matchesSearch = searchTerm === "" || 
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
       
     const matchesCategory = categoryFilter === "" || post.category === categoryFilter;
     
-    return matchesSearch && matchesCategory;
-  });
+    const matchesTag = tagFilter === "" || 
+      (post.tags && post.tags.some((tag: string) => 
+        tag.toLowerCase() === tagFilter.toLowerCase()));
+    
+    return matchesSearch && matchesCategory && matchesTag;
+  }) : [];
   
   // Get unique categories for filter dropdown
-  const categories = Array.from(new Set(allPosts.map((post: any) => post.category)));
+  const categoriesObj = FORUM_CATEGORIES as Record<string, { label: string; color: string; route: string }>;
+  const categories = Object.keys(categoriesObj);
   
   return (
     <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
@@ -95,23 +110,38 @@ export default function ForumPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1e2535] border-[#1e2535]">
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category: string) => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
+                    <SelectItem value="">All Categories</SelectItem>
+                    {categories.map((category) => {
+                      const categoryData = categoriesObj[category];
+                      return (
+                        <SelectItem 
+                          key={category} 
+                          value={category}
+                          className="flex items-center"
+                        >
+                          <div className="flex items-center">
+                            <div 
+                              className="w-2 h-2 rounded-full mr-2" 
+                              style={{ backgroundColor: categoryData.color }}
+                            />
+                            {categoryData.label}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
             </div>
             
             {/* Active Filters Display */}
-            {(searchTerm || categoryFilter) && (
+            {(searchTerm || categoryFilter || tagFilter) && (
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span className="text-sm text-gray-400">Active filters:</span>
                 <div className="flex flex-wrap gap-2">
                   {searchTerm && (
                     <Badge 
-                      className="forum-tag tag-question flex items-center gap-1 cursor-pointer"
+                      className="forum-tag bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/30 flex items-center gap-1 cursor-pointer"
                       onClick={() => setSearchTerm("")}
                     >
                       Search: {searchTerm}
@@ -120,10 +150,25 @@ export default function ForumPage() {
                   )}
                   {categoryFilter && (
                     <Badge 
-                      className={`forum-tag tag-${categoryFilter.toLowerCase()} flex items-center gap-1 cursor-pointer`}
+                      style={{
+                        backgroundColor: `${categoriesObj[categoryFilter].color}20`,
+                        color: categoriesObj[categoryFilter].color,
+                        borderColor: `${categoriesObj[categoryFilter].color}40`
+                      }}
+                      className="flex items-center gap-1 cursor-pointer border"
                       onClick={() => setCategoryFilter("")}
                     >
-                      Category: {categoryFilter}
+                      Category: {categoriesObj[categoryFilter].label}
+                      <span className="ml-1 text-xs">×</span>
+                    </Badge>
+                  )}
+                  {tagFilter && (
+                    <Badge 
+                      className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 flex items-center gap-1 cursor-pointer"
+                      onClick={() => setTagFilter("")}
+                    >
+                      <TagIcon className="h-3 w-3 mr-1" />
+                      {tagFilter}
                       <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
@@ -132,6 +177,7 @@ export default function ForumPage() {
                     onClick={() => {
                       setSearchTerm("");
                       setCategoryFilter("");
+                      setTagFilter("");
                     }}
                   >
                     Clear All
