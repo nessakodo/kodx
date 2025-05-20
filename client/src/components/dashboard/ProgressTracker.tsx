@@ -128,7 +128,7 @@ export function ProgressTracker({
           </div>
         </div>
         
-        <div className="hidden sm:block">
+        <div className="hidden sm:block relative z-10">
           <XPRing 
             percentage={(xpEarned / xpTotal) * 100}
             size="sm"
@@ -140,7 +140,7 @@ export function ProgressTracker({
       </div>
       
       <div className="mt-3 flex justify-between items-center">
-        <div className="block sm:hidden">
+        <div className="block sm:hidden relative z-10">
           <XPRing 
             percentage={(xpEarned / xpTotal) * 100}
             size="sm"
@@ -148,6 +148,7 @@ export function ProgressTracker({
             currentValue={xpEarned}
             totalValue={xpTotal}
             animationSpeed="slow"
+            pulseEffect={xpEarned > 0}
           />
         </div>
         

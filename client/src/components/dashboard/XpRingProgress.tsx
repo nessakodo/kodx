@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
+import { XPRing } from "@/components/ui/xp-ring";
 
 interface XpRingProgressProps {
   xp: number;
@@ -43,85 +44,43 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
   
   return (
     <div className="flex flex-col items-center">
-      <div className="relative">
-        {/* Background Circle */}
-        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2">
-          <circle 
-            cx="70" 
-            cy="70" 
-            r={circleRadius} 
-            strokeWidth="8" 
-            stroke="#1e293b" 
-            fill="none" 
-            strokeDasharray={circumference} 
-            strokeDashoffset="0"
-            className="opacity-30"
+      <div className="relative mt-10">
+        {/* Free-floating XP ring, positioned outside the avatar */}
+        <div className="absolute -top-3 -left-3 z-10">
+          <XPRing 
+            percentage={progress}
+            size="lg"
+            showValue={false}
+            pulseEffect={true}
+            animationSpeed="slow"
           />
-        </svg>
+        </div>
         
-        {/* Progress Circle with Animation */}
-        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform">
-          <circle 
-            cx="70" 
-            cy="70" 
-            r={circleRadius} 
-            strokeWidth="8" 
-            stroke="url(#gradient)" 
-            fill="none" 
-            strokeLinecap="round"
-            strokeDasharray={circumference} 
-            strokeDashoffset={dashOffset}
-            className="transition-all duration-1000 ease-out"
-          />
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Glow Effect */}
-        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform">
-          <circle 
-            cx="70" 
-            cy="70" 
-            r={circleRadius} 
-            strokeWidth="2" 
-            stroke="url(#gradientGlow)" 
-            fill="none" 
-            strokeLinecap="round"
-            strokeDasharray={circumference} 
-            strokeDashoffset={dashOffset}
-            filter="blur(4px)"
-            className="transition-all duration-1000 ease-out"
-          />
-          <defs>
-            <linearGradient id="gradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Avatar */}
+        {/* Avatar centered without ring */}
         <div className="relative flex items-center justify-center">
-          <Avatar className="h-32 w-32 border-4 border-[#1e293b] shadow-xl">
+          <Avatar className="h-28 w-28 border-4 border-[#1e293b] shadow-xl">
             <AvatarImage src={profileImageUrl} />
             <AvatarFallback className="text-2xl font-medium bg-gradient-to-r from-[#2a3a4a] to-[#1e2535]">
               {username.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
+          
+          {/* Level badge on avatar */}
+          <div className="absolute -bottom-2 -right-2 bg-[#1e293b] border border-[#9ecfff]/30 rounded-full h-10 w-10 flex items-center justify-center shadow-lg">
+            <span className="text-sm font-orbitron text-white">{level}</span>
+          </div>
         </div>
       </div>
       
       {/* Level and XP Display */}
-      <div className="mt-4 text-center">
-        <div className="text-base sm:text-lg text-gray-300 mb-1">Level {level}</div>
-        <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">
+      <div className="mt-6 text-center">
+        <div className="text-xl sm:text-2xl font-orbitron tracking-wider text-white mb-1">
+          {username}
+        </div>
+        <div className="text-lg sm:text-xl font-orbitron text-[#9ecfff] tracking-wide">
           {animatedXp.toLocaleString()} XP
         </div>
-        <div className="text-xs text-gray-500 mt-1">{progress}% to Level {level + 1}</div>
+        <div className="text-sm text-gray-400 mt-1">{progress}% to Level {level + 1}</div>
       </div>
     </div>
   );
