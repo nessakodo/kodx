@@ -74,7 +74,7 @@ export function KodexModal({
     const rect = element.getBoundingClientRect();
     const offset = position?.offset || 8;
     
-    switch (position.placement) {
+    switch (position?.placement || "bottom") {
       case "top":
         return {
           bottom: `${window.innerHeight - rect.top + offset}px`,
@@ -132,10 +132,10 @@ export function KodexModal({
           isOpen
             ? "animate-in fade-in-0 zoom-in-95"
             : "animate-out fade-out-0 zoom-out-95",
-          position ? "absolute bg-[#0f172a]/95 backdrop-blur-sm border border-[#9ecfff]/15 rounded-lg shadow-lg" : "relative",
+          position || positionElement ? "absolute bg-[#0f172a]/95 backdrop-blur-sm border border-[#9ecfff]/15 rounded-lg shadow-lg" : "relative",
           className
         )}
-        style={position ? getPositionStyles() : {}}
+        style={(position || positionElement) ? getPositionStyles() : {}}
       >
         {/* Modal header */}
         <div className="kodex-modal-header flex items-center justify-between">
