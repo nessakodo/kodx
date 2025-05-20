@@ -46,11 +46,18 @@ export function ForumPostDetail() {
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const [commentContent, setCommentContent] = useState("");
+  const [isSaved, setIsSaved] = useState(false); // Track saved state
 
   // Fetch post details
   const { data: post, isLoading } = useQuery({
     queryKey: [`/api/forum-posts/${id}`],
     enabled: !!id,
+  });
+  
+  // Fetch related posts by same category
+  const { data: relatedPosts, isLoading: isLoadingRelated } = useQuery({
+    queryKey: ['/api/forum-posts', 'related', post?.category],
+    enabled: !!post?.category,
   });
 
   // Like post mutation
@@ -83,6 +90,27 @@ export function ForumPostDetail() {
       toast({
         title: "Error",
         description: "Failed to post comment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Save post mutation
+  const saveMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/forum-posts/${id}/save`, {}),
+    onSuccess: () => {
+      setIsSaved(prev => !prev);
+      toast({
+        title: isSaved ? "Post Removed" : "Post Saved",
+        description: isSaved 
+          ? "This post has been removed from your saved items" 
+          : "This post has been added to your saved items"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save post. Please try again.",
         variant: "destructive",
       });
     },
