@@ -120,7 +120,7 @@ export default function CreatePostPage() {
       });
       
       // Redirect to the newly created post
-      setLocation(`/forum/post/${response.id}`);
+      setLocation(`/forum/post/${newPost.id}`);
     } catch (error) {
       console.error("Error creating post:", error);
       toast({

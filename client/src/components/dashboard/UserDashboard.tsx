@@ -364,24 +364,32 @@ export function UserDashboard() {
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
                       <h3 className="font-medium text-lg text-gray-200">Secure Password Storage – Best Practices</h3>
-                      <div className="flex items-center gap-2">
-                        <Badge style={{
-                          backgroundColor: `rgba(156, 39, 176, 0.2)`,
-                          color: `rgb(156, 39, 176)`,
-                          borderColor: `rgba(156, 39, 176, 0.4)`
-                        }} className="border">RESOURCES</Badge>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-[#10b981]">Resources</Badge>
                         <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">security</Badge>
                       </div>
+                    </div>
+                    <div className="flex items-center text-xs text-gray-500 mb-3">
+                      <span>Posted by </span>
+                      <span className="font-medium ml-1 text-[#9ecfff]">@securityGuru</span>
+                      <span className="mx-2">•</span>
+                      <span>18 May 2025</span>
                     </div>
                     <div className="text-gray-400 mb-3 line-clamp-3">
                       When it comes to storing passwords securely, hashing is just the beginning. This post outlines modern techniques including salting, peppers, and appropriate hash functions that...
                     </div>
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-1 text-gray-500">
-                        <MessageCircleIcon className="h-4 w-4" />
-                        <span>12 comments</span>
-                      </div>
-                      <div className="text-xs text-gray-500">Saved: 18 May 2025</div>
+                      <Link href="/forum/post/25">
+                        <Button variant="link" className="text-[#9ecfff] p-0 h-auto">
+                          Read Post
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs text-gray-400">
+                        <span className="sr-only">Unsave</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#9ecfff]">
+                          <path d="M3.53 2.47a.75.75 0 00-1.06 1.06l18 18a.75.75 0 101.06-1.06l-18-18zM20.25 5.507v11.561L5.853 2.671c.15-.043.306-.075.467-.094a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93zM3.75 21V6.932l14.063 14.063L12 18.088l-7.165 3.583A.75.75 0 013.75 21z" />
+                        </svg>
+                      </Button>
                     </div>
                   </div>
                   
