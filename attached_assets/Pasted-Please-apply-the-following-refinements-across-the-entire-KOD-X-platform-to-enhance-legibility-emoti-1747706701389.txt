@@ -1,0 +1,124 @@
+Please apply the following refinements across the entire KODΞX platform to enhance legibility, emotional tone, visual polish, and secure interaction logic.
+
+TYPOGRAPHY & BRANDING
+
+Increase letter-spacing across all text using the Orbitron font
+
+Ensure the “KODEX” wordmark glow/gradient styling is applied consistently in:
+
+Navbar (do not add weight)
+
+Footer
+
+Hero sections
+
+GLOBAL BUTTONS
+
+Replace all primary action buttons (e.g., “Create Account”, “Start Lab”) with this new gradient glassmorphic style for consistent aesthetic:
+
+.cta-button {
+background: rgba(255, 255, 255, 0.05);
+border: 1px solid rgba(158, 207, 255, 0.3);
+border-radius: 16px;
+padding: 0.9rem 2rem;
+font-size: 1rem;
+font-weight: 600;
+color: #ffffff;
+cursor: pointer;
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+box-shadow: 0 0 20px rgba(158, 207, 255, 0.1);
+transition: all 0.4s ease;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+}
+
+.cta-button:hover {
+background: rgba(158, 207, 255, 0.1);
+box-shadow: 0 0 25px rgba(158, 207, 255, 0.3), 0 0 40px rgba(136, 201, 183, 0.2);
+border-color: rgba(158, 207, 255, 0.6);
+}
+
+TASK & QUIZ INTERACTIONS
+
+Style Lab/Project task bubbles with:
+
+Glassmorphic background
+
+Glow ring on hover/complete
+
+Subtle microanimation on toggle
+
+Style Quiz cards with:
+
+Slight elevation + glow outline on focus
+
+Interactive feedback on option selection
+
+Clear, Orbitron-styled questions with consistent spacing
+
+HOMEPAGE LAYOUT
+
+Make “Next Lab Drop” card full-width to match page columns
+
+Enhance visibility with glow border, timer, and Add to Calendar button
+
+FOOTER SIMPLIFICATION
+
+Remove all content section columns: Labs, Projects, Community, About
+
+Keep only:
+
+KODEX wordmark + 1-line description: “A platform for mindful technologists building secure, ethical, and intentional digital systems.”
+
+Social icons: Discord, YouTube, GitHub
+
+Bottom links: Privacy Policy, Terms of Service, Code of Conduct
+
+BACKGROUND & GRID
+
+Set site-wide background to a subtle radial blue-gray “mist” gradient
+
+Overlay a terminal-style grid:
+
+Slightly enlarged grid units
+
+Low-opacity white lines with light blur/glassmorphic effect
+
+Ensure all foreground elements remain highly legible and focused
+
+NAVBAR
+
+Transparent on page load
+
+Adds backdrop blur + elevation on scroll
+
+Includes glowing “KODEX” wordmark
+
+Navigation and sign in/out logic as previously scoped
+
+LOGIC & AUTH BEHAVIOR
+
+Only logged-in users can:
+
+See “Start” or “Continue” buttons on Labs/Projects
+
+Like, comment, or post in the Forum
+
+View the Dashboard or Notifications
+
+Admin posts in Forum:
+
+Must be visually distinct (e.g., badge highlight or elevated frame)
+
+XP ring should animate constantly on the dashboard only
+
+Notifications must show only when logged in
+
+RESPONSIVENESS & ACCESSIBILITY
+
+Ensure layout and animations degrade gracefully on mobile
+
+Maintain high contrast ratios and keyboard navigation across all components
+
+All animations should enhance clarity, not distract
