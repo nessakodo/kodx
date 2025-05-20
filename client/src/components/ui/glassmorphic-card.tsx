@@ -1,23 +1,16 @@
 import { cn } from "@/lib/utils";
 
-interface GlassmorphicCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GlassmorphicCardProps {
   children: React.ReactNode;
   className?: string;
 }
 
-export function GlassmorphicCard({ 
-  children, 
-  className,
-  ...props
-}: GlassmorphicCardProps) {
+export function GlassmorphicCard({ children, className }: GlassmorphicCardProps) {
   return (
-    <div 
-      className={cn(
-        "glassmorphic rounded-xl shadow-lg", 
-        className
-      )}
-      {...props}
-    >
+    <div className={cn(
+      "bg-[#1e2535]/25 backdrop-blur-md border border-[#9ecfff]/10 rounded-lg shadow-lg", 
+      className
+    )}>
       {children}
     </div>
   );

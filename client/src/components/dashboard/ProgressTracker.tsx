@@ -2,6 +2,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { BookIcon, GitForkIcon, ArrowRightIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ProgressTrackerProps {
   type: "lab" | "project";
@@ -51,7 +52,12 @@ export function ProgressTracker({
   const difficultyStyle = difficultyStyles[difficulty as keyof typeof difficultyStyles] || difficultyStyles.beginner;
 
   return (
-    <div className="bg-[#1e2535]/50 rounded-lg p-4 border border-[#9ecfff]/10 hover:border-[#9ecfff]/30 transition-colors">
+    <div className={cn(
+      "bg-[#1e2535]/50 rounded-lg p-4 border border-[#9ecfff]/10 hover:border-[#9ecfff]/30 transition-all",
+      isCompleted 
+        ? "" 
+        : "hover:shadow-[0_0_15px_rgba(158,207,255,0.2)] hover:bg-[#1e2535]/70"
+    )}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
         <div className="flex items-center">
           {type === "lab" ? (
