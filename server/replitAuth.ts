@@ -62,17 +62,23 @@ export async function setupAuth(app: Express) {
       profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
       role: "user",
       totalXp: 1250, // Adding XP for user profile display
+      username: "testuser", // Add username for display
     };
+    
+    console.log("Logging in test user:", testUser);
     
     // Save this user in the database
     storage.upsertUser(testUser)
-      .then(() => {
+      .then((user) => {
+        console.log("User saved in database:", user);
         req.login(testUser, (err) => {
           if (err) {
             console.error("Login error:", err);
             return res.status(500).json({ message: "Login failed" });
           }
-          return res.redirect("/");
+          console.log("User logged in successfully");
+          // Send success response instead of redirect for debugging
+          return res.redirect("/?loggedIn=true");
         });
       })
       .catch(err => {
@@ -97,7 +103,7 @@ export async function setupAuth(app: Express) {
   });
 }
 
-export const isAuthenticated: RequestHandler = async (req, res, next) => {
+export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });
   }
