@@ -3,11 +3,12 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { BellIcon, LogOutIcon, MenuIcon, SettingsIcon, XIcon } from "lucide-react";
+import { BellIcon, LogOutIcon, MenuIcon, SettingsIcon, XIcon, ShieldIcon } from "lucide-react";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { calculateLevel } from "@/lib/utils";
 import { KodexModal } from "@/components/ui/kodex-modal";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
   const { user, isAuthenticated } = useAuth();
@@ -15,6 +16,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { toast } = useToast();
   
   // Mocked unread notifications count - would come from the API in a real app
   const [unreadNotifications, setUnreadNotifications] = useState(3);
@@ -73,6 +75,18 @@ export function Header() {
       return currentLocation === href;
     }
     return currentLocation.startsWith(href);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setUserMenuOpen(false);
+    window.location.href = "/api/logout";
+  };
+
+  // Handle admin login test
+  const handleAdminTest = () => {
+    setUserMenuOpen(false);
+    window.location.href = "/api/auth/admin";
   };
   
   return (
@@ -192,39 +206,33 @@ export function Header() {
                       </Link>
                       
                       <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
-                        <Link 
-                          href="/api/logout"
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#ff9e9e]/10 hover:text-[#ff9e9e] transition-colors"
-                          onClick={() => setUserMenuOpen(false)}
+                        <button 
+                          className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#ff9e9e]/10 hover:text-[#ff9e9e] transition-colors"
+                          onClick={handleLogout}
                         >
                           <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#ff9e9e]/20 flex items-center justify-center">
                             <LogOutIcon className="h-4 w-4 text-[#ff9e9e]" />
                           </div>
-                          <div className="flex-1">
+                          <div className="flex-1 text-left">
                             <div className="font-medium">Sign Out</div>
                             <div className="text-xs text-gray-500">End your current session</div>
                           </div>
-                        </Link>
+                        </button>
                       </div>
-
+                      
                       <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
-                        <Link 
-                          href="/api/auth/admin"
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
-                          onClick={() => setUserMenuOpen(false)}
+                        <button 
+                          className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
+                          onClick={handleAdminTest}
                         >
                           <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#9ecfff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                              <line x1="9" y1="9" x2="15" y2="15"></line>
-                              <line x1="15" y1="9" x2="9" y2="15"></line>
-                            </svg>
+                            <ShieldIcon className="h-4 w-4 text-[#9ecfff]" />
                           </div>
-                          <div className="flex-1">
+                          <div className="flex-1 text-left">
                             <div className="font-medium">Admin Test</div>
                             <div className="text-xs text-gray-500">Test admin panel</div>
                           </div>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   </KodexModal>
@@ -244,9 +252,14 @@ export function Header() {
                   variant="default" 
                   className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
                   onClick={() => {
-                    // For testing, add a signup prompt
-                    const email = prompt("Enter your email (or leave empty for test account):");
-                    window.location.href = "/api/login"; // Use the login endpoint for now until we have signup
+                    toast({
+                      title: "Sign Up Process",
+                      description: "For demonstration, we'll use the test account login.",
+                      duration: 3000,
+                    });
+                    setTimeout(() => {
+                      window.location.href = "/api/login";
+                    }, 1500);
                   }}
                 >
                   Sign Up
