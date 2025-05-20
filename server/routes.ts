@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/labs/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const labId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if lab exists
       const [lab] = await db.select().from(labs).where(eq(labs.id, labId));
@@ -229,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/projects/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if project exists
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId));
@@ -311,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Progress & Dashboard routes
   app.get("/api/dashboard", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user
       const [user] = await db.select().from(users).where(eq(users.id, userId));
@@ -502,7 +502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/forum-posts", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { title, content, category } = req.body;
       
       if (!title || !content || !category) {
@@ -529,7 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/forum-posts/:id/comments", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { content } = req.body;
       
       if (!content) {
@@ -575,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/forum-posts/:id/save", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if post exists
       const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, postId));
@@ -621,7 +621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 app.get("/api/saved-posts", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get all saved posts for the user with post and author details
       const savedPosts = await db
@@ -657,7 +657,7 @@ app.get("/api/saved-posts", isAuthenticated, async (req: any, res) => {
 app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if post exists
       const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, postId));
@@ -718,7 +718,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
   // Admin routes
   app.post("/api/admin/labs", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role
       const [user] = await db
@@ -758,7 +758,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
 
   app.post("/api/admin/projects", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role
       const [user] = await db
@@ -799,7 +799,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
 
   app.post("/api/admin/badges", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role
       const [user] = await db
