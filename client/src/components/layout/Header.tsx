@@ -9,6 +9,7 @@ import { calculateLevel } from "@/lib/utils";
 import { KodexModal } from "@/components/ui/kodex-modal";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export function Header() {
   const { user, isAuthenticated } = useAuth();
@@ -16,6 +17,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const { toast } = useToast();
   
   // Mocked unread notifications count - would come from the API in a real app
@@ -244,91 +246,24 @@ export function Header() {
                 <Button 
                   variant="outline" 
                   className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
-                  onClick={() => setUserMenuOpen(true)}
+                  onClick={() => setAuthModalOpen(true)}
                 >
                   Sign In
                 </Button>
                 <Button 
                   variant="default" 
                   className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
-                  onClick={() => setUserMenuOpen(true)}
+                  onClick={() => setAuthModalOpen(true)}
                 >
                   Sign Up
                 </Button>
                 
-                {/* Login Selection Modal */}
-                <KodexModal
-                  isOpen={userMenuOpen}
-                  onClose={() => setUserMenuOpen(false)}
-                  title="Test Accounts"
-                  width="sm"
-                >
-                  <div className="p-4">
-                    <div className="mb-6 text-sm text-gray-400">
-                      Choose a test account to explore different user experiences:
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {/* Regular User */}
-                      <div 
-                        className="flex items-center gap-4 p-4 rounded-lg bg-gradient-to-r from-[#0d2e4d]/30 to-[#1e2535]/30 hover:from-[#0d2e4d]/50 hover:to-[#1e2535]/50 border border-[#9ecfff]/20 cursor-pointer transition-all duration-300"
-                        onClick={() => window.location.href = "/api/login?type=regular"}
-                      >
-                        <div className="flex-shrink-0">
-                          <Avatar className="h-12 w-12 ring-2 ring-[#9ecfff]/50">
-                            <AvatarImage src="https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff" />
-                            <AvatarFallback className="bg-[#0D8ABC]">TU</AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-white">Test User</div>
-                          <div className="text-sm text-gray-400">Level 3 • Regular User</div>
-                          <div className="text-xs text-[#9ecfff]/80 mt-1">1,250 XP • Beginner features</div>
-                        </div>
-                      </div>
-                      
-                      {/* Experienced User */}
-                      <div 
-                        className="flex items-center gap-4 p-4 rounded-lg bg-gradient-to-r from-[#2a0d4d]/30 to-[#1e2535]/30 hover:from-[#2a0d4d]/50 hover:to-[#1e2535]/50 border border-[#bb86fc]/20 cursor-pointer transition-all duration-300"
-                        onClick={() => window.location.href = "/api/login?type=experienced"}
-                      >
-                        <div className="flex-shrink-0">
-                          <Avatar className="h-12 w-12 ring-2 ring-[#bb86fc]/50">
-                            <AvatarImage src="https://ui-avatars.com/api/?name=Advanced+User&background=9C27B0&color=fff" />
-                            <AvatarFallback className="bg-[#9C27B0]">AU</AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-white">Advanced User</div>
-                          <div className="text-sm text-gray-400">Level 7 • Experienced</div>
-                          <div className="text-xs text-[#bb86fc]/80 mt-1">5,750 XP • Completed projects</div>
-                        </div>
-                      </div>
-                      
-                      {/* Admin User */}
-                      <div 
-                        className="flex items-center gap-4 p-4 rounded-lg bg-gradient-to-r from-[#4d0d0d]/30 to-[#1e2535]/30 hover:from-[#4d0d0d]/50 hover:to-[#1e2535]/50 border border-[#ff9e9e]/20 cursor-pointer transition-all duration-300"
-                        onClick={() => window.location.href = "/api/auth/admin"}
-                      >
-                        <div className="flex-shrink-0">
-                          <Avatar className="h-12 w-12 ring-2 ring-[#ff9e9e]/50">
-                            <AvatarImage src="https://ui-avatars.com/api/?name=Admin+User&background=F44336&color=fff" />
-                            <AvatarFallback className="bg-[#F44336]">AD</AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-white">Admin User</div>
-                          <div className="text-sm text-gray-400">Level 9 • Administrator</div>
-                          <div className="text-xs text-[#ff9e9e]/80 mt-1">9,950 XP • Full admin access</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6 text-xs text-gray-500 italic">
-                      Note: These are test accounts for demonstration purposes only.
-                    </div>
-                  </div>
-                </KodexModal>
+                {/* Auth Modal for login/signup */}
+                <AuthModal 
+                  isOpen={authModalOpen}
+                  onClose={() => setAuthModalOpen(false)}
+                  initialMode="test-accounts"
+                />
               </div>
             )}
             

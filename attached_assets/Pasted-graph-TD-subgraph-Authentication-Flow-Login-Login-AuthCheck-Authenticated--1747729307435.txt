@@ -1,0 +1,78 @@
+graph TD
+    subgraph "Authentication Flow"
+        Login[Login] --> AuthCheck{Authenticated?}
+        Register[Register] --> AuthCheck
+        AuthCheck -->|Yes| RoleCheck{Role?}
+        AuthCheck -->|No| Redirect[Redirect to Login]
+        RoleCheck -->|Admin| AdminDashboard[Admin Dashboard]
+        RoleCheck -->|User| UserDashboard[User Dashboard]
+    end
+    
+    subgraph "User Dashboard Flow"
+        UserDashboard --> UserProfile[Profile & Avatar]
+        UserDashboard --> SavedContent[Saved Content]
+        UserDashboard --> Progress[XP & Badges]
+        UserDashboard --> Notes[Personal Notes]
+        UserDashboard --> RecentActivity[Recent Activity]
+        
+        UserDashboard --> LabsAccess[Labs Access]
+        UserDashboard --> ProjectsAccess[Projects Access]
+        UserDashboard --> ForumAccess[Forum Access]
+        
+        LabsAccess --> StartLab[Start Lab]
+        StartLab --> CompleteLesson[Complete Lesson]
+        CompleteLesson --> EarnXP[Earn XP]
+        CompleteLesson --> LabQuiz[Lab Quiz]
+        LabQuiz --> CompleteQuiz[Complete Quiz]
+        CompleteQuiz --> LabReflection[Lab Reflection]
+        LabReflection --> LabComplete[Lab Complete]
+        LabComplete --> BadgeCheck{Badge Criteria Met?}
+        BadgeCheck -->|Yes| EarnBadge[Earn Badge]
+        BadgeCheck -->|No| NextLab[Next Lab]
+        
+        ProjectsAccess --> StartProject[Start Project]
+        StartProject --> GitHubFork[GitHub Fork]
+        GitHubFork --> ProjectTasks[Complete Project Tasks]
+        ProjectTasks --> DevLog[Post DevLog]
+        DevLog --> ProjectComplete[Project Complete]
+        ProjectComplete --> EarnXP
+        ProjectComplete --> BadgeCheck
+    end
+    
+    subgraph "Admin Flow"
+        AdminDashboard --> ManageLabs[Manage Labs]
+        AdminDashboard --> ManageProjects[Manage Projects]
+        AdminDashboard --> ModerateForums[Moderate Forums]
+        AdminDashboard --> ManageUsers[Manage Users]
+        AdminDashboard --> SendNewsletter[Send Newsletter]
+        
+        ManageLabs --> CreateLab[Create Lab]
+        ManageLabs --> EditLab[Edit Lab]
+        ManageLabs --> DeleteLab[Delete Lab]
+        
+        ManageProjects --> CreateProject[Create Project]
+        ManageProjects --> EditProject[Edit Project]
+        ManageProjects --> DeleteProject[Delete Project]
+        
+        ModerateForums --> DeletePost[Delete Post]
+        ModerateForums --> FeaturePost[Feature Post]
+        
+        ManageUsers --> DeleteUser[Delete User]
+        ManageUsers --> EditUserRole[Edit User Role]
+    end
+    
+    subgraph "Forum Flow"
+        ForumAccess --> BrowseForum[Browse Forum]
+        BrowseForum --> ViewPost[View Post]
+        BrowseForum --> FilterPosts[Filter Posts]
+        ViewPost --> LikePost[Like Post]
+        ViewPost --> CommentPost[Comment on Post]
+        ViewPost --> SavePost[Save Post]
+        ForumAccess --> CreatePost[Create Post]
+    end
+    
+    %% Connect flows
+    EarnXP --> Progress
+    EarnBadge --> Progress
+    SavePost --> SavedContent
+    LabReflection --> Notes
