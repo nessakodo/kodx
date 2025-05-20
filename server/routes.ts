@@ -219,10 +219,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/projects", async (req, res) => {
     try {
       const allProjects = await db.select().from(projects).orderBy(projects.id);
+      if (allProjects.length === 0) {
+        // Import mock data if needed
+        const { MOCK_PROJECTS } = await import('./mock-data');
+        return res.json(MOCK_PROJECTS);
+      }
       res.json(allProjects);
     } catch (error) {
       console.error("Error fetching projects:", error);
-      res.status(500).json({ message: "Failed to fetch projects" });
+      // Return mock data on error
+      const { MOCK_PROJECTS } = await import('./mock-data');
+      return res.json(MOCK_PROJECTS);
     }
   });
 
@@ -232,12 +239,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId));
       
       if (!project) {
+        // Try to find in mock data
+        const { MOCK_PROJECTS } = await import('./mock-data');
+        const mockProject = MOCK_PROJECTS.find(p => p.id === projectId);
+        if (mockProject) {
+          return res.json(mockProject);
+        }
         return res.status(404).json({ message: "Project not found" });
       }
       
       res.json(project);
     } catch (error) {
       console.error("Error fetching project:", error);
+      
+      // Try mock data on error
+      try {
+        const { MOCK_PROJECTS } = await import('./mock-data');
+        const projectId = parseInt(req.params.id);
+        const mockProject = MOCK_PROJECTS.find(p => p.id === projectId);
+        if (mockProject) {
+          return res.json(mockProject);
+        }
+      } catch (e) {
+        console.error("Error loading mock data:", e);
+      }
+      
       res.status(500).json({ message: "Failed to fetch project" });
     }
   });

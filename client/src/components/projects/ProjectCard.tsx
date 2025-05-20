@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { DifficultyBadge } from "@/components/ui/difficulty-badge";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon, ArrowRightIcon, GithubIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -80,11 +81,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         <p className="text-gray-500 mb-4 flex-1">{project.description}</p>
         
         <div className="flex items-center justify-between">
-          <Badge 
-            className={`text-xs uppercase tracking-wider bg-transparent px-2 py-1 rounded border ${difficultyStyle.border} ${difficultyStyle.text} font-orbitron letter-spacing-wide`}
-          >
-            {difficultyStyle.label}
-          </Badge>
+          <DifficultyBadge level={project.difficulty} />
           
           <div className="flex items-center gap-3">
             <a 
@@ -93,13 +90,12 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
               rel="noopener noreferrer" 
               title="Fork on GitHub"
               aria-label="Fork on GitHub"
-              className="text-gray-400 hover:text-white transition-colors flex items-center justify-center h-8 w-8 bg-[#1e2535]/50 rounded-full border border-[#9ecfff]/10 hover:border-[#9ecfff]/30"
+              className="text-gray-400 hover:text-white transition-colors flex items-center justify-center h-8 w-8 bg-[#1e2535]/50 rounded-full border border-[#1e2535]/70 hover:border-[#1e2535]/90"
             >
               <GithubIcon className="h-4 w-4" />
             </a>
             <Link href={`/projects/${project.id}`}>
-              <div className="inline-flex items-center px-3 py-1 rounded bg-[#1e2535]/50 border border-[#9ecfff]/20 
-                text-[#9ecfff] text-sm hover:bg-[#1e2535]/80 hover:border-[#9ecfff]/30 transition-all">
+              <div className="btn-kodex inline-flex items-center px-3 py-1 rounded text-sm">
                 {isInProgress ? "Continue" : "Start"} Project <ArrowRightIcon className="ml-1 h-3 w-3" />
               </div>
             </Link>
