@@ -70,29 +70,11 @@ export function UserDashboard() {
             <div className="text-center mt-2 mb-2">
               <div className="text-xs text-gray-500">
                 <span className="inline-flex items-center">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 mr-1 text-[#9ecfff]" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M12 18V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M16.24 16.24L19.07 19.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M2 12H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M18 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M4.93 19.07L7.76 16.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M16.24 7.76L19.07 4.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
+                  <span className="w-3 h-3 rounded-full bg-[#56ccf2]/20 flex items-center justify-center mr-1">
+                    <span className="block w-1.5 h-1.5 rounded-full bg-[#56ccf2]"></span>
+                  </span>
                   Started updating XpRingProgress component for gamification
                 </span>
-              </div>
-            </div>
-            
-            <div className="w-full mt-2 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Level {level}</span>
-                <span className="text-gray-400">Level {nextLevel}</span>
-              </div>
-              <Progress value={xpProgress} className="h-2 bg-[#1e293b] border border-[#1e293b]" />
-              <div className="text-center text-xs text-gray-500">
-                {xpNeeded - ((user?.totalXp || 0) - currentLevelXp)} XP until next level
               </div>
             </div>
           </GlassmorphicCard>

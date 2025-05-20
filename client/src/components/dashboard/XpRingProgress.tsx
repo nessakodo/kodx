@@ -118,7 +118,7 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
             cx="70" 
             cy="70" 
             r={circleRadius} 
-            strokeWidth="8" 
+            strokeWidth="4" 
             stroke="#1e293b" 
             fill="none" 
             strokeDasharray={circumference} 
@@ -133,7 +133,7 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
             cx="70" 
             cy="70" 
             r={circleRadius} 
-            strokeWidth="8" 
+            strokeWidth="4" 
             stroke="url(#gradient)" 
             fill="none" 
             strokeLinecap="round"
@@ -143,31 +143,31 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
           />
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
+              <stop offset="0%" stopColor="#56ccf2" />
+              <stop offset="100%" stopColor="#2a80b9" />
             </linearGradient>
           </defs>
         </svg>
         
         {/* Glow Effect */}
-        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform">
+        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform animate-pulse">
           <circle 
             cx="70" 
             cy="70" 
             r={circleRadius} 
-            strokeWidth="2" 
+            strokeWidth="6" 
             stroke="url(#gradientGlow)" 
             fill="none" 
             strokeLinecap="round"
             strokeDasharray={circumference} 
             strokeDashoffset={dashOffset}
-            filter="blur(4px)"
-            className="transition-all duration-1000 ease-out"
+            filter="blur(8px)"
+            className="transition-all duration-1000 ease-out opacity-60"
           />
           <defs>
             <linearGradient id="gradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
+              <stop offset="0%" stopColor="#56ccf2" />
+              <stop offset="100%" stopColor="#2a80b9" />
             </linearGradient>
           </defs>
         </svg>
@@ -185,14 +185,28 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
       
       {/* Level and XP Display */}
       <div className="mt-4 text-center">
-        <div className="text-base sm:text-lg font-orbitron bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent mb-1">
+        <div className="text-base sm:text-lg font-orbitron bg-gradient-to-r from-[#56ccf2] to-[#2a80b9] bg-clip-text text-transparent mb-1">
           @{username}
         </div>
         <div className="text-base sm:text-lg text-gray-300 mb-1">Level {level}</div>
-        <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">
+        <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#56ccf2] to-[#2a80b9] bg-clip-text text-transparent">
           {animatedXp.toLocaleString()} XP
         </div>
         <div className="text-xs text-gray-500 mt-1">{progress}% to Level {level + 1}</div>
+        
+        {/* Progress Bar */}
+        <div className="mt-2 w-full max-w-xs mx-auto">
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Level {level}</span>
+            <span>Level {level + 1}</span>
+          </div>
+          <div className="w-full h-2 bg-[#1e293b] rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-[#56ccf2] to-[#2a80b9] rounded-full transition-all duration-1000"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       </div>
       
       {/* Level Up Modal */}
