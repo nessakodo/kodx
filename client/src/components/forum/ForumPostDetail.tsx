@@ -417,7 +417,9 @@ export function ForumPostDetail() {
               <h3 className="text-lg font-orbitron mb-4">Actions</h3>
               <div className="space-y-2">
                 <Button 
-                  className="w-full justify-start bg-[#1e2535]/50 hover:bg-[#1e2535] border border-[#9ecfff]/20"
+                  className={`w-full justify-start ${isSaved 
+                    ? 'bg-[#1e2535] text-[#9ecfff]' 
+                    : 'bg-[#1e2535]/50'} hover:bg-[#1e2535] border border-[#9ecfff]/20`}
                   onClick={() => {
                     if (!isAuthenticated) {
                       toast({
@@ -427,14 +429,12 @@ export function ForumPostDetail() {
                       });
                       return;
                     }
-                    // Toggle save post logic would go here
-                    toast({
-                      title: "Post Saved",
-                      description: "This post has been added to your saved items"
-                    });
+                    saveMutation.mutate();
                   }}
+                  disabled={saveMutation.isPending}
                 >
-                  <BookmarkIcon className="h-4 w-4 mr-2" /> Save for Later
+                  <BookmarkIcon className={`h-4 w-4 mr-2 ${isSaved ? 'fill-[#9ecfff]' : ''}`} /> 
+                  {isSaved ? 'Saved' : 'Save for Later'}
                 </Button>
                 <Button 
                   className="w-full justify-start bg-[#1e2535]/50 hover:bg-[#1e2535] border border-[#9ecfff]/20"
@@ -458,19 +458,47 @@ export function ForumPostDetail() {
               </div>
             </GlassmorphicCard>
             
-            {/* Related Topics */}
+            {/* Related Posts */}
             <GlassmorphicCard className="p-4">
-              <h3 className="text-lg font-orbitron mb-4">Related Topics</h3>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <Link key={i} href="/forum" className="block hover:bg-[#1e2535]/30 p-2 rounded-md transition-colors">
-                    <h4 className="font-medium text-[#9ecfff]">Related Forum Topic {i}</h4>
-                    <p className="text-sm text-gray-400 mt-1">
-                      A brief preview of the related topic content...
-                    </p>
-                  </Link>
-                ))}
-              </div>
+              <h3 className="text-lg font-orbitron mb-4">Related Posts</h3>
+              {isLoadingRelated ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-2 border-b border-[#1e293b] last:border-0">
+                      <Skeleton className="h-5 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              ) : relatedPosts && relatedPosts.length > 0 ? (
+                <div className="space-y-4">
+                  {relatedPosts
+                    .filter((p: any) => p.id !== Number(id))
+                    .slice(0, 3)
+                    .map((post: any) => (
+                      <Link 
+                        key={post.id} 
+                        href={`/forum/${post.id}`} 
+                        className="block hover:bg-[#1e2535]/30 p-2 rounded-md transition-colors border-b border-[#1e293b] last:border-0"
+                      >
+                        <h4 className="font-medium text-[#9ecfff] line-clamp-1">{post.title}</h4>
+                        <div className="flex items-center text-xs text-gray-400 mt-2">
+                          <span className="flex items-center">
+                            <HeartIcon className="inline h-3 w-3 mr-1" /> {post.likes}
+                          </span>
+                          <span className="mx-2">•</span>
+                          <span className="flex items-center">
+                            <MessageSquareIcon className="inline h-3 w-3 mr-1" /> {post.comments?.length || 0}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  No related posts found
+                </p>
+              )}
             </GlassmorphicCard>
           </div>
         </div>
