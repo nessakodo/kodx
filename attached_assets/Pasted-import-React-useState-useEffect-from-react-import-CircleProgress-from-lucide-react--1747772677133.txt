@@ -1,0 +1,64 @@
+import React, { useState, useEffect } from 'react';
+import { CircleProgress } from 'lucide-react';
+
+const DashboardXPRing = ({ userXP = 0, userLevel = 1, nextLevelXP = 100 }) => {
+  // Calculate progress percentage for the current level
+  const progressPercentage = Math.min(Math.floor((userXP / nextLevelXP) * 100), 100);
+  
+  // State for animation
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  
+  // Animate the progress ring on load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedProgress(progressPercentage);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [progressPercentage]);
+
+  return (
+    <div className="flex flex-col items-center justify-center">
+      {/* XP Ring Container */}
+      <div className="relative w-32 h-32">
+        {/* Outer static ring - represents the level */}
+        <div className="absolute inset-0 rounded-full border-8 border-gray-200 opacity-30"></div>
+        
+        {/* Inner progress ring - shows progress to next level */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="40" 
+            fill="none" 
+            stroke="#9ecfff" 
+            strokeWidth="8"
+            strokeDasharray={`${animatedProgress * 2.51} 251`}
+            strokeLinecap="round"
+            transform="rotate(-90 50 50)"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        
+        {/* Level Number in center */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-4xl font-bold font-display">{userLevel}</span>
+          <span className="text-xs text-gray-300">LEVEL</span>
+        </div>
+        
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-full filter blur-md bg-pine-mint opacity-20"></div>
+      </div>
+      
+      {/* XP Counter below the ring */}
+      <div className="mt-2 text-center">
+        <p className="text-sm font-mono">
+          <span className="text-mist-blue">{userXP}</span>
+          <span className="text-gray-400"> / {nextLevelXP} XP</span>
+        </p>
+        <p className="text-xs text-citrine-ember mt-1">+{nextLevelXP - userXP} XP to level {userLevel + 1}</p>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardXPRing;
