@@ -13,21 +13,19 @@ export default function Home() {
   return (
     <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
       <Header />
-      <main>
-        <Hero />
-        
-        <Container>
+      <Container>
+        <main className="py-4">
+          <Hero />
           <FeaturedModules />
           <UserExperience />
           <LabPreview />
           <CommunitySection />
-          
-          <div className="grid grid-cols-1 gap-12 my-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
             <Newsletter />
             <Countdown />
           </div>
-        </Container>
-      </main>
+        </main>
+      </Container>
       <Footer />
     </div>
   );

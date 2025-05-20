@@ -138,7 +138,7 @@ export function XPRing({
   };
   
   return (
-    <div className="relative inline-flex items-center justify-center z-10">
+    <div className="relative inline-flex items-center justify-center">
       {/* Rotating canvas for ambient effect */}
       <div 
         ref={ringRef}
@@ -154,17 +154,6 @@ export function XPRing({
           className="w-full h-full"
         />
       </div>
-      
-      {/* Outer glow effect */}
-      {percentage > 0 && pulseEffect && (
-        <div 
-          className={cn(
-            "absolute rounded-full opacity-20 animate-pulse-slow",
-            sizeClasses[size],
-            "shadow-[0_0_15px_rgba(158,207,255,0.8)]"
-          )}
-        />
-      )}
       
       {/* Inner content */}
       <div 
