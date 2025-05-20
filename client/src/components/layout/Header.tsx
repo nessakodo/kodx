@@ -206,19 +206,52 @@ export function Header() {
                           </div>
                         </Link>
                       </div>
+
+                      <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
+                        <Link 
+                          href="/api/auth/admin"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#9ecfff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <line x1="9" y1="9" x2="15" y2="15"></line>
+                              <line x1="15" y1="9" x2="9" y2="15"></line>
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">Admin Test</div>
+                            <div className="text-xs text-gray-500">Test admin panel</div>
+                          </div>
+                        </Link>
+                      </div>
                     </div>
                   </KodexModal>
                 </div>
               </>
             ) : (
-              // Login Button for non-authenticated users
-              <Button 
-                variant="outline" 
-                className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
-                onClick={() => window.location.href = "/api/login"}
-              >
-                Sign In
-              </Button>
+              // Login and Signup Buttons for non-authenticated users
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
+                  onClick={() => window.location.href = "/api/login"}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="default" 
+                  className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
+                  onClick={() => {
+                    // For testing, add a signup prompt
+                    const email = prompt("Enter your email (or leave empty for test account):");
+                    window.location.href = "/api/login"; // Use the login endpoint for now until we have signup
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </div>
             )}
             
             {/* Mobile Menu Button */}
