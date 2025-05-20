@@ -3,7 +3,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
 import { FeaturedModules } from "@/components/home/FeaturedModules";
 import { UserExperience } from "@/components/home/UserExperience";
-import { CommunityStats } from "@/components/home/CommunityStats";
 import { CommunitySection } from "@/components/home/CommunitySection";
 import { Newsletter } from "@/components/home/Newsletter";
 import { Countdown } from "@/components/home/Countdown";
@@ -14,7 +13,6 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <CommunityStats />
         <FeaturedModules />
         <UserExperience />
         <CommunitySection />
