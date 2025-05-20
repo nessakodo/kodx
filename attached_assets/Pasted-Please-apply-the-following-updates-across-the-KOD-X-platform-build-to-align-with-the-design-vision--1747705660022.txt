@@ -1,0 +1,84 @@
+Please apply the following updates across the KODΞX platform build to align with the design vision, enhance clarity, and ensure accessibility:
+
+Typography & Visual Styling
+
+Increase letter-spacing globally for all text elements using the Orbitron font for improved readability
+
+Ensure consistent use of the “KODEX” gradient/glow wordmark style (used in header) in:
+
+Navbar (without bold weight)
+
+Footer
+
+Hero sections
+
+Improve global font and spacing alignment for better UI/UX balance and legibility
+
+Component Enhancements
+
+Tasks (Lab/Project checklists): Style each task bubble with a soft glassmorphic background, clear hover/focus/checked states, and rounded outline glow to make interaction aesthetically satisfying
+
+Quizzes: Style each question bubble and option with subtle elevation, animated selection feedback, and orbitron-style titles
+
+"Next Lab Drop" card: Make it full-width (to match page columns) and give it visual weight as a key homepage module
+
+Layout & Footer
+
+Footer:
+
+Simplify: remove "Labs", "Projects", "Community", and "About" sections
+
+Keep only:
+
+One-line platform description (cyber-zen learning ecosystem, etc.)
+
+Social icons (Discord, YouTube, GitHub)
+
+Background:
+
+Use blue-gray “misty” radial gradient as background
+
+Apply a subtle glassmorphic terminal grid overlay
+
+Increase grid unit size to improve rhythm and harmony
+
+Navbar:
+
+Transparent by default
+
+Apply blurred glass background and slight elevation when scrolling
+
+Interactivity & Logic
+
+Lab/Project cards:
+
+“Start” or “Continue” buttons only appear if user is logged in
+
+Forum:
+
+Only logged-in users can like, comment, or post
+
+Admin posts should be visually distinct (e.g., glow border or pinned badge indicator)
+
+Behavioral Logic (already in scope, but clarify)
+
+Labs and Projects should store progress and dynamically switch button states:
+
+“Start Lab” → “Continue Lab” → “Completed”
+
+Dashboard XP ring and devlog entries must only be visible to logged-in users
+
+Notifications in navbar should only appear after login
+
+🧪 QA Note
+
+Please check for consistent behavior across mobile/tablet/desktop viewports and confirm that animation/glow styles don’t compromise accessibility or legibility.
+
+📁 Assets & Style References
+
+Use the styling in the existing KodexZen.zip as base
+
+Refer to kodex_starter_content_v2.zip for content data
+
+Apply Orbitron-wide letter-spacing across all headers, buttons, and nav items
+
