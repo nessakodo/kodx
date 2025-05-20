@@ -16,6 +16,12 @@ import {
   BookOpenCheck,
   Code,
   FileText,
+  Bell,
+  Eye,
+  Award,
+  MessageSquare,
+  Heart,
+  CheckCircle
 } from 'lucide-react';
 
 // Sample badge for demonstration
@@ -23,8 +29,8 @@ const SAMPLE_BADGE = {
   id: 1,
   name: "Digital Starter",
   description: "Embarked on your journey toward digital enlightenment",
-  category: "achievement",
-  rarity: "common",
+  category: "achievement" as const,
+  rarity: "common" as const,
   createdAt: new Date().toISOString()
 };
 
@@ -191,22 +197,98 @@ export function SimpleDashboard() {
         
         {/* Right Column - Activity & Forum */}
         <div className="space-y-8">
-          {/* Activity Section */}
+          {/* Notifications Section */}
           <div className="mb-10">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-orbitron text-2xl text-amber-300">
-                Recent Activity
+              <h2 className="font-orbitron text-2xl text-blue-300">
+                Notifications
               </h2>
             </div>
             
-            <Card className="border border-[#1e293b] bg-[#0c1527]/50 p-6">
-              <p className="text-center text-gray-400 py-8">
-                Your activity history will appear here as you engage with labs, projects, and the community.
-              </p>
+            <Card className="border border-[#1e293b] bg-[#0c1527]/50">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-orbitron text-blue-300">Recent Notifications</h3>
+                  <Button 
+                    variant="ghost" 
+                    className="text-blue-300 hover:text-blue-200 text-sm"
+                    onClick={() => {}}
+                  >
+                    Mark all as read
+                  </Button>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* No notifications state */}
+                  <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-blue-500/10 border border-blue-500/30">
+                      <Bell className="h-6 w-6 text-blue-400" />
+                    </div>
+                    <h3 className="text-xl font-orbitron text-blue-300 mb-3">No Recent Activity</h3>
+                    <p className="text-gray-400 mb-6 max-w-md mx-auto">
+                      Your timeline is a blank canvas. Once you begin your first Lab, Project, 
+                      or Forum thread, your journey will unfold here.
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <Link href="/labs">
+                        <Button 
+                          variant="outline" 
+                          className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20"
+                        >
+                          Explore Labs
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/forum">
+                        <Button 
+                          variant="outline" 
+                          className="border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20"
+                        >
+                          Join Community Forum
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                  
+                  {/* Sample notifications that would be shown once user engages */}
+                  {/* 
+                  <div className="p-4 flex items-start space-x-4 bg-blue-900/10 rounded-md">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-green-500/20 border border-green-500/30">
+                      <Eye className="h-5 w-5 text-green-400" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-medium text-white">
+                          Welcome to KOD•X
+                          <Badge className="ml-2 bg-blue-500 text-white">
+                            New
+                          </Badge>
+                        </h3>
+                      </div>
+                      
+                      <p className="text-sm text-gray-300 mt-1">
+                        Begin your journey into mindful technology and cyber-zen practices.
+                      </p>
+                      
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-400">
+                          Just now
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  */}
+                </div>
+              </div>
               
-              <div className="text-center mt-4">
-                <Button variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20">
-                  Start a Lab
+              <div className="p-4 border-t border-[#1e293b] text-center">
+                <Button
+                  variant="ghost"
+                  className="text-blue-300 hover:text-blue-200"
+                >
+                  View All Notifications
                 </Button>
               </div>
             </Card>

@@ -884,6 +884,103 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
     }
   });
 
+  // Notifications endpoints
+  app.get("/api/notifications", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Sample notifications - in production these would come from the database
+      const notifications = [
+        {
+          id: "1",
+          type: "welcome",
+          title: "Welcome to KOD·X",
+          message: "Begin your journey into mindful technology and cyber-zen practices.",
+          timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5 minutes ago
+          read: false,
+          link: "/dashboard",
+          iconColor: "#10b981" // emerald-500
+        },
+        {
+          id: "2",
+          type: "badge_earned",
+          title: "Badge Earned: Digital Starter",
+          message: "You've earned the Digital Starter badge for beginning your journey.",
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+          read: false,
+          link: "/profile/badges",
+          iconColor: "#8b5cf6" // violet-500
+        },
+        {
+          id: "3",
+          type: "lab_progress",
+          title: "Lab Progress: Digital Sanctuary Setup",
+          message: "You've completed 75% of the Digital Sanctuary Setup lab.",
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+          read: true,
+          link: "/labs/1",
+          iconColor: "#6366f1" // indigo-500
+        },
+        {
+          id: "4",
+          type: "forum_like",
+          title: "Your post received a like",
+          message: "cyberninja liked your post 'Getting started with encryption basics'",
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+          read: true,
+          link: "/forum/posts/1",
+          iconColor: "#ec4899" // pink-500
+        },
+        {
+          id: "5",
+          type: "event",
+          title: "Upcoming Event: Cyber Defense Workshop",
+          message: "Don't miss our upcoming live workshop on basic cyber defense techniques.",
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+          read: true,
+          link: "/events/5",
+          iconColor: "#10b981" // emerald-500
+        }
+      ];
+      
+      // Get total count and paginate
+      const totalCount = notifications.length;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+      
+      const paginatedNotifications = notifications.slice(startIndex, endIndex);
+      
+      res.json({
+        items: paginatedNotifications,
+        totalCount,
+        page,
+        totalPages: Math.ceil(totalCount / limit)
+      });
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+  
+  app.post("/api/notifications/mark-all-read", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // In a production environment, we would update notifications in the database
+      // For this demo, we'll just return a success response
+      
+      res.json({ 
+        success: true, 
+        message: "All notifications marked as read" 
+      });
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark notifications as read" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
