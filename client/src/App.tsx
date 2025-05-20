@@ -13,6 +13,7 @@ import ProjectPage from "@/pages/projects/[id]";
 import ForumPage from "@/pages/forum/index";
 import ForumPostPage from "@/pages/forum/[id]";
 import DashboardPage from "@/pages/dashboard";
+import SettingsPage from "@/pages/settings";
 import AdminPage from "@/pages/admin";
 
 function Router() {
@@ -33,8 +34,9 @@ function Router() {
       <Route path="/forum" component={ForumPage} />
       <Route path="/forum/:id" component={ForumPostPage} />
       
-      {/* Dashboard and Admin */}
+      {/* Dashboard, Settings and Admin */}
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/admin" component={AdminPage} />
       
       {/* Fallback to 404 */}

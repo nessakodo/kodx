@@ -75,12 +75,37 @@ export function Header() {
                       className="relative text-[#9ecfff]"
                     >
                       <BellIcon size={20} />
-                      {/* Notification dot */}
-                      <span className="absolute -top-1 -right-1 bg-[#b166ff] w-2 h-2 rounded-full"></span>
+                      {/* Notification dot - only shown when there are unread notifications */}
+                      <span className="absolute -top-1 -right-1 bg-[#b166ff] w-2 h-2 rounded-full animate-pulse"></span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>No new notifications</DropdownMenuItem>
+                  <DropdownMenuContent align="end" className="w-72">
+                    <div className="px-2 py-2 border-b border-[#9ecfff]/10">
+                      <div className="text-sm font-medium">Notifications</div>
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
+                        <div className="flex flex-col">
+                          <div className="text-sm"><span className="font-semibold">Quantum Mechanics</span> lab is now available</div>
+                          <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
+                        <div className="flex flex-col">
+                          <div className="text-sm"><span className="font-semibold">@codemaster</span> commented on your forum post</div>
+                          <div className="text-xs text-gray-400 mt-1">Yesterday</div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
+                        <div className="flex flex-col">
+                          <div className="text-sm">Your post received <span className="font-semibold">5 new likes</span></div>
+                          <div className="text-xs text-gray-400 mt-1">3 days ago</div>
+                        </div>
+                      </DropdownMenuItem>
+                    </div>
+                    <div className="px-2 py-2 border-t border-[#9ecfff]/10">
+                      <Link href="/dashboard" className="text-sm text-[#9ecfff] hover:text-[#cae6ff] w-full text-center block">View all in Dashboard</Link>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -91,31 +116,37 @@ export function Header() {
                       className="h-10 w-10 rounded-full p-0 border-2 border-[#9ecfff]/20 overflow-hidden"
                       variant="ghost"
                     >
-                      <Avatar>
-                        <AvatarImage
-                          src={user.profileImageUrl}
-                          alt={user.username}
-                        />
-                        <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-                          {user.username[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-1 -right-1 bg-[#5cdc96] text-xs px-1 rounded text-black font-semibold">
-                        {user.totalXp}
+                      <div className="relative">
+                        <Avatar>
+                          <AvatarImage
+                            src={user.profileImageUrl}
+                            alt={user.username}
+                          />
+                          <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
+                            {user.username[0].toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="w-48">
+                    <div className="px-2 py-2 border-b border-[#9ecfff]/10">
+                      <div className="text-sm font-medium">{user.username}</div>
+                      <div className="text-xs text-gray-400">Level {Math.floor(user.totalXp / 1000) + 1} • {user.totalXp} XP</div>
+                    </div>
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard">Dashboard</Link>
+                      <Link href="/dashboard" className="cursor-pointer">Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="cursor-pointer">Settings</Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem asChild>
-                        <Link href="/admin">Admin Panel</Link>
+                        <Link href="/admin" className="cursor-pointer">Admin Panel</Link>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem>
-                      <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Sign Out</a>
+                    <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
