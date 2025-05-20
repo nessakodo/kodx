@@ -46,16 +46,12 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
     if (categories[categoryKey]) {
       return {
         color: categories[categoryKey].color,
-        border: `border-[${categories[categoryKey].color}]/30`,
-        bg: `bg-[${categories[categoryKey].color}]/10`,
       };
     }
     
     // Default styling if category not found
     return {
       color: "#9ca3af", // gray-400
-      border: "border-gray-400/30",
-      bg: "bg-gray-400/10",
     };
   };
 
@@ -106,12 +102,12 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
               </Badge>
             )}
             <Badge 
+              className="text-xs px-2 py-1 rounded-full uppercase tracking-wider border"
               style={{
                 backgroundColor: `${categoryStyle.color}20`,
                 color: categoryStyle.color,
                 borderColor: `${categoryStyle.color}40`
               }}
-              className="text-xs px-2 py-1 rounded-full uppercase tracking-wider border"
             >
               {post.category}
             </Badge>

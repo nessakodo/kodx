@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme-provider";
+import React, { lazy, Suspense } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/index";
 import LabsPage from "@/pages/labs/index";
@@ -11,7 +12,6 @@ import LabPage from "@/pages/labs/[id]";
 import ProjectsPage from "@/pages/projects/index";
 import ProjectPage from "@/pages/projects/[id]";
 import ForumPage from "@/pages/forum/index";
-import ForumPostPage from "@/pages/forum/[id]";
 import DashboardPage from "@/pages/dashboard";
 import SettingsPage from "@/pages/settings";
 import AdminPage from "@/pages/admin";
@@ -32,7 +32,10 @@ function Router() {
       
       {/* Forum routes */}
       <Route path="/forum" component={ForumPage} />
-      <Route path="/forum/:id" component={ForumPostPage} />
+      <Route path="/forum/create" component={ForumPage} />
+      <Route path="/forum/post/:id" component={ForumPage} />
+      <Route path="/forum/categories/:category" component={ForumPage} />
+      <Route path="/forum/tags/:tag" component={ForumPage} />
       
       {/* Dashboard, Settings and Admin */}
       <Route path="/dashboard" component={DashboardPage} />
