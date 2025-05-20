@@ -106,9 +106,9 @@ export function KodexModal({
       aria-modal="true"
       role="dialog"
     >
-      {/* Backdrop overlay */}
+      {/* Backdrop overlay - lighter for positioned modals */}
       <div
-        className={`fixed inset-0 bg-black/50 ${
+        className={`fixed inset-0 ${position ? 'bg-black/20' : 'bg-black/50'} ${
           isOpen ? "animate-in fade-in-0" : "animate-out fade-out-0"
         } transition-opacity duration-200`}
         onClick={onClose}
@@ -125,7 +125,7 @@ export function KodexModal({
           isOpen
             ? "animate-in fade-in-0 zoom-in-95"
             : "animate-out fade-out-0 zoom-out-95",
-          position ? "absolute" : "relative",
+          position ? "absolute bg-[#0f172a]/95 backdrop-blur-sm border border-[#9ecfff]/15 rounded-lg shadow-lg" : "relative",
           className
         )}
         style={position ? getPositionStyles() : {}}
