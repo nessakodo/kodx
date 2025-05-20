@@ -5,6 +5,7 @@ import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 import { setupPassport, initializeTestUsers } from "./auth";
 import { hashPassword } from "./auth";
+import { User } from "@shared/schema";
 
 // Simple mock authentication for development purposes
 // This will be replaced with proper Replit Auth integration in production
@@ -42,113 +43,190 @@ export async function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // For development purposes, we'll use a simplified authentication system
-  // Later we can implement the full Replit Auth when OpenID Connect setup is properly configured
+  // Setup passport with local strategy
+  setupPassport();
   
-  // Passport session setup
-  passport.serializeUser((user: Express.User, done) => {
-    done(null, user);
+  // Initialize test users with proper credentials
+  await initializeTestUsers();
+  
+  // Login route with username/password
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate('local', (err: Error | null, user: any, info: { message: string } | undefined) => {
+      if (err) {
+        console.error("Login error:", err);
+        return res.status(500).json({ success: false, message: "An error occurred during login" });
+      }
+      
+      if (!user) {
+        return res.status(401).json({ success: false, message: info?.message || "Invalid credentials" });
+      }
+      
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Login error:", err);
+          return res.status(500).json({ success: false, message: "Failed to complete login" });
+        }
+        
+        // Don't send password back to client
+        const safeUser = { ...user, password: undefined };
+        return res.json({ success: true, user: safeUser });
+      });
+    })(req, res, next);
   });
   
-  passport.deserializeUser((user: Express.User, done) => {
-    done(null, user);
-  });
-  
-  // Test users for development
-  const testUsers = {
-    regular: {
-      id: "test-user-123",
-      email: "test@example.com",
-      firstName: "Test",
-      lastName: "User",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff",
-      role: "user",
-      totalXp: 1250,
-      username: "testuser",
-    },
-    experienced: {
-      id: "test-user-456",
-      email: "advanced@example.com", 
-      firstName: "Advanced",
-      lastName: "User",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Advanced+User&background=9C27B0&color=fff",
-      role: "user",
-      totalXp: 5750,
-      username: "advanceduser",
-    },
-    admin: {
-      id: "admin-789",
-      email: "admin@example.com",
-      firstName: "Admin",
-      lastName: "User",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=F44336&color=fff",
-      role: "admin",
-      totalXp: 9950,
-      username: "adminuser",
+  // Register route for new users
+  app.post("/api/register", async (req, res) => {
+    try {
+      const { username, email, password, confirmPassword } = req.body;
+      
+      // Basic validation
+      if (!username || !email || !password) {
+        return res.status(400).json({ success: false, message: "All fields are required" });
+      }
+      
+      if (password !== confirmPassword) {
+        return res.status(400).json({ success: false, message: "Passwords don't match" });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: "Username already exists" });
+      }
+      
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(400).json({ success: false, message: "Email already exists" });
+      }
+      
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+      
+      // Create new user
+      const newUser = await storage.upsertUser({
+        id: `user-${Date.now()}`,
+        username,
+        email,
+        password: hashedPassword,
+        firstName: "",
+        lastName: "",
+        profileImageUrl: `https://ui-avatars.com/api/?name=${username}&background=0D8ABC&color=fff`,
+        totalXp: 0,
+        role: "user",
+      });
+      
+      // Log in the new user
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error("Auto-login error after registration:", err);
+          return res.status(200).json({ 
+            success: true, 
+            message: "Registration successful. Please log in.",
+            user: { ...newUser, password: undefined } 
+          });
+        }
+        
+        return res.status(201).json({ 
+          success: true, 
+          message: "Registration successful. You are now logged in.",
+          user: { ...newUser, password: undefined }
+        });
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ success: false, message: "Failed to register" });
     }
-  };
+  });
   
-  // Development routes for authentication
+  // Legacy route for test users
   app.get("/api/login", (req, res) => {
     const userType = req.query.type || "regular";
-    const userToLogin = testUsers[userType as keyof typeof testUsers] || testUsers.regular;
     
-    console.log(`Logging in ${userToLogin.role} user:`, userToLogin);
-    
-    // Save this user in the database
-    storage.upsertUser(userToLogin)
-      .then((user) => {
-        console.log("User saved in database:", user);
-        req.login(userToLogin, (err) => {
-          if (err) {
-            console.error("Login error:", err);
-            return res.status(500).json({ message: "Login failed" });
+    if (userType === "admin") {
+      storage.getUserByUsername("admin")
+        .then(user => {
+          if (!user) {
+            return res.status(404).json({ success: false, message: "Admin user not found" });
           }
-          console.log("User logged in successfully");
-          const redirectUrl = typeof req.query.redirect === 'string' ? req.query.redirect : "/?loggedIn=true";
-          return res.redirect(redirectUrl);
+          
+          req.login(user, (err) => {
+            if (err) {
+              console.error("Admin login error:", err);
+              return res.status(500).json({ success: false, message: "Admin login failed" });
+            }
+            
+            return res.redirect("/admin?adminLoggedIn=true");
+          });
+        })
+        .catch(err => {
+          console.error("Admin fetch error:", err);
+          res.status(500).json({ success: false, message: "Failed to fetch admin user" });
         });
-      })
-      .catch(err => {
-        console.error("User creation error:", err);
-        res.status(500).json({ message: "Failed to create test user" });
-      });
+    } else {
+      storage.getUserByUsername("testuser")
+        .then(user => {
+          if (!user) {
+            return res.status(404).json({ success: false, message: "Test user not found" });
+          }
+          
+          req.login(user, (err) => {
+            if (err) {
+              console.error("Test user login error:", err);
+              return res.status(500).json({ success: false, message: "Test user login failed" });
+            }
+            
+            const redirectUrl = typeof req.query.redirect === 'string' ? req.query.redirect : "/?loggedIn=true";
+            return res.redirect(redirectUrl);
+          });
+        })
+        .catch(err => {
+          console.error("Test user fetch error:", err);
+          res.status(500).json({ success: false, message: "Failed to fetch test user" });
+        });
+    }
   });
   
-  app.get("/api/auth/admin", (req, res) => {
-    const adminUser = testUsers.admin;
-    
-    storage.upsertUser(adminUser)
-      .then((user) => {
-        req.login(adminUser, (err) => {
-          if (err) {
-            console.error("Admin login error:", err);
-            return res.status(500).json({ message: "Admin login failed" });
-          }
-          console.log("Admin logged in successfully");
-          return res.redirect("/admin?adminLoggedIn=true");
-        });
-      })
-      .catch(err => {
-        console.error("Admin creation error:", err);
-        res.status(500).json({ message: "Failed to create admin user" });
+  // Admin access route
+  app.get("/api/auth/admin", async (req, res) => {
+    try {
+      const adminUser = await storage.getUserByUsername("admin");
+      
+      if (!adminUser) {
+        return res.status(404).json({ success: false, message: "Admin user not found" });
+      }
+      
+      req.login(adminUser, (err) => {
+        if (err) {
+          console.error("Admin login error:", err);
+          return res.status(500).json({ success: false, message: "Admin login failed" });
+        }
+        
+        return res.redirect("/admin?adminLoggedIn=true");
       });
+    } catch (err) {
+      console.error("Admin access error:", err);
+      res.status(500).json({ success: false, message: "Failed to access admin" });
+    }
   });
   
+  // Logout route
   app.get("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
         console.error("Logout error:", err);
-        return res.status(500).json({ message: "Logout failed" });
+        return res.status(500).json({ success: false, message: "Logout failed" });
       }
       res.redirect("/?loggedOut=true");
     });
   });
 
-  // Add auth endpoint for checking authenticated user
+  // Get current authenticated user
   app.get("/api/auth/user", (req, res) => {
     if (req.isAuthenticated()) {
-      res.json(req.user);
+      // Don't send password back to client
+      const user = req.user as any;
+      const safeUser = { ...user, password: undefined };
+      res.json(safeUser);
     } else {
       res.status(401).json({ message: "Unauthorized" });
     }

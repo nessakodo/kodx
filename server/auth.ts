@@ -19,7 +19,7 @@ export async function comparePassword(password: string, hashedPassword: string):
 // Configure passport to use local strategy
 export function setupPassport() {
   // Serialize user to the session
-  passport.serializeUser((user: User, done) => {
+  passport.serializeUser((user: any, done) => {
     done(null, user.id);
   });
 
