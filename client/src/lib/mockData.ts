@@ -64,32 +64,32 @@ export const MOCK_PROJECTS = [
 
 export const FORUM_CATEGORIES = {
   "DISCUSSION": {
-    label: "DISCUSSION",
+    label: "Discussion",
     color: "#8b5cf6", 
     route: "/forum/categories/discussion"
   },
   "RESOURCES": {
-    label: "RESOURCES",
+    label: "Resources",
     color: "#10b981",
     route: "/forum/categories/resources"
   },
   "SHOWCASE": {
-    label: "SHOWCASE",
+    label: "Showcase",
     color: "#facc15",
     route: "/forum/categories/showcase"
   },
   "QUESTIONS": {
-    label: "QUESTIONS",
+    label: "Questions",
     color: "#3b82f6",
     route: "/forum/categories/questions"
   },
   "FEEDBACK": {
-    label: "FEEDBACK",
+    label: "Feedback",
     color: "#f87171",
     route: "/forum/categories/feedback"
   },
   "ANNOUNCEMENTS": {
-    label: "ANNOUNCEMENTS",
+    label: "Announcements",
     color: "#e879f9",
     route: "/forum/categories/announcements"
   }

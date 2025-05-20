@@ -19,14 +19,14 @@ export default function ForumPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [tagFilter, setTagFilter] = useState("");
+  const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [location] = useLocation();
   
   // Check if we're navigating from a tag route and set the filter
   useEffect(() => {
     if (location.startsWith('/forum/tags/')) {
       const tag = location.split('/').pop() || "";
-      setTagFilter(`#${tag}`);
+      setTagFilters([`#${tag}`]);
     }
   }, [location]);
   
