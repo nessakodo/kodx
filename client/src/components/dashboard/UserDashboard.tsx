@@ -292,45 +292,136 @@ export function UserDashboard() {
       <section className="mb-8">
         <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
           <MessageSquareIcon className="h-5 w-5 text-[#9ecfff]" />
-          Your Forum Posts
+          Your Forum Activity
         </h2>
-        <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
-          {isLoading ? (
-            <div className="p-6 space-y-4">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
+        <Tabs defaultValue="posts" className="h-full">
+          <TabsList className="grid grid-cols-2 bg-[#1e293b]/30 mb-4 w-[240px]">
+            <TabsTrigger 
+              value="posts"
+              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+            >
+              Your Posts
+            </TabsTrigger>
+            <TabsTrigger 
+              value="saved"
+              className="data-[state=active]:bg-[#1e2535]/70 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+            >
+              Saved Posts
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="posts" className="h-full">
+            <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
+              {isLoading ? (
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+                      <h3 className="font-medium text-lg text-gray-200">Devlog – Reflections on Quantum Computing Basics</h3>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">devlog</Badge>
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">quantum</Badge>
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">beginner</Badge>
+                      </div>
+                    </div>
+                    <div className="text-gray-400 mb-3 line-clamp-3">
+                      I've completed the Quantum Computing Basics lab and wanted to share some thoughts. The concept of superposition was particularly interesting as it...
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <MessageCircleIcon className="h-4 w-4" />
+                        <span>3 comments</span>
+                      </div>
+                      <div className="text-xs text-gray-500">Posted: 19 May 2025</div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 flex justify-center">
+                    <Link href="/forum">
+                      <Button variant="outline" className="btn-kodex">
+                        View All Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
             </div>
-          ) : (
-            <>
-              <div className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
-                  <h3 className="font-medium text-lg text-gray-200">Devlog – Reflections on Quantum Computing Basics</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">devlog</Badge>
-                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">quantum</Badge>
-                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">beginner</Badge>
+          </TabsContent>
+          
+          <TabsContent value="saved" className="h-full">
+            <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
+              {isLoading ? (
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+                      <h3 className="font-medium text-lg text-gray-200">Secure Password Storage – Best Practices</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge style={{
+                          backgroundColor: `rgba(156, 39, 176, 0.2)`,
+                          color: `rgb(156, 39, 176)`,
+                          borderColor: `rgba(156, 39, 176, 0.4)`
+                        }} className="border">RESOURCES</Badge>
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">security</Badge>
+                      </div>
+                    </div>
+                    <div className="text-gray-400 mb-3 line-clamp-3">
+                      When it comes to storing passwords securely, hashing is just the beginning. This post outlines modern techniques including salting, peppers, and appropriate hash functions that...
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <MessageCircleIcon className="h-4 w-4" />
+                        <span>12 comments</span>
+                      </div>
+                      <div className="text-xs text-gray-500">Saved: 18 May 2025</div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-gray-400 mb-3 line-clamp-3">
-                  I've completed the Quantum Computing Basics lab and wanted to share some thoughts. The concept of superposition was particularly interesting as it...
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <MessageCircleIcon className="h-4 w-4" />
-                    <span>3 comments</span>
+                  
+                  <div className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+                      <h3 className="font-medium text-lg text-gray-200">Creating Ethical AI: A Developer's Responsibility</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge style={{
+                          backgroundColor: `rgba(100, 149, 237, 0.2)`,
+                          color: `rgb(100, 149, 237)`,
+                          borderColor: `rgba(100, 149, 237, 0.4)`
+                        }} className="border">DISCUSSION</Badge>
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">ethics</Badge>
+                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">ai</Badge>
+                      </div>
+                    </div>
+                    <div className="text-gray-400 mb-3 line-clamp-3">
+                      As AI becomes more embedded in society, our responsibility as developers extends beyond just making it work. This discussion explores frameworks for ethical decision-making...
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <MessageCircleIcon className="h-4 w-4" />
+                        <span>27 comments</span>
+                      </div>
+                      <div className="text-xs text-gray-500">Saved: 15 May 2025</div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500">Posted: 19 May 2025</div>
-                </div>
-              </div>
-              
-              <div className="p-4 flex justify-center">
-                <Button variant="outline" className="btn-kodex">
-                  View All Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
+                  
+                  <div className="p-4 flex justify-center">
+                    <Link href="/forum">
+                      <Button variant="outline" className="btn-kodex">
+                        View All Saved Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </section>
       
       <section>

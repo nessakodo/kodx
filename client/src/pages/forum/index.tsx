@@ -51,7 +51,7 @@ export default function ForumPage() {
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesCategory = categoryFilter === "" || post.category === categoryFilter;
+    const matchesCategory = categoryFilter === "all" || post.category === categoryFilter;
     
     const matchesTag = tagFilter === "" || 
       (post.tags && post.tags.some((tag: string) => 
@@ -110,7 +110,7 @@ export default function ForumPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1e2535] border-[#1e2535]">
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => {
                       const categoryData = categoriesObj[category];
                       return (

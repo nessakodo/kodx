@@ -8,7 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
+import { useTheme } from "@/lib/theme-provider";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 const AVATAR_OPTIONS = [
   { id: 1, gradient: "from-[#9ecfff] to-[#88c9b7]", label: "Ocean Breeze" },
@@ -43,7 +46,7 @@ export default function SettingsPage() {
     );
   }
 
-  const handleUpdateProfile = (e) => {
+  const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "Profile Updated",
@@ -51,7 +54,7 @@ export default function SettingsPage() {
     });
   };
 
-  const handleUpdatePassword = (e) => {
+  const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       toast({
@@ -71,7 +74,7 @@ export default function SettingsPage() {
     setConfirmPassword("");
   };
 
-  const handleAvatarSelect = (id) => {
+  const handleAvatarSelect = (id: number) => {
     setSelectedAvatar(id);
     toast({
       title: "Avatar Updated",
