@@ -24,6 +24,7 @@ const AVATAR_OPTIONS = [
 
 export default function SettingsPage() {
   const { user, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -98,6 +99,7 @@ export default function SettingsPage() {
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="avatar">Avatar</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
           </TabsList>
           
           <TabsContent value="profile">
@@ -236,6 +238,91 @@ export default function SettingsPage() {
                     Update Password
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="appearance">
+            <Card className="glassmorphic">
+              <CardHeader>
+                <CardTitle>Appearance Settings</CardTitle>
+                <CardDescription>Customize the look and feel of your interface</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="theme-toggle">Dark Mode</Label>
+                      <p className="text-sm text-gray-400">
+                        {theme === "dark" ? "Currently using dark theme" : "Currently using light theme"}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <SunIcon className={`h-4 w-4 ${theme === "light" ? "text-[#ffa700]" : "text-gray-500"}`} />
+                      <Switch 
+                        id="theme-toggle" 
+                        checked={theme === "dark"}
+                        onCheckedChange={() => {
+                          toggleTheme();
+                          toast({
+                            title: `${theme === "dark" ? "Light" : "Dark"} Mode Activated`,
+                            description: `Theme switched to ${theme === "dark" ? "light" : "dark"} mode.`,
+                          });
+                        }}
+                      />
+                      <MoonIcon className={`h-4 w-4 ${theme === "dark" ? "text-[#9ecfff]" : "text-gray-500"}`} />
+                    </div>
+                  </div>
+                  
+                  <div className="pt-6 border-t border-[#1e293b]/70">
+                    <h3 className="text-sm font-medium mb-3">UI Animation Level</h3>
+                    <div className="flex flex-col space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="animation-subtle" className="flex items-center cursor-pointer">
+                          <input 
+                            type="radio"
+                            id="animation-subtle"
+                            name="animation-level"
+                            className="mr-2 accent-[#9ecfff]"
+                            defaultChecked
+                          />
+                          Subtle
+                        </Label>
+                        <p className="text-xs text-gray-400">Minimal animations</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="animation-moderate" className="flex items-center cursor-pointer">
+                          <input 
+                            type="radio"
+                            id="animation-moderate"
+                            name="animation-level"
+                            className="mr-2 accent-[#9ecfff]"
+                          />
+                          Moderate
+                        </Label>
+                        <p className="text-xs text-gray-400">Balanced experience</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="animation-enhanced" className="flex items-center cursor-pointer">
+                          <input 
+                            type="radio"
+                            id="animation-enhanced"
+                            name="animation-level"
+                            className="mr-2 accent-[#9ecfff]"
+                          />
+                          Enhanced
+                        </Label>
+                        <p className="text-xs text-gray-400">Full animation suite</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    className="w-full bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+                  >
+                    Save Appearance Settings
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
