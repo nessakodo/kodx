@@ -17,9 +17,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes - Development mode
+  // Auth routes - Development mode endpoints for testing
+  
+  // USER account endpoint
   app.get('/api/auth/user', async (req: any, res) => {
-    // For development purposes, auto-authenticate with a mock user
+    // Always return a standard user for development
     try {
       // Try to get user from database first (to avoid creating duplicates)
       let user = await storage.getUser("test-user-123");
@@ -48,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Also provide an admin user for testing
+  // ADMIN account endpoint 
   app.get('/api/auth/admin', async (req: any, res) => {
     try {
       // Try to get admin user from database first
@@ -62,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           firstName: "Admin",
           lastName: "User",
           username: "adminuser",
-          profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User",
+          profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=5cdc96&color=fff",
           role: "admin",
           totalXp: 5000,
         };

@@ -1,24 +1,47 @@
 import { useQuery } from "@tanstack/react-query";
 
-// Simpler useAuth implementation to avoid hook order issues
+// Very simple auth hook for development
 export function useAuth() {
-  // For development, we'll always fetch from the user endpoint 
-  // and it will always return a user
-  const { data: user, isLoading } = useQuery({
+  // Fixed data for our test user accounts
+  const testUser = {
+    id: "test-user-123",
+    email: "test@example.com",
+    firstName: "Test",
+    lastName: "User",
+    username: "testuser",
+    profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
+    role: "user",
+    totalXp: 1250,
+  };
+  
+  const adminUser = {
+    id: "admin-user-456",
+    email: "admin@example.com",
+    firstName: "Admin",
+    lastName: "User",
+    username: "adminuser",
+    profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=5cdc96&color=fff",
+    role: "admin",
+    totalXp: 5000,
+  };
+  
+  // Use the standard endpoint just to check if it's available
+  const { data, isLoading } = useQuery({
     queryKey: ["/api/auth/user"],
-    staleTime: 30000, // Refresh every 30 seconds
+    enabled: false, // Don't actually run the query
   });
+  
+  // For development, we'll use our predefined user data
+  const isAdmin = window.location.pathname === "/admin";
+  const user = isAdmin ? adminUser : testUser;
   
   return {
     user,
-    isLoading,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === "admin",
-    // Simple role toggle - reloads the page to switch endpoints
-    toggleRole: () => {
-      window.location.href = user?.role === "admin" 
-        ? "/api/auth/user" 
-        : "/api/auth/admin";
-    }
+    isLoading: false,
+    isAuthenticated: true, // Always authenticated for development
+    isAdmin,
+    loginAsUser: () => window.location.href = "/",
+    loginAsAdmin: () => window.location.href = "/admin",
+    logout: () => console.log("Logged out (simulated)"),
   };
 }

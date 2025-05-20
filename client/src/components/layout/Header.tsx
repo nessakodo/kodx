@@ -15,7 +15,7 @@ import { useState } from "react";
 
 export function Header() {
   const [location] = useLocation();
-  const { user, isAuthenticated, isAdmin, toggleRole } = useAuth();
+  const { user, isAuthenticated, isAdmin, loginAsUser, loginAsAdmin, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -124,20 +124,19 @@ export function Header() {
               </>
             ) : (
               <>
-                <Button
-                  variant="ghost"
-                  className="border border-[#9ecfff]/30 hover:bg-[#9ecfff]/10"
-                  asChild
+                <button
+                  onClick={loginAsUser}
+                  className="cta-button bg-transparent hover:bg-[rgba(158,207,255,0.1)]"
                 >
-                  <a href="/api/login">Sign In</a>
-                </Button>
+                  Sign In
+                </button>
 
-                <Button
-                  className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30 transition-all"
-                  asChild
+                <button
+                  onClick={loginAsAdmin}
+                  className="cta-button"
                 >
-                  <a href="/api/login">Create Account</a>
-                </Button>
+                  Admin Access
+                </button>
               </>
             )}
           </div>
