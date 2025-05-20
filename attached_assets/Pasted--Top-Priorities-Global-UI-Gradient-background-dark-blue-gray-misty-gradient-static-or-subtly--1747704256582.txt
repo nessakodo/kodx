@@ -1,0 +1,107 @@
+📌 Top Priorities
+
+Global UI
+
+Gradient background: dark, blue/gray misty gradient (static or subtly animated)
+
+Subtle terminal-style grid overlay
+
+Typography: Orbitron (uppercase, wide tracking) + Inter
+
+Glow effect on all instances of “KODΞX”
+
+Full glassmorphic UI with proper spacing and legibility
+
+Avatar + notifications in navbar when signed in; XP ring hidden
+
+XP ring animated on dashboard (only for logged-in users)
+
+Homepage Content (Prioritized)
+
+Hero (title + slogan + subtitle + CTA)
+
+Featured Labs + Projects carousel
+
+Manifesto + About + Community Metrics
+
+Countdown timer for next drop + Add to Calendar button
+
+Newsletter signup (dummy: /api/newsletter/signup)
+
+Social links: Discord, YouTube, GitHub in footer and nav
+
+Lab & Project Pages
+
+/labs/:id and /projects/:id
+
+Markdown rendered with metadata:
+
+title, video, quiz[], timestamps, tasks[], XP, badge ID
+
+Labs: YouTube + quizzes + checklist + devlog prompt
+
+Projects: Fork repo button, timestamps, checklist, notes
+
+On completion:
+
+XP granted
+
+Badge unlocked
+
+Notes aggregated
+
+Suggested devlog posted to forum
+
+Forum System
+
+Threads, replies, reactions (likes, XP)
+
+Auth required to post/comment/like/follow
+
+Devlog auto-posts after Lab/Project completion
+
+Badge and avatar display on posts
+
+Dashboard
+
+Auth required
+
+Animated XP ring
+
+Avatar + badges unlocked
+
+Progress tracker: in-progress Labs/Projects
+
+Notes history
+
+Notifications (likes, comments, follows)
+
+Admin Console
+
+Protected routes for content management
+
+Create/Edit/Delete Labs, Projects, Badges
+
+Forum moderation (pin, highlight, delete)
+
+Badge logic editor (XP, completions, etc.)
+
+🗃️ Files to Use
+
+KodexZen.zip → UI base
+
+kodex_starter_content_v2.zip → seed Labs/Projects (JSON + .md)
+
+KODEX_SiteSpec_RemixPrompt_FINAL_V2.pdf → full system spec
+
+KODEX Microcopy Suite.zip → all interface language
+
+Claude_Routes_Architecture.png → backend and route logic
+
+Screenshots → design fidelity references
+
+🧠 Summary
+
+Build the KODΞX as a living, breathing operating system for digital self-agency — from secure habits to creative projects to shared knowledge.
+
+This is a secure, poetic, full-stack experience designed for scale, depth, and creative resonance.

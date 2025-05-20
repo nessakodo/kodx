@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KODΞX WORLD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: #0e0e0e;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at top left, rgba(158, 207, 255, 0.1), transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(136, 201, 183, 0.1), transparent 40%);
+    }
+
+    .kodex-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4.5rem;
+      text-align: center;
+      background: linear-gradient(90deg, #9ecfff, #88c9b7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(158, 207, 255, 0.8);
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+
+    .kodex-slogan {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      text-align: center;
+      color: #c0c0c0;
+      margin-bottom: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      max-width: 640px;
+      text-align: center;
+      color: #b0b0b0;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .cta-button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(158, 207, 255, 0.3);
+      border-radius: 16px;
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(158, 207, 255, 0.1);
+      transition: all 0.4s ease;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cta-button:hover {
+      background: rgba(158, 207, 255, 0.1);
+      box-shadow: 0 0 25px rgba(158, 207, 255, 0.3), 0 0 40px rgba(136, 201, 183, 0.2);
+      border-color: rgba(158, 207, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="kodex-logo">KODΞX WORLD</h1>
+  <p class="kodex-slogan">DESIGN THE FUTURE. DECODE THE PAST.</p>
+  <p class="subtitle">A platform for mindful technologists. Build secure systems. Create with intention. 
+  Transform your relationship with code, security, and self — one Lab at a time.</p>
+  <button class="cta-button">Enter the KODΞX</button>
+</body>
+</html>
