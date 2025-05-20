@@ -1,24 +1,20 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { UserDashboard } from "@/components/dashboard/UserDashboard";
+import { SimpleDashboard } from "@/components/dashboard/SimpleDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { useEffect } from "react";
-import { awardFounderBadge } from "@/utils/badges";
 
 export default function DashboardPage() {
   const { isAuthenticated, user } = useAuth();
   const [, setLocation] = useLocation();
   
-  // Award founder badge to new users
+  // Check if user is authenticated
   useEffect(() => {
-    if (isAuthenticated && user && user.id) {
-      // Check if user is new and award founder badge
-      if (user.createdAt && 
-          new Date(user.createdAt).getTime() > Date.now() - 10 * 60 * 1000) { // User created in the last 10 minutes
-        awardFounderBadge(user.id);
-      }
+    if (isAuthenticated && user) {
+      // User is authenticated, we can proceed
+      console.log("User authenticated:", user);
     }
   }, [isAuthenticated, user]);
   
@@ -57,7 +53,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
       <Header />
       <main>
-        <UserDashboard />
+        <SimpleDashboard />
       </main>
       <Footer />
     </div>

@@ -42,15 +42,25 @@ export function UserDashboard() {
     enabled: isAuthenticated,
   });
   
+  // Create default empty dashboard data
+  const EMPTY_DASHBOARD_DATA = {
+    labProgress: [],
+    projectProgress: [],
+    badges: [],
+    notes: [],
+    totalXp: 0,
+    forumActivity: []
+  };
+  
   // Check if user is new (no progress data yet)
   const isNewUser = !dashboardData || (
-    (!dashboardData.labProgress || dashboardData.labProgress.length === 0) &&
-    (!dashboardData.projectProgress || dashboardData.projectProgress.length === 0) &&
-    (!dashboardData.badges || dashboardData.badges.length === 0)
+    (!dashboardData?.labProgress || dashboardData?.labProgress.length === 0) &&
+    (!dashboardData?.projectProgress || dashboardData?.projectProgress.length === 0) &&
+    (!dashboardData?.badges || dashboardData?.badges.length === 0)
   );
   
   // Use appropriate data based on user status
-  const display = dashboardData || (isNewUser ? EMPTY_DASHBOARD_DATA : MOCK_DASHBOARD_DATA);
+  const display = dashboardData || EMPTY_DASHBOARD_DATA;
   
   // Calculate level and progress
   const level = calculateLevel(user?.totalXp || 0);
