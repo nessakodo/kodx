@@ -68,9 +68,9 @@ export function LabCard({ lab, className }: LabCardProps) {
         </div>
         <div className="absolute top-4 right-4 flex gap-1">
           <Badge 
-            className="bg-[#1e2535]/80 backdrop-blur text-xs px-3 py-1 rounded-full flex items-center gap-1"
+            className="bg-[#1e2535]/80 backdrop-blur text-xs px-3 py-1 rounded-full flex items-center gap-1 hover-glow border border-[#1e2535]"
           >
-            <StarIcon className="h-3 w-3 text-[#9ecfff]" /> {lab.xpReward} XP
+            <StarIcon className="h-3 w-3 text-[#9ecfff]" /> <span className="text-gray-200">{lab.xpReward} XP</span>
           </Badge>
         </div>
       </div>

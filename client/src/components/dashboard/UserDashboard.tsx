@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
 import { Progress } from "@/components/ui/progress";
-import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon } from "lucide-react";
+import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon } from "lucide-react";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
 import { Link } from "wouter";
 
@@ -282,6 +282,50 @@ export function UserDashboard() {
               <div className="p-4 flex justify-center">
                 <Button variant="outline" className="btn-kodex">
                   Show More Notes <ChevronDownIcon className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+      
+      <section className="mb-8">
+        <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
+          <MessageSquareIcon className="h-5 w-5 text-[#9ecfff]" />
+          Your Forum Posts
+        </h2>
+        <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
+          {isLoading ? (
+            <div className="p-6 space-y-4">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          ) : (
+            <>
+              <div className="p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+                  <h3 className="font-medium text-lg text-gray-200">Devlog – Reflections on Quantum Computing Basics</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">devlog</Badge>
+                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">quantum</Badge>
+                    <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">beginner</Badge>
+                  </div>
+                </div>
+                <div className="text-gray-400 mb-3 line-clamp-3">
+                  I've completed the Quantum Computing Basics lab and wanted to share some thoughts. The concept of superposition was particularly interesting as it...
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <MessageCircleIcon className="h-4 w-4" />
+                    <span>3 comments</span>
+                  </div>
+                  <div className="text-xs text-gray-500">Posted: 19 May 2025</div>
+                </div>
+              </div>
+              
+              <div className="p-4 flex justify-center">
+                <Button variant="outline" className="btn-kodex">
+                  View All Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </Button>
               </div>
             </>
