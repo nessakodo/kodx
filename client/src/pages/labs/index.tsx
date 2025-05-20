@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LabCard } from "@/components/labs/LabCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,8 +23,7 @@ export default function LabsPage() {
   const displayLabs = (labs && labs.length > 0) ? labs : MOCK_LABS;
   
   return (
-    <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
-      <Header />
+    <div className="min-h-screen">
       <main className="container mx-auto px-4 py-12">
         <div className="mb-10">
           <h1 className="font-orbitron text-3xl tracking-wider mb-4">
