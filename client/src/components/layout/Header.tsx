@@ -22,21 +22,35 @@ export function Header() {
   // Ref for notification bell button to position the dropdown
   const notificationBellRef = useRef<HTMLButtonElement>(null);
   
+  // Ref for user menu button
+  const userMenuRef = useRef<HTMLButtonElement>(null);
+  
   // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Close menus when clicking outside their containers
-      if (mobileMenuOpen || userMenuOpen) {
-        setMobileMenuOpen(false);
-        setUserMenuOpen(false);
+      if (notificationBellRef.current && !notificationBellRef.current.contains(event.target as Node)) {
+        // Close notifications when clicking outside notification bell
+        if (notificationsOpen) {
+          setNotificationsOpen(false);
+        }
       }
       
-      // Don't close notifications panel here - it's handled by the KodexModal component
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        // Close user menu when clicking outside user menu button
+        if (userMenuOpen) {
+          setUserMenuOpen(false);
+        }
+      }
+      
+      // Close mobile menu when clicking outside
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
     };
     
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [mobileMenuOpen, userMenuOpen]);
+  }, [mobileMenuOpen, userMenuOpen, notificationsOpen]);
   
   // Close mobile menu when location changes
   useEffect(() => {
@@ -116,6 +130,7 @@ export function Header() {
                 {/* User Menu */}
                 <div className="relative">
                   <Button
+                    ref={userMenuRef}
                     variant="ghost"
                     className="flex items-center space-x-2 ml-2"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
