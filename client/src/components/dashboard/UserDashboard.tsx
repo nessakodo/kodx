@@ -23,6 +23,12 @@ export function UserDashboard() {
     enabled: isAuthenticated,
   });
   
+  // Fetch saved posts
+  const { data: savedPosts, isLoading: isSavedPostsLoading } = useQuery({
+    queryKey: ["/api/saved-posts"],
+    enabled: isAuthenticated,
+  });
+  
   // Use mock data when no real data is available
   const display = dashboardData || MOCK_DASHBOARD_DATA;
   

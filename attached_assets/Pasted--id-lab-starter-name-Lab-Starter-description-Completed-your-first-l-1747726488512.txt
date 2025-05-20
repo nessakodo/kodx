@@ -1,0 +1,98 @@
+[
+  {
+    "id": "lab_starter",
+    "name": "Lab Starter",
+    "description": "Completed your first lab",
+    "icon": "🔥"
+  },
+  {
+    "id": "forum_poster",
+    "name": "First Post",
+    "description": "Made your first forum post",
+    "icon": "✍️"
+  },
+  {
+    "id": "founder",
+    "name": "Founding Member",
+    "description": "Early member of KODΞX.WORLD",
+    "icon": "🚀"
+  },
+  {
+    "id": "level_10",
+    "name": "Level 10 Achiever",
+    "description": "Reached Level 10 – your power is growing",
+    "icon": "⚡"
+  },
+  {
+    "id": "devlog_scribe",
+    "name": "Devlog Scribe",
+    "description": "Shared your first project reflection in the forum",
+    "icon": "📓"
+  },
+  {
+    "id": "project_builder",
+    "name": "Project Builder",
+    "description": "Completed your first project",
+    "icon": "🛠️"
+  },
+  {
+    "id": "secure_thinker",
+    "name": "Secure Thinker",
+    "description": "Completed a lab in the Cybersecurity Pathway",
+    "icon": "🧠"
+  },
+  {
+    "id": "creative_agent",
+    "name": "Creative Agent",
+    "description": "Completed a project in the Creative Coding Pathway",
+    "icon": "🎨"
+  },
+  {
+    "id": "ritualist",
+    "name": "Digital Ritualist",
+    "description": "Submitted a reflection on tech & intention",
+    "icon": "🌒"
+  },
+  {
+    "id": "mentor",
+    "name": "Community Mentor",
+    "description": "Marked as helpful in 3 forum threads",
+    "icon": "🌱"
+  },
+  {
+    "id": "deep_dive",
+    "name": "Deep Diver",
+    "description": "Completed 5+ labs in one learning path",
+    "icon": "🧬"
+  },
+  {
+    "id": "night_runner",
+    "name": "Night Runner",
+    "description": "Logged progress between 12am–5am local time",
+    "icon": "🌌"
+  },
+  {
+    "id": "open_source_contributor",
+    "name": "Open Source Contributor",
+    "description": "Linked a GitHub repo in your project submission",
+    "icon": "🌍"
+  },
+  {
+    "id": "signal_seeker",
+    "name": "KODΞX SIGNAL Subscriber",
+    "description": "Subscribed to the KODΞX SIGNAL newsletter",
+    "icon": "📡"
+  },
+  {
+    "id": "early_supporter",
+    "name": "Early Supporter",
+    "description": "Supported KODΞX in its first year of launch",
+    "icon": "🪐"
+  },
+  {
+    "id": "glowkeeper",
+    "name": "Glowkeeper",
+    "description": "Completed 3 projects with a glowing review",
+    "icon": "✨"
+  }
+]

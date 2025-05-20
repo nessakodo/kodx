@@ -176,6 +176,14 @@ export const userCommentLikes = pgTable("user_comment_likes", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User saved posts (many-to-many)
+export const userSavedPosts = pgTable("user_saved_posts", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  postId: integer("post_id").notNull().references(() => forumPosts.id, { onDelete: 'cascade' }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Newsletter subscribers
 export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   id: serial("id").primaryKey(),

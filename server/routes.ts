@@ -7,7 +7,7 @@ import {
   users, labs, projects, badges, userBadges, 
   labProgress, projectProgress, forumPosts, 
   forumComments, userPostLikes, userCommentLikes,
-  newsletterSubscribers, insertNewsletterSubscriberSchema
+  userSavedPosts, newsletterSubscribers, insertNewsletterSubscriberSchema
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
@@ -614,7 +614,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => {
+  app.post("/api/forum-posts/:id/save", isAuthenticated, async (req: any, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      // Check if post exists
+      const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, postId));
+      if (!post) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      
+      // Check if user already saved the post
+      const [existingSave] = await db
+        .select()
+        .from(userSavedPosts)
+        .where(and(
+          eq(userSavedPosts.userId, userId),
+          eq(userSavedPosts.postId, postId)
+        ));
+      
+      if (existingSave) {
+        // Unsave: Remove the saved post
+        await db
+          .delete(userSavedPosts)
+          .where(and(
+            eq(userSavedPosts.userId, userId),
+            eq(userSavedPosts.postId, postId)
+          ));
+        
+        res.json({ postId, saved: false });
+      } else {
+        // Save: Add to saved posts
+        await db
+          .insert(userSavedPosts)
+          .values({
+            userId,
+            postId
+          });
+        
+        res.json({ postId, saved: true });
+      }
+    } catch (error) {
+      console.error("Error saving/unsaving post:", error);
+      res.status(500).json({ message: "Failed to save/unsave post" });
+    }
+  });
+
+app.get("/api/saved-posts", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get all saved posts for the user with post and author details
+      const savedPosts = await db
+        .select({
+          post: forumPosts,
+          user: {
+            id: users.id,
+            username: users.username,
+            profileImageUrl: users.profileImageUrl
+          },
+          savedAt: userSavedPosts.createdAt
+        })
+        .from(userSavedPosts)
+        .innerJoin(forumPosts, eq(userSavedPosts.postId, forumPosts.id))
+        .innerJoin(users, eq(forumPosts.userId, users.id))
+        .where(eq(userSavedPosts.userId, userId))
+        .orderBy(desc(userSavedPosts.createdAt));
+      
+      // Map results to a more friendly format
+      const formattedPosts = savedPosts.map(({ post, user, savedAt }) => ({
+        ...post,
+        user,
+        savedAt
+      }));
+      
+      res.json(formattedPosts);
+    } catch (error) {
+      console.error("Error fetching saved posts:", error);
+      res.status(500).json({ message: "Failed to fetch saved posts" });
+    }
+  });
+
+app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
