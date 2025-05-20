@@ -47,7 +47,7 @@ export function Hero() {
       >
         <Link href="/labs">
           <Button 
-            className="px-6 py-3 h-auto border border-[#9ecfff]/30 hover:bg-[#9ecfff]/10 bg-[#1e2535]/25 backdrop-blur-md transition-all font-medium tracking-wide"
+            className="px-6 py-3 h-auto border border-[#9ecfff]/30 hover:bg-[#1e2535]/80 bg-[#1e2535]/60 backdrop-blur-md transition-all font-medium tracking-wide text-gray-100"
             size="lg"
           >
             Explore Labs

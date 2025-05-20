@@ -141,8 +141,15 @@ html, body {
   }
 }
 
+.hover-glow {
+  color: rgba(226, 232, 240, 0.9);
+  text-shadow: 0 0 2px rgba(158, 207, 255, 0.1);
+}
+
 .hover-glow:hover {
   animation: subtle-glow 2s infinite;
+  color: rgba(226, 232, 240, 1);
+  text-shadow: 0 0 6px rgba(158, 207, 255, 0.3);
 }
 
 /* Consistent card styles */
