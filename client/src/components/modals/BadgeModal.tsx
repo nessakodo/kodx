@@ -1,205 +1,133 @@
-import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState, useEffect } from 'react';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BadgeCategory, BadgeRarity, BADGE_CATEGORY_COLORS, BADGE_RARITY_EFFECTS } from '@shared/constants/badges';
+import {
+  BADGE_CATEGORY_COLORS, 
+  BADGE_RARITY_EFFECTS,
+  type Badge as BadgeType
+} from '@shared/constants/badges';
 
 interface BadgeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  badge: {
-    id: string;
-    name: string;
-    description: string;
-    category: BadgeCategory;
-    rarity: BadgeRarity;
-    reward?: string;
-  };
+  badge: BadgeType | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function BadgeModal({
-  isOpen,
-  onClose,
-  badge
-}: BadgeModalProps) {
-  // Play sound effect on open
+export function BadgeModal({ badge, open, onOpenChange }: BadgeModalProps) {
+  const [animate, setAnimate] = useState(false);
+  
+  // Start animation when modal opens with a badge
   useEffect(() => {
-    if (isOpen) {
-      // Sound effect code would go here if implemented
+    if (open && badge) {
+      // Small delay to ensure modal is visible before animation starts
+      const timer = setTimeout(() => setAnimate(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimate(false);
     }
-  }, [isOpen]);
-
-  // Get category color
-  const categoryColor = BADGE_CATEGORY_COLORS[badge.category] || { text: 'text-gray-400', bg: 'bg-gray-400/10' };
+  }, [open, badge]);
   
-  // Get rarity effect
-  const rarityEffect = BADGE_RARITY_EFFECTS[badge.rarity] || {};
+  if (!badge) {
+    return null;
+  }
   
-  // Determine gradient based on rarity
-  const getGradient = () => {
-    switch (badge.rarity) {
-      case 'common':
-        return 'from-gray-400 to-white';
-      case 'uncommon':
-        return 'from-blue-400 to-cyan-300';
-      case 'rare':
-        return 'from-purple-400 to-indigo-300';
-      case 'epic':
-        return 'from-amber-400 to-yellow-300';
-      case 'legendary':
-        return 'from-red-400 to-rose-300';
-      default:
-        return 'from-gray-400 to-white';
-    }
-  };
-
+  // Get badge styling based on category and rarity
+  const categoryColors = BADGE_CATEGORY_COLORS[badge.category];
+  const rarityEffects = BADGE_RARITY_EFFECTS[badge.rarity];
+  
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="bg-[#0f172a]/95 backdrop-blur-sm border border-[#9ecfff]/20 max-w-lg overflow-hidden p-0">
-            <DialogHeader className="bg-gradient-to-r from-[#1e2535]/80 to-[#1e2535]/40 p-6 pb-8 relative">
-              <motion.div
-                className="absolute inset-0 z-0 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0f172a]/95 border-[#9ecfff]/30 backdrop-blur-lg max-w-lg overflow-hidden">
+        {/* Animation overlay - rays */}
+        <div 
+          className={`absolute inset-0 ${animate ? 'opacity-50' : 'opacity-0'} transition-opacity duration-1000 pointer-events-none`}
+          style={{ 
+            background: `radial-gradient(circle, transparent 30%, #0f172a 70%), 
+                         conic-gradient(from 0deg, 
+                          ${categoryColors.gradient} 0%, 
+                          transparent 10%, 
+                          transparent 45%, 
+                          ${categoryColors.gradient} 50%, 
+                          transparent 55%, 
+                          transparent 90%, 
+                          ${categoryColors.gradient} 100%)` 
+          }}
+        />
+        
+        <DialogHeader className="text-center mb-6">
+          <DialogTitle className="text-2xl font-orbitron text-white">
+            <span className="text-blue-300">Badge Earned!</span>
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            You've unlocked a new achievement
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex flex-col items-center justify-center">
+          {/* Badge display */}
+          <div 
+            className={`mb-6 transition-all duration-1000 ${animate ? 'scale-100' : 'scale-0'}`}
+          >
+            {/* Badge icon wrapper */}
+            <div 
+              className="w-32 h-32 rounded-full flex items-center justify-center mb-4 border-4 mx-auto"
+              style={{ 
+                borderColor: rarityEffects.borderColor,
+                boxShadow: rarityEffects.glow,
+                animation: animate ? rarityEffects.animation : 'none',
+                background: `radial-gradient(circle, rgba(15, 23, 42, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%)`,
+              }}
+            >
+              {/* Badge icon */}
+              <span 
+                className={`text-6xl font-orbitron ${categoryColors.text}`}
+                style={{ 
+                  textShadow: `0 0 15px ${categoryColors.gradient}` 
+                }}
               >
-                {/* Particle effect background */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(158,207,255,0.15)_0%,rgba(187,134,252,0.05)_50%,rgba(0,0,0,0)_100%)]"></div>
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 rounded-full bg-white"
-                    initial={{
-                      x: Math.random() * 100 + '%',
-                      y: Math.random() * 100 + '%',
-                      opacity: 0,
-                      scale: 0
-                    }}
-                    animate={{
-                      opacity: [0, 0.8, 0],
-                      scale: [0, 1, 0],
-                      x: `${Math.random() * 100}%`,
-                      y: `${Math.random() * 100}%`,
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      delay: Math.random() * 4,
-                      ease: "easeInOut"
-                    }}
-                  />
-                ))}
-              </motion.div>
-              
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="mb-3">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 15, 
-                      delay: 0.2 
-                    }}
-                    className="relative"
-                  >
-                    <div 
-                      className="absolute inset-0 rounded-full opacity-30 blur-md"
-                      style={{ 
-                        background: `radial-gradient(circle, ${rarityEffect.glowColor || '#9ecfff'} 0%, transparent 70%)` 
-                      }}
-                    ></div>
-                    
-                    <div className="relative w-24 h-24 rounded-full flex items-center justify-center bg-[#1e2535] border-2 border-[#9ecfff]/30">
-                      <div 
-                        className={`w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br ${getGradient()} bg-opacity-20`}
-                        style={{
-                          boxShadow: rarityEffect.glow,
-                          animation: rarityEffect.animation
-                        }}
-                      >
-                        <span className="text-4xl font-orbitron text-white">
-                          {badge.name.charAt(0)}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <DialogTitle className="font-orbitron text-2xl text-center bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent mb-1">
-                    New Badge Earned
-                  </DialogTitle>
-                  
-                  <div className="font-orbitron text-xl text-white text-center mb-4">
-                    {badge.name}
-                  </div>
-                  
-                  <div className="flex gap-2 justify-center mb-2">
-                    <Badge className={`${categoryColor.text} ${categoryColor.bg}`}>
-                      {badge.category}
-                    </Badge>
-                    <Badge className={`text-${
-                      badge.rarity === 'common' ? 'gray-400' :
-                      badge.rarity === 'uncommon' ? 'blue-400' :
-                      badge.rarity === 'rare' ? 'purple-400' :
-                      badge.rarity === 'epic' ? 'amber-400' : 'red-400'
-                    } bg-[#1e2535]`}>
-                      {badge.rarity}
-                    </Badge>
-                  </div>
-                </motion.div>
-              </div>
-            </DialogHeader>
-            
-            <div className="p-6 pt-4">
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mb-6"
-              >
-                <div className="text-center text-gray-300 mb-4">
-                  {badge.description}
-                </div>
-                
-                {badge.reward && (
-                  <div className="text-center text-sm text-cyan-400 mb-4 p-3 border border-cyan-500/20 bg-cyan-500/5 rounded-md">
-                    <div className="font-medium mb-1">Reward Unlocked</div>
-                    {badge.reward}
-                  </div>
-                )}
-                
-                <div className="text-center text-sm text-gray-500">
-                  View your badge collection in your profile to track your progress.
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="flex justify-center"
-              >
-                <Button 
-                  className="bg-gradient-to-r from-[#9ecfff]/20 to-[#bb86fc]/20 hover:from-[#9ecfff]/30 hover:to-[#bb86fc]/30 border border-[#9ecfff]/30"
-                  onClick={onClose}
-                >
-                  Accept
-                </Button>
-              </motion.div>
+                {badge.name.charAt(0)}
+              </span>
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
-    </AnimatePresence>
+            
+            {/* Badge info */}
+            <div className="text-center">
+              <h3 className="font-orbitron text-xl text-white mb-2">
+                {badge.name}
+              </h3>
+              <p className="text-gray-300 mb-4">
+                {badge.description}
+              </p>
+              
+              <div className="flex justify-center gap-2 mb-6">
+                <Badge className={`${categoryColors.bg} ${categoryColors.text}`}>
+                  {badge.category}
+                </Badge>
+                <Badge className="bg-[#1e293b] text-white capitalize">
+                  {badge.rarity}
+                </Badge>
+              </div>
+              
+              <p className="text-gray-400 text-sm">
+                Earned {new Date().toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={() => onOpenChange(false)}
+            className="mt-6 bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Continue
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

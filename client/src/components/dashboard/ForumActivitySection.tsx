@@ -1,129 +1,166 @@
 import React, { useState } from 'react';
+import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { Link } from 'wouter';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmptyForumActivityState, EmptySavedPostsState } from './EmptyStates';
-import { ForumThreadCard } from '../forum/ForumThreadCard';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { EmptyForumState } from './EmptyStates';
 
 export function ForumActivitySection() {
   const { user, isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('your-posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'saved'>('posts');
   
-  // Fetch user's forum posts
-  const { data: userPosts = [] } = useQuery({
+  // Fetch user posts
+  const { data: userPosts = [], isLoading: isLoadingPosts } = useQuery({
     queryKey: ['/api/user-posts'],
-    enabled: isAuthenticated && activeTab === 'your-posts',
+    enabled: isAuthenticated && activeTab === 'posts',
   });
   
-  // Fetch user's saved posts
-  const { data: savedPosts = [] } = useQuery({
+  // Fetch saved posts
+  const { data: savedPosts = [], isLoading: isLoadingSaved } = useQuery({
     queryKey: ['/api/saved-posts'],
-    enabled: isAuthenticated && activeTab === 'saved-posts',
+    enabled: isAuthenticated && activeTab === 'saved',
   });
   
-  // Handle like action
-  const handleLikePost = (postId: number) => {
-    // API call to like/unlike post would go here
-    console.log(`Toggle like for post: ${postId}`);
+  // Format date to relative time
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    return new Intl.DateTimeFormat('en-US', { 
+      month: 'short', 
+      day: 'numeric'
+    }).format(date);
   };
   
-  // Handle save action
-  const handleSavePost = (postId: number) => {
-    // API call to save/unsave post would go here
-    console.log(`Post saved: ${postId}`);
-  };
+  const renderPostItem = (post: any) => (
+    <Card 
+      key={post.id}
+      className="p-4 mb-4 border border-[#9ecfff]/20 bg-[#0f172a]/70 hover:bg-[#1e2535]/40 transition-all cursor-pointer"
+    >
+      <div className="flex items-start gap-3">
+        <Avatar className="h-10 w-10 border border-[#9ecfff]/20">
+          <AvatarImage src={post.authorImageUrl || post.user?.profileImageUrl} />
+          <AvatarFallback className="bg-[#1e293b] text-blue-300 font-orbitron">
+            {(post.authorName?.[0] || post.user?.username?.[0] || 'U').toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-medium text-white line-clamp-1 mr-2">{post.title}</h3>
+            <span className="text-xs text-gray-400">{formatRelativeTime(post.createdAt)}</span>
+          </div>
+          
+          <p className="text-sm text-gray-300 line-clamp-2 mb-2">{post.content}</p>
+          
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="flex items-center gap-1">
+              <span>👁️ {post.views || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>💬 {post.comments || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>❤️ {post.likes || 0}</span>
+            </div>
+            
+            {post.category && (
+              <Badge variant="outline" className="ml-auto bg-blue-900/20 text-blue-300 border-blue-500/30">
+                {post.category}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+  
+  const isLoading = (activeTab === 'posts' && isLoadingPosts) || 
+                    (activeTab === 'saved' && isLoadingSaved);
+                    
+  const currentPosts = activeTab === 'posts' ? userPosts : savedPosts;
+  const hasData = Array.isArray(currentPosts) && currentPosts.length > 0;
   
   return (
     <section className="mb-10">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-orbitron text-2xl text-teal-300">Your Forum Activity</h2>
+        <h2 className="font-orbitron text-2xl text-blue-300">
+          Your Forum Activity
+        </h2>
         
-        <Link href="/forum">
-          <Button variant="outline" 
-            className="border-teal-500/30 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20">
-            Browse Forum
-          </Button>
-        </Link>
-      </div>
-      
-      <Tabs defaultValue="your-posts" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="bg-[#1e2535]/50 border border-teal-500/20 mb-6">
-          <TabsTrigger 
-            value="your-posts"
-            className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-300"
+        <div className="flex space-x-2">
+          <Button
+            variant={activeTab === 'posts' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('posts')}
+            className={activeTab === 'posts' 
+              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'}
           >
             Your Posts
-          </TabsTrigger>
-          <TabsTrigger 
-            value="saved-posts"
-            className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-300"
+          </Button>
+          
+          <Button
+            variant={activeTab === 'saved' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('saved')}
+            className={activeTab === 'saved'
+              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'}
           >
             Saved Posts
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="your-posts">
+          </Button>
+        </div>
+      </div>
+      
+      {isLoading ? (
+        // Loading skeleton
+        <div className="space-y-4">
+          {[1, 2].map(i => (
+            <Card key={i} className="p-4 border border-[#9ecfff]/10 bg-[#0f172a]/70">
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-full bg-[#1e293b]/50 animate-pulse" />
+                <div className="flex-1">
+                  <div className="h-4 bg-[#1e293b]/50 rounded mb-2 animate-pulse" />
+                  <div className="h-3 bg-[#1e293b]/50 rounded mb-1 animate-pulse" />
+                  <div className="h-3 bg-[#1e293b]/50 rounded mb-2 w-2/3 animate-pulse" />
+                  <div className="h-3 bg-[#1e293b]/50 rounded w-1/4 animate-pulse" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : hasData ? (
+        <>
           <div className="space-y-4">
-            {userPosts && userPosts.length > 0 ? (
-              userPosts.map((post: any) => (
-                <ForumThreadCard
-                  key={post.id}
-                  id={post.id}
-                  title={post.title}
-                  author={{
-                    id: user?.id || '',
-                    username: user?.username || 'Anonymous',
-                    profileImageUrl: user?.profileImageUrl
-                  }}
-                  excerpt={post.content.substring(0, 150) + '...'}
-                  createdAt={post.createdAt}
-                  commentsCount={post.commentsCount || 0}
-                  likesCount={post.likesCount || 0}
-                  category={post.category || 'discussion'}
-                  isLiked={post.isLiked}
-                  isSaved={post.isSaved}
-                  onLike={handleLikePost}
-                  onSave={handleSavePost}
-                />
-              ))
-            ) : (
-              <EmptyForumActivityState />
-            )}
+            {currentPosts.slice(0, 3).map((post: any) => renderPostItem(post))}
           </div>
-        </TabsContent>
-        
-        <TabsContent value="saved-posts">
-          <div className="space-y-4">
-            {savedPosts && savedPosts.length > 0 ? (
-              savedPosts.map((post: any) => (
-                <ForumThreadCard
-                  key={post.id}
-                  id={post.id}
-                  title={post.title}
-                  author={{
-                    id: post.author.id,
-                    username: post.author.username,
-                    profileImageUrl: post.author.profileImageUrl
-                  }}
-                  excerpt={post.content.substring(0, 150) + '...'}
-                  createdAt={post.createdAt}
-                  commentsCount={post.commentsCount || 0}
-                  likesCount={post.likesCount || 0}
-                  category={post.category || 'discussion'}
-                  isLiked={post.isLiked}
-                  isSaved={true} // Always true for saved posts
-                  onLike={handleLikePost}
-                  onSave={handleSavePost}
-                />
-              ))
-            ) : (
-              <EmptySavedPostsState />
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+          
+          {currentPosts.length > 3 && (
+            <div className="text-center mt-6">
+              <Link href="/forum">
+                <Button variant="link" className="text-blue-300 hover:text-blue-200">
+                  View All Activity
+                </Button>
+              </Link>
+            </div>
+          )}
+        </>
+      ) : (
+        <EmptyForumState type={activeTab} />
+      )}
     </section>
   );
 }

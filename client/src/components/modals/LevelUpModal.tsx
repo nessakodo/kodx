@@ -1,141 +1,151 @@
-import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState, useEffect } from 'react';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 import { XPRing } from '@/components/dashboard/XPRing';
+import { getLevelData } from '@shared/constants/levels';
 
 interface LevelUpModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   level: number;
-  title: string;
-  message: string;
-  xp: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function LevelUpModal({
-  isOpen,
-  onClose,
-  level,
-  title,
-  message,
-  xp
-}: LevelUpModalProps) {
-  // Play sound effect on open
+export function LevelUpModal({ level, open, onOpenChange }: LevelUpModalProps) {
+  const [animate, setAnimate] = useState(false);
+  
+  // Get level data
+  const levelData = getLevelData(level);
+  
+  // Start animation when modal opens
   useEffect(() => {
-    if (isOpen) {
-      // Sound effect code would go here if implemented
+    if (open) {
+      // Small delay to ensure modal is visible before animation starts
+      const timer = setTimeout(() => setAnimate(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimate(false);
     }
-  }, [isOpen]);
-
+  }, [open]);
+  
+  // Calculate color based on level
+  const getLevelColor = () => {
+    if (level < 5) return 'blue';
+    if (level < 10) return 'purple';
+    if (level < 20) return 'pink';
+    if (level < 35) return 'amber';
+    return 'emerald';
+  };
+  
+  // Generate color classes based on level
+  const colorClass = getLevelColor();
+  const textColor = `text-${colorClass}-400`;
+  const bgColor = `bg-${colorClass}-500/10`;
+  const borderColor = `border-${colorClass}-500/30`;
+  const glowColor = {
+    blue: 'rgba(96, 165, 250, 0.5)',
+    purple: 'rgba(167, 139, 250, 0.5)',
+    pink: 'rgba(244, 114, 182, 0.5)',
+    amber: 'rgba(251, 191, 36, 0.5)',
+    emerald: 'rgba(52, 211, 153, 0.5)'
+  }[colorClass];
+  
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="bg-[#0f172a]/95 backdrop-blur-sm border border-[#9ecfff]/20 max-w-lg overflow-hidden p-0">
-            <DialogHeader className="bg-gradient-to-r from-[#1e2535]/80 to-[#1e2535]/40 p-6 pb-8 relative">
-              <motion.div
-                className="absolute inset-0 z-0 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {/* Particle effect background */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(158,207,255,0.15)_0%,rgba(187,134,252,0.05)_50%,rgba(0,0,0,0)_100%)]"></div>
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 rounded-full bg-white"
-                    initial={{
-                      x: Math.random() * 100 + '%',
-                      y: Math.random() * 100 + '%',
-                      opacity: 0,
-                      scale: 0
-                    }}
-                    animate={{
-                      opacity: [0, 0.8, 0],
-                      scale: [0, 1, 0],
-                      x: `${Math.random() * 100}%`,
-                      y: `${Math.random() * 100}%`,
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      delay: Math.random() * 4,
-                      ease: "easeInOut"
-                    }}
-                  />
-                ))}
-              </motion.div>
-              
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="mb-3">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 15, 
-                      delay: 0.2 
-                    }}
-                  >
-                    <div className="relative">
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] opacity-30 blur-md"></div>
-                      <XPRing xp={xp} size={120} strokeWidth={6} />
-                    </div>
-                  </motion.div>
-                </div>
-
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <DialogTitle className="font-orbitron text-2xl text-center bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent mb-1">
-                    Level {level} Achieved
-                  </DialogTitle>
-                  
-                  <div className="font-orbitron text-xl text-white text-center mb-4">
-                    {title}
-                  </div>
-                </motion.div>
-              </div>
-            </DialogHeader>
-            
-            <div className="p-6 pt-4">
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mb-6"
-              >
-                <div className="text-center text-gray-300 mb-4">
-                  {message}
-                </div>
-                
-                <div className="text-center text-sm text-gray-500">
-                  Continue your journey to unlock new abilities and insights.
-                </div>
-              </motion.div>
-              
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="flex justify-center"
-              >
-                <Button 
-                  className="bg-gradient-to-r from-[#9ecfff]/20 to-[#bb86fc]/20 hover:from-[#9ecfff]/30 hover:to-[#bb86fc]/30 border border-[#9ecfff]/30"
-                  onClick={onClose}
-                >
-                  Continue
-                </Button>
-              </motion.div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0f172a]/95 border-[#9ecfff]/30 backdrop-blur-lg max-w-lg overflow-hidden">
+        {/* Animation overlay - rays */}
+        <div 
+          className={`absolute inset-0 ${animate ? 'opacity-40' : 'opacity-0'} transition-opacity duration-1000 pointer-events-none`}
+          style={{ 
+            background: `radial-gradient(circle, transparent 30%, #0f172a 70%), 
+                         repeating-conic-gradient(from 0deg, 
+                          ${glowColor} 0%, 
+                          transparent 5%, 
+                          transparent 47.5%,  
+                          ${glowColor} 50%,
+                          transparent 52.5%,
+                          transparent 95%,
+                          ${glowColor} 100%)` 
+          }}
+        />
+        
+        <DialogHeader className="text-center mb-4 relative z-10">
+          <DialogTitle className="text-2xl font-orbitron-wide text-white">
+            <span className={textColor}>LEVEL UP!</span>
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            You've reached a new milestone in your journey
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex flex-col items-center justify-center relative z-10">
+          {/* Level ring with animation */}
+          <div 
+            className={`mb-6 transition-all duration-1000 transform ${animate ? 'scale-100' : 'scale-0'}`}
+          >
+            <div 
+              className={`p-8 rounded-full ${bgColor} ${borderColor} border-2`}
+              style={{ 
+                boxShadow: animate ? `0 0 30px ${glowColor}` : 'none',
+                transition: 'box-shadow 1s ease-in-out' 
+              }}
+            >
+              <XPRing 
+                totalXp={levelData.xpRequired} 
+                size="xl"
+                showTooltip={false}
+                className="translate-z-0"
+              />
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
-    </AnimatePresence>
+          </div>
+          
+          {/* Level details */}
+          <div className={`text-center transition-all duration-700 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <h3 className="font-orbitron text-2xl text-white mb-2">
+              <span className={textColor}>Level {level}</span> Achieved
+            </h3>
+            
+            <p className="text-gray-300 mb-6 max-w-md mx-auto">
+              <span className="font-medium text-white">{levelData.title}:</span>{" "}
+              {levelData.message}
+            </p>
+            
+            <h4 className="text-sm font-medium text-gray-400 mb-3">Milestone Rewards</h4>
+            <div className="flex justify-center gap-2 mb-8 flex-wrap max-w-xs mx-auto">
+              <Badge className={`${bgColor} ${textColor}`}>
+                +500 XP Bonus
+              </Badge>
+              <Badge className={`${bgColor} ${textColor}`}>
+                New Capabilities
+              </Badge>
+              {level % 5 === 0 && (
+                <Badge className="bg-amber-500/10 text-amber-400">
+                  Special Badge
+                </Badge>
+              )}
+              {level % 10 === 0 && (
+                <Badge className="bg-purple-500/10 text-purple-400">
+                  Advanced Features
+                </Badge>
+              )}
+            </div>
+          </div>
+          
+          <Button 
+            onClick={() => onOpenChange(false)}
+            className={`mt-2 bg-${colorClass}-600 hover:bg-${colorClass}-700 text-white`}
+            style={{ backgroundColor: glowColor, color: 'white' }}
+          >
+            Continue
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
