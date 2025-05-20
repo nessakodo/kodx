@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Header } from "@/components/layout/Header";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Footer } from "@/components/layout/Footer";
 import { ForumPostCard } from "@/components/forum/ForumPostCard";
 import { ForumSidebar } from "@/components/forum/ForumSidebar";
@@ -9,15 +8,37 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus, SearchIcon, FilterIcon } from "lucide-react";
+import { AlertCircle, Plus, SearchIcon, FilterIcon, Bookmark, BookmarkCheck } from "lucide-react";
 import { MOCK_FORUM_POSTS } from "@/lib/mockData";
 import { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { KodexModal } from "@/components/ui/kodex-modal";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ForumPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // State for search and filtering
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10;
+  
+  // State for creating new posts
+  const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: "",
+    content: "",
+    category: "discussion"
+  });
+  
+  // State for saving posts
+  const [savedPosts, setSavedPosts] = useState<number[]>([]);
   
   // Prefill the query cache with mock data
   useEffect(() => {
@@ -84,9 +105,91 @@ export default function ForumPage() {
     }
   };
   
+  // Handle creating a new forum post
+  const handleCreatePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!newPost.title.trim() || !newPost.content.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Title and content are required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      // In a real implementation, this would call the API
+      const newPostId = Math.max(...allPosts.map((post: any) => post.id), 0) + 1;
+      const createdPost = {
+        id: newPostId,
+        title: newPost.title,
+        content: newPost.content,
+        category: newPost.category,
+        likes: 0,
+        createdAt: new Date().toISOString(),
+        user: {
+          id: user?.id || "guest",
+          username: user?.firstName || "Anonymous",
+          profileImageUrl: user?.profileImageUrl
+        },
+        commentsCount: 0,
+        comments: []
+      };
+      
+      // Add to local data
+      const updatedPosts = [createdPost, ...allPosts];
+      queryClient.setQueryData(["/api/forum-posts"], updatedPosts);
+      
+      // Reset form and close modal
+      setNewPost({
+        title: "",
+        content: "",
+        category: "discussion"
+      });
+      setIsCreatePostModalOpen(false);
+      
+      toast({
+        title: "Post Created",
+        description: "Your post has been published successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Toggle saving a post for later
+  const toggleSavePost = (postId: number) => {
+    if (savedPosts.includes(postId)) {
+      setSavedPosts(savedPosts.filter(id => id !== postId));
+      toast({
+        title: "Post Unsaved",
+        description: "Post removed from your saved items"
+      });
+    } else {
+      setSavedPosts([...savedPosts, postId]);
+      toast({
+        title: "Post Saved",
+        description: "Post added to your saved items"
+      });
+    }
+  };
+  
+  // Pagination logic
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  
   return (
-    <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
-      <Header />
+    <div className="min-h-screen">
       <main className="container mx-auto px-4 py-12">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
           <div>
@@ -99,7 +202,10 @@ export default function ForumPage() {
           </div>
           
           {isAuthenticated && (
-            <Button className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white">
+            <Button 
+              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+              onClick={() => setIsCreatePostModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" /> Create Post
             </Button>
           )}
@@ -149,13 +255,13 @@ export default function ForumPage() {
                       <span className="cursor-pointer">×</span>
                     </Badge>
                   )}
-                  {categoryFilter && (
+                  {categoryFilter && categoryFilter !== "all" && (
                     <Badge 
-                      className="flex items-center gap-1 bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20"
+                      className={`flex items-center gap-1 bg-[#1e2535]/70 hover:bg-[#1e2535] ${getCategoryStyle(categoryFilter).border} ${getCategoryStyle(categoryFilter).text}`}
                       onClick={() => setCategoryFilter("")}
                     >
                       Category: {categoryFilter}
-                      <span className="cursor-pointer">×</span>
+                      <span className="cursor-pointer ml-1">×</span>
                     </Badge>
                   )}
                 </div>
