@@ -12,15 +12,19 @@ import LabPage from "@/pages/labs/[id]";
 import ProjectsPage from "@/pages/projects/index";
 import ProjectPage from "@/pages/projects/[id]";
 import ForumPage from "@/pages/forum/index";
+import CreatePostPage from "@/pages/forum/create";
+import PostDetailPage from "@/pages/forum/post/[id]";
 import DashboardPage from "@/pages/dashboard";
 import SettingsPage from "@/pages/settings";
 import AdminPage from "@/pages/admin";
+import ResourcesPage from "@/pages/resources";
 
 function Router() {
   return (
     <Switch>
       {/* Main pages */}
       <Route path="/" component={Home} />
+      <Route path="/resources" component={ResourcesPage} />
       
       {/* Lab routes */}
       <Route path="/labs" component={LabsPage} />
@@ -32,8 +36,8 @@ function Router() {
       
       {/* Forum routes */}
       <Route path="/forum" component={ForumPage} />
-      <Route path="/forum/create" component={ForumPage} />
-      <Route path="/forum/post/:id" component={ForumPage} />
+      <Route path="/forum/create" component={CreatePostPage} />
+      <Route path="/forum/post/:id" component={PostDetailPage} />
       <Route path="/forum/categories/:category" component={ForumPage} />
       <Route path="/forum/tags/:tag" component={ForumPage} />
       

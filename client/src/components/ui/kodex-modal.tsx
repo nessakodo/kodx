@@ -6,13 +6,15 @@ export interface KodexModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  size?: "sm" | "md" | "lg" | "full";
+  size?: "sm" | "md" | "lg" | "full" | "xs";
   showCloseButton?: boolean;
   position?: {
     element?: HTMLElement;
     placement?: "top" | "bottom" | "left" | "right";
     offset?: number;
   };
+  positionElement?: HTMLElement;
+  width?: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -24,6 +26,8 @@ export function KodexModal({
   size = "md",
   showCloseButton = true,
   position,
+  positionElement,
+  width,
   children,
   className,
 }: KodexModalProps) {
@@ -32,6 +36,7 @@ export function KodexModal({
   
   // Size classes based on the size prop
   const sizeClasses = {
+    xs: "max-w-xs",
     sm: "max-w-md",
     md: "max-w-lg",
     lg: "max-w-2xl",
@@ -62,10 +67,12 @@ export function KodexModal({
   
   // Calculate position based on the trigger element
   const getPositionStyles = () => {
-    if (!position?.element || !mounted) return {};
+    // Handle both position.element and positionElement for backward compatibility
+    const element = positionElement || position?.element;
+    if (!element || !mounted) return {};
     
-    const rect = position.element.getBoundingClientRect();
-    const offset = position.offset || 8;
+    const rect = element.getBoundingClientRect();
+    const offset = position?.offset || 8;
     
     switch (position.placement) {
       case "top":

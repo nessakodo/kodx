@@ -117,8 +117,8 @@ export default function CreatePostPage() {
         description: "Your post has been published successfully.",
       });
       
-      // Redirect to post
-      setLocation(`/forum/post/${response.id}`);
+      // Redirect to post - for now, just go back to the forum
+      setLocation(`/forum`);
     } catch (error) {
       console.error("Error creating post:", error);
       toast({
@@ -308,7 +308,7 @@ export default function CreatePostPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => navigate("/forum")}
+                        onClick={() => setLocation("/forum")}
                         className="border-gray-700"
                       >
                         Cancel

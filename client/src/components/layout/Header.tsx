@@ -134,38 +134,65 @@ export function Header() {
                     </div>
                   </Button>
                   
-                  {/* User Menu Dropdown */}
-                  {userMenuOpen && (
-                    <div 
-                      className="absolute right-0 mt-2 w-48 py-2 bg-[#1e2535] border border-[#9ecfff]/10 rounded-md shadow-xl z-50"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                  {/* User Menu Dropdown Modal */}
+                  <KodexModal
+                    isOpen={userMenuOpen}
+                    onClose={() => setUserMenuOpen(false)}
+                    positionElement={notificationBellRef.current as HTMLElement | undefined}
+                    title="Profile Menu"
+                    width="xs"
+                  >
+                    <div className="flex flex-col space-y-2 p-1">
                       <Link 
                         href="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-white transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
                       >
-                        Dashboard
+                        <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#9ecfff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">Dashboard</div>
+                          <div className="text-xs text-gray-500">View your progress & awards</div>
+                        </div>
                       </Link>
+                      
                       <Link 
                         href="/settings"
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-white transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
                       >
-                        <span className="flex items-center">
-                          <SettingsIcon className="h-4 w-4 mr-2" />
-                          Settings
-                        </span>
+                        <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                          <SettingsIcon className="h-4 w-4 text-[#9ecfff]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">Settings</div>
+                          <div className="text-xs text-gray-500">Manage your account</div>
+                        </div>
                       </Link>
-                      <Link 
-                        href="/api/logout"
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white border-t border-[#9ecfff]/10 mt-1 pt-1"
-                      >
-                        <span className="flex items-center">
-                          <LogOutIcon className="h-4 w-4 mr-2" />
-                          Sign Out
-                        </span>
-                      </Link>
+                      
+                      <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
+                        <Link 
+                          href="/api/logout"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#ff9e9e]/10 hover:text-[#ff9e9e] transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#ff9e9e]/20 flex items-center justify-center">
+                            <LogOutIcon className="h-4 w-4 text-[#ff9e9e]" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">Sign Out</div>
+                            <div className="text-xs text-gray-500">End your current session</div>
+                          </div>
+                        </Link>
+                      </div>
                     </div>
-                  )}
+                  </KodexModal>
                 </div>
               </>
             ) : (
