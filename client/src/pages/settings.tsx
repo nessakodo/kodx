@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -30,7 +30,8 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
+        <Header />
         <main className="container mx-auto px-4 py-16">
           <div className="glassmorphic p-8 rounded-2xl shadow-lg max-w-md mx-auto">
             <h1 className="text-2xl mb-4 font-orbitron text-center">Access Denied</h1>
@@ -79,7 +80,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
+      <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="mb-8">
           <h1 className="font-orbitron text-3xl tracking-wider">

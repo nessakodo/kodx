@@ -1,3 +1,4 @@
+import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
 import { FeaturedModules } from "@/components/home/FeaturedModules";
@@ -8,8 +9,9 @@ import { Countdown } from "@/components/home/Countdown";
 
 export default function Home() {
   return (
-    <>
-      <main className="container mx-auto px-4">
+    <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
+      <Header />
+      <main>
         <Hero />
         <FeaturedModules />
         <UserExperience />
@@ -18,6 +20,6 @@ export default function Home() {
         <Countdown />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

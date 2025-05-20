@@ -26,7 +26,8 @@ export default function ProjectsPage() {
   const displayProjects = projects || MOCK_PROJECTS;
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
+      <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="mb-10">
           <h1 className="font-orbitron text-3xl tracking-wider mb-4">

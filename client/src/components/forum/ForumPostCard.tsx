@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { HeartIcon, MessageSquareIcon, Bookmark, BookmarkCheck } from "lucide-react";
+import { HeartIcon, MessageSquareIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface User {
@@ -32,35 +32,25 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
   // Format category badge style based on category type
   const getCategoryStyle = (category: string) => {
     switch (category.toLowerCase()) {
-      case 'discussion':
-        return {
-          gradient: "from-[#1e293b] to-[#1e293b]",
-          border: "border-[#9ecfff]/30",
-          text: "text-[#9ecfff]"
-        };
-      case 'resources':
-        return {
-          gradient: "from-[#1e293b] to-[#1e293b]",
-          border: "border-[#88c9b7]/30",
-          text: "text-[#88c9b7]"
-        };
-      case 'showcase':
-        return {
-          gradient: "from-[#1e293b] to-[#1e293b]",
-          border: "border-[#b166ff]/30",
-          text: "text-[#b166ff]"
-        };
       case 'announcement':
         return {
-          gradient: "from-[#1e293b] to-[#1e293b]",
-          border: "border-[#d4af37]/30",
-          text: "text-[#d4af37]"
+          gradient: "from-[#88c9b7]/10 to-[#88c9b7]/10",
+          border: "border-[#88c9b7]/20"
+        };
+      case 'question':
+        return {
+          gradient: "from-[#9ecfff]/10 to-[#9ecfff]/10",
+          border: "border-[#9ecfff]/20"
+        };
+      case 'devlog':
+        return {
+          gradient: "from-[#b166ff]/10 to-[#9ecfff]/10",
+          border: "border-[#b166ff]/20"
         };
       default:
         return {
-          gradient: "from-[#1e293b] to-[#1e293b]",
-          border: "border-gray-500/30",
-          text: "text-gray-400"
+          gradient: "from-gray-500/10 to-gray-500/10",
+          border: "border-gray-500/20"
         };
     }
   };
@@ -96,7 +86,7 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
             </div>
           </div>
           <Badge 
-            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border} ${categoryStyle.text}`}
+            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border}`}
           >
             {post.category}
           </Badge>
@@ -115,26 +105,11 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
             </span>
           </div>
           
-          <div className="flex items-center gap-3">
-            <Link href={`/forum/${post.id}`}>
-              <span className="text-sm text-[#9ecfff] font-medium group-hover:underline cursor-pointer">
-                Read More
-              </span>
-            </Link>
-            <button
-              className="text-gray-500 hover:text-[#9ecfff]"
-              aria-label={`Save post: ${post.title}`}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                window.dispatchEvent(new CustomEvent('savePost', { 
-                  detail: { postId: post.id }
-                }));
-              }}
-            >
-              <Bookmark className="h-4 w-4" />
-            </button>
-          </div>
+          <Link href={`/forum/${post.id}`}>
+            <a className="text-sm text-[#9ecfff] font-medium group-hover:underline">
+              Read More
+            </a>
+          </Link>
         </div>
       </div>
     </GlassmorphicCard>

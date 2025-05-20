@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { HeartIcon, MessageSquareIcon, ArrowLeftIcon, BookmarkIcon, FlagIcon } from "lucide-react";
+import { HeartIcon, MessageSquareIcon, ArrowLeftIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -46,18 +46,11 @@ export function ForumPostDetail() {
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const [commentContent, setCommentContent] = useState("");
-  const [isSaved, setIsSaved] = useState(false); // Track saved state
 
   // Fetch post details
   const { data: post, isLoading } = useQuery({
     queryKey: [`/api/forum-posts/${id}`],
     enabled: !!id,
-  });
-  
-  // Fetch related posts by same category
-  const { data: relatedPosts, isLoading: isLoadingRelated } = useQuery({
-    queryKey: ['/api/forum-posts', 'related', post?.category],
-    enabled: !!post?.category,
   });
 
   // Like post mutation
@@ -90,27 +83,6 @@ export function ForumPostDetail() {
       toast({
         title: "Error",
         description: "Failed to post comment. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-  
-  // Save post mutation
-  const saveMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/forum-posts/${id}/save`, {}),
-    onSuccess: () => {
-      setIsSaved(prev => !prev);
-      toast({
-        title: isSaved ? "Post Removed" : "Post Saved",
-        description: isSaved 
-          ? "This post has been removed from your saved items" 
-          : "This post has been added to your saved items"
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to save post. Please try again.",
         variant: "destructive",
       });
     },
@@ -253,255 +225,160 @@ export function ForumPostDetail() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-3/4">
-          <Link href="/forum" className="inline-flex items-center text-[#9ecfff] hover:underline mb-6">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
-          </Link>
+      <Link href="/forum">
+        <a className="inline-flex items-center text-[#9ecfff] hover:underline mb-6">
+          <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
+        </a>
+      </Link>
+      
+      {/* Main Post */}
+      <GlassmorphicCard className="mb-8">
+        <div className="p-6">
+          <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+            <div className="flex items-center">
+              <Avatar className="w-12 h-12 rounded-full overflow-hidden mr-4">
+                <AvatarImage 
+                  src={post.user.profileImageUrl} 
+                  alt={post.user.username}
+                />
+                <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
+                  {post.user.username?.[0]?.toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium flex items-center">
+                  {post.user.username}
+                  {post.user.totalXp && (
+                    <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#5cdc96]/20 text-[#5cdc96] rounded">
+                      {post.user.totalXp} XP
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Posted {getRelativeTime(post.createdAt)}
+                </div>
+                <div className="text-xs text-gray-500 hidden sm:block">
+                  {getFormattedDate(post.createdAt)}
+                </div>
+              </div>
+            </div>
+            
+            <Badge 
+              className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border}`}
+            >
+              {post.category}
+            </Badge>
+          </div>
           
-          {/* Main Post */}
-          <GlassmorphicCard className="mb-8">
-            <div className="p-6">
-              <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
-                <div className="flex items-center">
-                  <Avatar className="w-12 h-12 rounded-full overflow-hidden mr-4">
+          <h1 className="text-2xl md:text-3xl font-orbitron mb-6">{post.title}</h1>
+          <div className="text-gray-300 mb-8 whitespace-pre-line">
+            {post.content}
+          </div>
+          
+          <div className="flex items-center mt-6 pt-4 border-t border-[#9ecfff]/10">
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-1 mr-4 ${post.liked ? 'text-[#ff5c5c] border-[#ff5c5c]/30' : 'text-gray-400'}`}
+              onClick={handleLikeToggle}
+              disabled={likeMutation.isPending}
+            >
+              <HeartIcon className="h-4 w-4" /> {post.likes}
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-gray-400"
+              onClick={() => document.getElementById('comment-form')?.focus()}
+            >
+              <MessageSquareIcon className="h-4 w-4" /> {post.comments?.length || 0}
+            </Button>
+          </div>
+        </div>
+      </GlassmorphicCard>
+      
+      {/* Comment Form */}
+      {isAuthenticated ? (
+        <GlassmorphicCard className="mb-8">
+          <div className="p-6">
+            <h3 className="text-lg font-orbitron mb-4">Leave a Comment</h3>
+            <form onSubmit={handleCommentSubmit}>
+              <Textarea
+                id="comment-form"
+                placeholder="Add to the discussion..."
+                className="min-h-[120px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50 mb-4"
+                value={commentContent}
+                onChange={(e) => setCommentContent(e.target.value)}
+              />
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+                disabled={commentMutation.isPending || !commentContent.trim()}
+              >
+                {commentMutation.isPending ? "Posting..." : "Post Comment"}
+              </Button>
+            </form>
+          </div>
+        </GlassmorphicCard>
+      ) : (
+        <GlassmorphicCard className="mb-8 p-6 text-center">
+          <h3 className="text-lg font-orbitron mb-2">Sign In to Comment</h3>
+          <p className="text-gray-500 mb-4">Join the discussion by signing in to your account.</p>
+          <Button asChild>
+            <a href="/api/login">Sign In</a>
+          </Button>
+        </GlassmorphicCard>
+      )}
+      
+      {/* Comments */}
+      <div className="mb-4">
+        <h3 className="text-xl font-orbitron mb-6">
+          Comments ({post.comments?.length || 0})
+        </h3>
+        
+        {post.comments && post.comments.length > 0 ? (
+          <div className="space-y-4">
+            {post.comments.map((comment) => (
+              <GlassmorphicCard key={comment.id} className="p-6">
+                <div className="flex items-center mb-4">
+                  <Avatar className="w-10 h-10 rounded-full overflow-hidden mr-3">
                     <AvatarImage 
-                      src={post.user.profileImageUrl} 
-                      alt={post.user.username}
+                      src={comment.user.profileImageUrl} 
+                      alt={comment.user.username}
                     />
                     <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-                      {post.user.username?.[0]?.toUpperCase() || "U"}
+                      {comment.user.username?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium flex items-center">
-                      {post.user.username}
-                      {post.user.totalXp && (
+                      {comment.user.username}
+                      {comment.user.totalXp && (
                         <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#5cdc96]/20 text-[#5cdc96] rounded">
-                          {post.user.totalXp} XP
+                          {comment.user.totalXp} XP
                         </span>
                       )}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Posted {getRelativeTime(post.createdAt)}
-                    </div>
-                    <div className="text-xs text-gray-500 hidden sm:block">
-                      {getFormattedDate(post.createdAt)}
+                      {getRelativeTime(comment.createdAt)}
                     </div>
                   </div>
                 </div>
-                
-                <Badge 
-                  className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border}`}
-                >
-                  {post.category}
-                </Badge>
-              </div>
-              
-              <h1 className="text-2xl md:text-3xl font-orbitron mb-6">{post.title}</h1>
-              <div className="text-gray-300 mb-8 whitespace-pre-line">
-                {post.content}
-              </div>
-              
-              <div className="flex items-center mt-6 pt-4 border-t border-[#9ecfff]/10">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`flex items-center gap-1 mr-4 ${post.liked ? 'text-[#ff5c5c] border-[#ff5c5c]/30' : 'text-gray-400'}`}
-                  onClick={handleLikeToggle}
-                  disabled={likeMutation.isPending}
-                >
-                  <HeartIcon className="h-4 w-4" /> {post.likes}
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1 text-gray-400"
-                  onClick={() => document.getElementById('comment-form')?.focus()}
-                >
-                  <MessageSquareIcon className="h-4 w-4" /> {post.comments?.length || 0}
-                </Button>
-              </div>
-            </div>
-          </GlassmorphicCard>
-          
-          {/* Comment Form */}
-          {isAuthenticated ? (
-            <GlassmorphicCard className="mb-8">
-              <div className="p-6">
-                <h3 className="text-lg font-orbitron mb-4">Leave a Comment</h3>
-                <form onSubmit={handleCommentSubmit}>
-                  <Textarea
-                    id="comment-form"
-                    placeholder="Add to the discussion..."
-                    className="min-h-[120px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50 mb-4"
-                    value={commentContent}
-                    onChange={(e) => setCommentContent(e.target.value)}
-                  />
-                  <Button 
-                    type="submit"
-                    className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
-                    disabled={commentMutation.isPending || !commentContent.trim()}
-                  >
-                    {commentMutation.isPending ? "Posting..." : "Post Comment"}
-                  </Button>
-                </form>
-              </div>
-            </GlassmorphicCard>
-          ) : (
-            <GlassmorphicCard className="mb-8 p-6 text-center">
-              <h3 className="text-lg font-orbitron mb-2">Sign In to Comment</h3>
-              <p className="text-gray-500 mb-4">Join the discussion by signing in to your account.</p>
-              <Button asChild>
-                <a href="/api/login">Sign In</a>
-              </Button>
-            </GlassmorphicCard>
-          )}
-          
-          {/* Comments */}
-          <div className="mb-4">
-            <h3 className="text-xl font-orbitron mb-6">
-              Comments ({post.comments?.length || 0})
-            </h3>
-            
-            {post.comments && post.comments.length > 0 ? (
-              <div className="space-y-4">
-                {post.comments.map((comment) => (
-                  <GlassmorphicCard key={comment.id} className="p-6">
-                    <div className="flex items-center mb-4">
-                      <Avatar className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                        <AvatarImage 
-                          src={comment.user.profileImageUrl} 
-                          alt={comment.user.username}
-                        />
-                        <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-                          {comment.user.username?.[0]?.toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium flex items-center">
-                          {comment.user.username}
-                          {comment.user.totalXp && (
-                            <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#5cdc96]/20 text-[#5cdc96] rounded">
-                              {comment.user.totalXp} XP
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {getRelativeTime(comment.createdAt)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-gray-300 whitespace-pre-line">
-                      {comment.content}
-                    </div>
-                  </GlassmorphicCard>
-                ))}
-              </div>
-            ) : (
-              <GlassmorphicCard className="p-6 text-center">
-                <MessageSquareIcon className="h-8 w-8 mx-auto text-gray-500 mb-2" />
-                <p className="text-gray-500">
-                  No comments yet. Be the first to share your thoughts!
-                </p>
+                <div className="text-gray-300 whitespace-pre-line">
+                  {comment.content}
+                </div>
               </GlassmorphicCard>
-            )}
+            ))}
           </div>
-        </div>
-        
-        <div className="md:w-1/4 mt-16 md:mt-0">
-          <div className="sticky top-24">
-            {/* Post Actions */}
-            <GlassmorphicCard className="mb-6 p-4">
-              <h3 className="text-lg font-orbitron mb-4">Actions</h3>
-              <div className="space-y-2">
-                <Button 
-                  className={`w-full justify-start ${isSaved 
-                    ? 'bg-[#1e2535] text-[#9ecfff]' 
-                    : 'bg-[#1e2535]/50'} hover:bg-[#1e2535] border border-[#9ecfff]/20`}
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      toast({
-                        title: "Sign in required",
-                        description: "Please sign in to save posts.",
-                        variant: "default",
-                      });
-                      return;
-                    }
-                    saveMutation.mutate();
-                  }}
-                  disabled={saveMutation.isPending}
-                >
-                  <BookmarkIcon className={`h-4 w-4 mr-2 ${isSaved ? 'fill-[#9ecfff]' : ''}`} /> 
-                  {isSaved ? 'Saved' : 'Save for Later'}
-                </Button>
-                <Button 
-                  className="w-full justify-start bg-[#1e2535]/50 hover:bg-[#1e2535] border border-[#9ecfff]/20"
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      toast({
-                        title: "Sign in required",
-                        description: "Please sign in to report posts.",
-                        variant: "default",
-                      });
-                      return;
-                    }
-                    toast({
-                      title: "Post Reported",
-                      description: "Thank you for helping keep our community safe."
-                    });
-                  }}
-                >
-                  <FlagIcon className="h-4 w-4 mr-2" /> Report
-                </Button>
-              </div>
-            </GlassmorphicCard>
-            
-            {/* Related Posts */}
-            <GlassmorphicCard className="p-4">
-              <h3 className="text-lg font-orbitron mb-4">Related Posts</h3>
-              {isLoadingRelated ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-2 border-b border-[#1e293b] last:border-0">
-                      <Skeleton className="h-5 w-3/4 mb-2" />
-                      <Skeleton className="h-4 w-1/2" />
-                    </div>
-                  ))}
-                </div>
-              ) : relatedPosts && relatedPosts.length > 0 ? (
-                <div className="space-y-4">
-                  {relatedPosts
-                    .filter((p: any) => p.id !== Number(id))
-                    .slice(0, 3)
-                    .map((post: any) => (
-                      <Link 
-                        key={post.id} 
-                        href={`/forum/${post.id}`} 
-                        className="block hover:bg-[#1e2535]/30 p-2 rounded-md transition-colors border-b border-[#1e293b] last:border-0"
-                      >
-                        <h4 className="font-medium text-[#9ecfff] line-clamp-1">{post.title}</h4>
-                        <div className="flex items-center text-xs text-gray-400 mt-2">
-                          <span className="flex items-center">
-                            <HeartIcon className="inline h-3 w-3 mr-1" /> {post.likes}
-                          </span>
-                          <span className="mx-2">•</span>
-                          <span className="flex items-center">
-                            <MessageSquareIcon className="inline h-3 w-3 mr-1" /> {post.comments?.length || 0}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">
-                  No related posts found
-                </p>
-              )}
-            </GlassmorphicCard>
-          </div>
-        </div>
+        ) : (
+          <GlassmorphicCard className="p-6 text-center">
+            <MessageSquareIcon className="h-8 w-8 mx-auto text-gray-500 mb-2" />
+            <p className="text-gray-500">
+              No comments yet. Be the first to share your thoughts!
+            </p>
+          </GlassmorphicCard>
+        )}
       </div>
     </div>
   );
