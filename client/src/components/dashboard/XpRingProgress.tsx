@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
 
 interface XpRingProgressProps {
@@ -9,103 +9,119 @@ interface XpRingProgressProps {
 }
 
 export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgressProps) {
+  const [animatedXp, setAnimatedXp] = useState(0);
   const level = calculateLevel(xp);
   const progress = calculateLevelProgress(xp);
-  const [rotation, setRotation] = useState(0);
   
-  // Slow constant rotation animation
+  // Animate XP value on mount
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 0.2) % 360);
-    }, 50);
+    const duration = 1500; // Animation duration in ms
+    const startTime = Date.now();
+    const endValue = xp;
     
-    return () => clearInterval(interval);
-  }, []);
+    const animateXp = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      // Use ease-out cubic function for smoother animation
+      const progressEased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedXp(Math.floor(progressEased * endValue));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateXp);
+      }
+    };
+    
+    requestAnimationFrame(animateXp);
+  }, [xp]);
 
-  // Create the SVG for the XP ring
-  const size = 120;
-  const strokeWidth = 4;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
+  // Calculate the ring circumference and stroke-dashoffset
+  const circleRadius = 60;
+  const circumference = 2 * Math.PI * circleRadius;
+  const dashOffset = circumference * (1 - progress / 100);
   
   return (
     <div className="flex flex-col items-center">
       <div className="relative">
-        {/* Rotating background ring */}
-        <svg 
-          className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" 
-          width={size + 12} 
-          height={size + 12} 
-          style={{ transform: `translate(-50%, -50%) rotate(${rotation}deg)` }}
-        >
-          <defs>
-            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#9ecfff" stopOpacity="0.2" />
-              <stop offset="50%" stopColor="#b166ff" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#88c9b7" stopOpacity="0.2" />
-            </linearGradient>
-          </defs>
+        {/* Background Circle */}
+        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2">
           <circle 
-            cx={(size + 12) / 2} 
-            cy={(size + 12) / 2} 
-            r={radius + 6} 
+            cx="70" 
+            cy="70" 
+            r={circleRadius} 
+            strokeWidth="8" 
+            stroke="#1e293b" 
             fill="none" 
-            stroke="url(#ringGradient)" 
-            strokeWidth="1" 
+            strokeDasharray={circumference} 
+            strokeDashoffset="0"
+            className="opacity-30"
           />
         </svg>
         
-        {/* Progress ring */}
-        <svg 
-          className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" 
-          width={size} 
-          height={size}
-        >
+        {/* Progress Circle with Animation */}
+        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform">
+          <circle 
+            cx="70" 
+            cy="70" 
+            r={circleRadius} 
+            strokeWidth="8" 
+            stroke="url(#gradient)" 
+            fill="none" 
+            strokeLinecap="round"
+            strokeDasharray={circumference} 
+            strokeDashoffset={dashOffset}
+            className="transition-all duration-1000 ease-out"
+          />
           <defs>
-            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#9ecfff" />
               <stop offset="100%" stopColor="#88c9b7" />
             </linearGradient>
           </defs>
-          <circle 
-            cx={size / 2} 
-            cy={size / 2} 
-            r={radius} 
-            fill="none" 
-            stroke="rgba(158, 207, 255, 0.1)" 
-            strokeWidth={strokeWidth} 
-          />
-          <circle 
-            cx={size / 2} 
-            cy={size / 2} 
-            r={radius} 
-            fill="none" 
-            stroke="url(#progressGradient)" 
-            strokeWidth={strokeWidth} 
-            strokeDasharray={circumference} 
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            className="drop-shadow-glow"
-          />
         </svg>
         
-        {/* Avatar in the center */}
-        <div className="relative">
-          <Avatar className="h-20 w-20 border-2 border-[#9ecfff]/20">
-            <AvatarImage src={profileImageUrl} alt={username} />
-            <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-              {username[0].toUpperCase()}
+        {/* Glow Effect */}
+        <svg width="140" height="140" viewBox="0 0 140 140" className="absolute -top-2 -left-2 -rotate-90 transform">
+          <circle 
+            cx="70" 
+            cy="70" 
+            r={circleRadius} 
+            strokeWidth="2" 
+            stroke="url(#gradientGlow)" 
+            fill="none" 
+            strokeLinecap="round"
+            strokeDasharray={circumference} 
+            strokeDashoffset={dashOffset}
+            filter="blur(4px)"
+            className="transition-all duration-1000 ease-out"
+          />
+          <defs>
+            <linearGradient id="gradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#9ecfff" />
+              <stop offset="100%" stopColor="#88c9b7" />
+            </linearGradient>
+          </defs>
+        </svg>
+        
+        {/* Avatar */}
+        <div className="relative flex items-center justify-center">
+          <Avatar className="h-32 w-32 border-4 border-[#1e293b] shadow-xl">
+            <AvatarImage src={profileImageUrl} />
+            <AvatarFallback className="text-2xl font-medium bg-gradient-to-r from-[#2a3a4a] to-[#1e2535]">
+              {username.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </div>
       </div>
       
-      {/* Level and XP info */}
-      <div className="mt-4 flex flex-col items-center">
-        <div className="text-sm font-medium text-[#9ecfff]">Level {level}</div>
-        <div className="text-xs text-gray-400 mt-1">{progress}% to Level {level + 1}</div>
-        <div className="text-xs text-gray-500 mt-1">{xp} XP Total</div>
+      {/* Level and XP Display */}
+      <div className="mt-4 text-center">
+        <div className="text-base sm:text-lg text-gray-300 mb-1">Level {level}</div>
+        <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">
+          {animatedXp.toLocaleString()} XP
+        </div>
+        <div className="text-xs text-gray-500 mt-1">{progress}% to Level {level + 1}</div>
       </div>
     </div>
   );

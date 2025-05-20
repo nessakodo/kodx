@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { XPRing } from "@/components/ui/xp-ring";
-import { Radio } from "@/components/ui/radio";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 
@@ -170,25 +170,29 @@ export function LabPreview() {
                   <p className="mb-3 text-sm">Which of the following is NOT a secure way to store user passwords?</p>
                   
                   <div className="space-y-2">
-                    <label className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
-                      <Radio value="bcrypt" name="password-storage" className="border-[#9ecfff]/50 text-[#9ecfff]" />
-                      <span className="ml-2 text-sm">Salted bcrypt hashing</span>
-                    </label>
-                    
-                    <label className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
-                      <Radio value="argon2" name="password-storage" className="border-[#9ecfff]/50 text-[#9ecfff]" />
-                      <span className="ml-2 text-sm">Argon2id with proper parameters</span>
-                    </label>
-                    
-                    <label className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
-                      <Radio value="pbkdf2" name="password-storage" className="border-[#9ecfff]/50 text-[#9ecfff]" />
-                      <span className="ml-2 text-sm">PBKDF2 with high iteration count</span>
-                    </label>
-                    
-                    <label className="flex items-center p-2 bg-[#9ecfff]/5 border border-[#9ecfff]/20 rounded cursor-pointer">
-                      <Radio value="base64" name="password-storage" className="border-[#9ecfff]/50 text-[#9ecfff]" defaultChecked />
-                      <span className="ml-2 text-sm">Base64 encoding with a static salt</span>
-                    </label>
+                    <div className="flex flex-col space-y-2">
+                      <RadioGroup defaultValue="base64" className="space-y-2">
+                        <div className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
+                          <RadioGroupItem value="bcrypt" id="bcrypt" className="border-[#9ecfff]/50 text-[#9ecfff]" />
+                          <label htmlFor="bcrypt" className="ml-2 text-sm cursor-pointer">Salted bcrypt hashing</label>
+                        </div>
+                        
+                        <div className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
+                          <RadioGroupItem value="argon2" id="argon2" className="border-[#9ecfff]/50 text-[#9ecfff]" />
+                          <label htmlFor="argon2" className="ml-2 text-sm cursor-pointer">Argon2id with proper parameters</label>
+                        </div>
+                        
+                        <div className="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer">
+                          <RadioGroupItem value="pbkdf2" id="pbkdf2" className="border-[#9ecfff]/50 text-[#9ecfff]" />
+                          <label htmlFor="pbkdf2" className="ml-2 text-sm cursor-pointer">PBKDF2 with high iteration count</label>
+                        </div>
+                        
+                        <div className="flex items-center p-2 bg-[#9ecfff]/5 border border-[#9ecfff]/20 rounded cursor-pointer">
+                          <RadioGroupItem value="base64" id="base64" className="border-[#9ecfff]/50 text-[#9ecfff]" />
+                          <label htmlFor="base64" className="ml-2 text-sm cursor-pointer">Base64 encoding with a static salt</label>
+                        </div>
+                      </RadioGroup>
+                    </div>
                   </div>
                 </div>
                 

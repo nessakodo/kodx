@@ -1,89 +1,118 @@
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
-interface XPRingProps {
+export interface XPRingProps {
   percentage: number;
   size?: "sm" | "md" | "lg";
+  className?: string;
+  pulseEffect?: boolean;
 }
 
-export function XPRing({ percentage, size = "md" }: XPRingProps) {
-  const [rotation, setRotation] = useState(0);
+export function XPRing({ 
+  percentage,
+  size = "md",
+  className,
+  pulseEffect = false
+}: XPRingProps) {
+  const [animatedPercentage, setAnimatedPercentage] = useState(0);
   
-  // Size mappings
-  const sizesMap = {
-    sm: { width: 80, height: 80, strokeWidth: 3 },
-    md: { width: 100, height: 100, strokeWidth: 4 },
-    lg: { width: 120, height: 120, strokeWidth: 5 },
+  // Determine the size of the ring
+  const sizeClasses = {
+    sm: "w-10 h-10",
+    md: "w-16 h-16",
+    lg: "w-24 h-24"
   };
   
-  const { width, height, strokeWidth } = sizesMap[size];
-  const radius = (width - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+  const strokeWidth = {
+    sm: 3,
+    md: 4,
+    lg: 6
+  };
   
-  // Slow constant rotation animation
+  // Animate the percentage on mount
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation(prev => (prev + 0.2) % 360);
-    }, 50);
+    const duration = 1200; // Animation duration in ms
+    const startTime = Date.now();
+    const endValue = percentage;
     
-    return () => clearInterval(interval);
-  }, []);
+    const animatePercentage = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      // Use ease-out cubic function for smoother animation
+      const progressEased = 1 - Math.pow(1 - progress, 3);
+      setAnimatedPercentage(progressEased * endValue);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animatePercentage);
+      }
+    };
+    
+    requestAnimationFrame(animatePercentage);
+  }, [percentage]);
+
+  // Calculate the ring properties
+  const circleRadius = {
+    sm: 16,
+    md: 26,
+    lg: 40
+  }[size];
+  
+  const circumference = 2 * Math.PI * circleRadius;
+  const dashOffset = circumference * (1 - animatedPercentage / 100);
   
   return (
-    <div className="relative">
-      {/* Rotating background ring */}
-      <svg 
-        className="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" 
-        width={width + 10} 
-        height={height + 10} 
-        style={{ transform: `translate(-50%, -50%) rotate(${rotation}deg)` }}
-      >
-        <defs>
-          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#9ecfff" stopOpacity="0.2" />
-            <stop offset="50%" stopColor="#b166ff" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#88c9b7" stopOpacity="0.2" />
-          </linearGradient>
-        </defs>
+    <div className={cn("relative flex items-center justify-center", sizeClasses[size], className)}>
+      {/* Background Circle */}
+      <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0">
         <circle 
-          cx={(width + 10) / 2} 
-          cy={(height + 10) / 2} 
-          r={radius + 5} 
+          cx="50" 
+          cy="50" 
+          r={circleRadius} 
+          strokeWidth={strokeWidth[size]} 
+          stroke="#1e293b" 
           fill="none" 
-          stroke="url(#ringGradient)" 
-          strokeWidth="1" 
+          strokeDasharray={circumference} 
+          strokeDashoffset="0"
+          className="opacity-30"
         />
       </svg>
       
-      {/* Progress ring */}
-      <svg width={width} height={height}>
+      {/* Progress Circle with Animation */}
+      <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0 -rotate-90 transform">
+        <circle 
+          cx="50" 
+          cy="50" 
+          r={circleRadius} 
+          strokeWidth={strokeWidth[size]} 
+          stroke="url(#gradientXP)" 
+          fill="none" 
+          strokeLinecap="round"
+          strokeDasharray={circumference} 
+          strokeDashoffset={dashOffset}
+          className={cn(
+            "transition-all duration-1000 ease-out",
+            pulseEffect && "animate-pulse"
+          )}
+        />
         <defs>
-          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="gradientXP" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#9ecfff" />
             <stop offset="100%" stopColor="#88c9b7" />
           </linearGradient>
         </defs>
-        <circle 
-          cx={width / 2} 
-          cy={height / 2} 
-          r={radius} 
-          fill="none" 
-          stroke="rgba(158, 207, 255, 0.1)" 
-          strokeWidth={strokeWidth} 
-        />
-        <circle 
-          cx={width / 2} 
-          cy={height / 2} 
-          r={radius} 
-          fill="none" 
-          stroke="url(#progressGradient)" 
-          strokeWidth={strokeWidth} 
-          strokeDasharray={circumference} 
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className="drop-shadow-glow"
-        />
       </svg>
+      
+      {/* Percentage Display in Center */}
+      <div className="z-10 text-center flex items-center justify-center font-medium">
+        <span className={cn(
+          "bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent",
+          size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-base"
+        )}>
+          {Math.round(animatedPercentage)}%
+        </span>
+      </div>
     </div>
   );
 }

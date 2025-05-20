@@ -1,497 +1,273 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { XpRingProgress } from "@/components/dashboard/XpRingProgress";
+import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { XPRing } from "@/components/ui/xp-ring";
-import { Badge } from "@/components/ui/badge";
-import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { 
-  BookIcon, 
-  GitForkIcon, 
-  AwardIcon, 
-  NotebookPenIcon,
-  BellIcon, 
-  AlertCircleIcon
-} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
+import { useEffect } from "react";
 
 export function UserDashboard() {
-  const { user, isLoading: isUserLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   
   // Fetch dashboard data
-  const { data: dashboardData, isLoading: isDashboardLoading } = useQuery({
+  const { data: dashboardData, isLoading } = useQuery({
     queryKey: ["/api/dashboard"],
-    enabled: !!user,
+    enabled: isAuthenticated,
   });
   
-  const isLoading = isUserLoading || isDashboardLoading;
-
-  if (isLoading) {
+  // Use mock data when no real data is available
+  const display = dashboardData || MOCK_DASHBOARD_DATA;
+  
+  if (!isAuthenticated) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/3">
-            <Skeleton className="h-[300px] w-full rounded-xl mb-6" />
-            <Skeleton className="h-[300px] w-full rounded-xl" />
-          </div>
-          <div className="md:w-2/3">
-            <Skeleton className="h-12 w-full rounded-lg mb-6" />
-            <Skeleton className="h-[600px] w-full rounded-xl" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="container mx-auto py-16 px-4 text-center">
-        <AlertCircleIcon className="h-16 w-16 mx-auto text-[#ff5c5c] mb-6" />
-        <h2 className="text-2xl font-orbitron mb-4">Authentication Required</h2>
-        <p className="text-gray-500 mb-8">Please sign in to access your dashboard.</p>
-        <Button asChild>
-          <a href="/api/login">Sign In</a>
+      <div className="flex flex-col items-center justify-center py-12">
+        <h2 className="text-2xl font-orbitron mb-6">Sign in to view your dashboard</h2>
+        <Button
+          className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+        >
+          Sign In
         </Button>
       </div>
     );
   }
-
-  // Extract data
-  const { 
-    labProgress = [], 
-    projectProgress = [], 
-    badges = [] 
-  } = dashboardData || {};
-
-  // Calculate total XP and levels
-  const totalXp = user.totalXp || 0;
-  const level = Math.floor(totalXp / 1000) + 1; // Simple level calculation
   
-  // Calculate progress to next level
-  const xpForCurrentLevel = (level - 1) * 1000;
-  const xpForNextLevel = level * 1000;
-  const levelProgress = Math.round(((totalXp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100);
-  
-  // Sort completed and in-progress items
-  const completedLabs = labProgress.filter((item: any) => item.progress.isCompleted);
-  const inProgressLabs = labProgress.filter((item: any) => !item.progress.isCompleted);
-  
-  const completedProjects = projectProgress.filter((item: any) => item.progress.isCompleted);
-  const inProgressProjects = projectProgress.filter((item: any) => !item.progress.isCompleted);
-  
-  const completedCount = completedLabs.length + completedProjects.length;
-  const inProgressCount = inProgressLabs.length + inProgressProjects.length;
-
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col xl:flex-row gap-8">
-        {/* Sidebar */}
-        <div className="xl:w-1/3 space-y-8">
-          {/* User Profile Card */}
-          <GlassmorphicCard className="overflow-hidden">
-            <div className="p-6 text-center">
-              <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-[#9ecfff]/20">
-                <AvatarImage 
-                  src={user.profileImageUrl} 
-                  alt={user.username || "User"} 
-                />
-                <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30 text-xl">
-                  {user.username?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              
-              <h2 className="text-xl font-orbitron mb-1">{user.username || "User"}</h2>
-              <p className="text-gray-500 mb-4">{user.email}</p>
-              
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <XPRing percentage={levelProgress} size="lg" />
-                  <div className="absolute inset-0 flex items-center justify-center flex-col">
-                    <span className="text-xs text-gray-400">LEVEL</span>
-                    <span className="text-2xl font-bold text-white">{level}</span>
-                  </div>
-                </div>
-                
-                <div className="ml-6 text-left">
-                  <h3 className="text-lg font-orbitron text-[#9ecfff]">{totalXp} XP</h3>
-                  <p className="text-xs text-gray-500">
-                    {xpForNextLevel - totalXp} XP to level {level + 1}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <Badge variant="outline" className="bg-[#1e2535]/80 text-gray-300">
-                      {completedCount} Completed
-                    </Badge>
-                    <Badge variant="outline" className="bg-[#1e2535]/80 text-gray-300">
-                      {inProgressCount} In Progress
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4 text-center border-t border-[#9ecfff]/10 pt-4">
-                <div>
-                  <div className="text-2xl font-orbitron text-[#9ecfff]">
-                    {completedLabs.length}
-                  </div>
-                  <div className="text-xs text-gray-500">Labs</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-orbitron text-[#9ecfff]">
-                    {completedProjects.length}
-                  </div>
-                  <div className="text-xs text-gray-500">Projects</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-orbitron text-[#9ecfff]">
-                    {badges.length}
-                  </div>
-                  <div className="text-xs text-gray-500">Badges</div>
-                </div>
-              </div>
-            </div>
-          </GlassmorphicCard>
-          
-          {/* Badges Card */}
-          <GlassmorphicCard className="overflow-hidden">
-            <div className="p-6">
-              <h3 className="font-orbitron text-lg mb-4 flex items-center">
-                <AwardIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                Your Badges
-              </h3>
-              
-              {badges.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-2 gap-4">
-                  {badges.map((badge: any) => (
-                    <div key={badge.id} className="flex flex-col items-center text-center p-3 bg-[#1e2535]/80 rounded-lg">
-                      <div className="w-16 h-16 mb-2 bg-gradient-to-br from-[#9ecfff]/10 to-[#88c9b7]/10 border border-[#9ecfff]/20 rounded-full flex items-center justify-center">
-                        <img
-                          src={badge.iconUrl || `https://api.dicebear.com/6.x/shapes/svg?seed=${badge.name}`}
-                          alt={badge.name}
-                          className="w-10 h-10"
-                        />
+    <div className="container mx-auto px-4 py-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="lg:col-span-1">
+          <GlassmorphicCard className="p-8 flex flex-col items-center h-full">
+            <XpRingProgress
+              xp={user.totalXp}
+              username={user.username}
+              profileImageUrl={user.profileImageUrl}
+            />
+            
+            <div className="mt-6 w-full">
+              <h3 className="font-orbitron text-lg text-center mb-4">Achievement Badges</h3>
+              <div className="flex flex-wrap justify-center gap-3">
+                {isLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-16 w-16 rounded-full" />
+                  ))
+                ) : display.badges && display.badges.length > 0 ? (
+                  display.badges.map((badge: any) => (
+                    <div 
+                      key={badge.id}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 flex items-center justify-center">
+                        {badge.iconUrl ? (
+                          <img src={badge.iconUrl} alt={badge.name} className="h-10 w-10" />
+                        ) : (
+                          <span className="text-2xl">🏆</span>
+                        )}
                       </div>
-                      <h4 className="text-sm font-medium">{badge.name}</h4>
-                      <p className="text-xs text-gray-500 mt-1">{badge.description}</p>
+                      <span className="text-xs text-gray-400 mt-1">{badge.name}</span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <AwardIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                  <p className="text-gray-500">Complete labs and projects to earn badges!</p>
-                </div>
-              )}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center text-sm">Complete labs and projects to earn badges!</p>
+                )}
+              </div>
             </div>
           </GlassmorphicCard>
         </div>
         
-        {/* Main Content */}
-        <div className="xl:w-2/3">
-          <Tabs defaultValue="progress" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="progress" className="font-orbitron">Progress</TabsTrigger>
-              <TabsTrigger value="notes" className="font-orbitron">Notes</TabsTrigger>
-              <TabsTrigger value="badges" className="font-orbitron">Badges</TabsTrigger>
-              <TabsTrigger value="notifications" className="font-orbitron">Notifications</TabsTrigger>
-            </TabsList>
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="labs" className="h-full">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-orbitron text-2xl">Your Progress</h2>
+              <TabsList className="grid grid-cols-2 bg-[#1e293b]/30">
+                <TabsTrigger 
+                  value="labs"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9ecfff]/20 data-[state=active]:to-[#88c9b7]/20 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+                >
+                  Labs
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="projects"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9ecfff]/20 data-[state=active]:to-[#88c9b7]/20 data-[state=active]:border-b-2 data-[state=active]:border-[#9ecfff]"
+                >
+                  Projects
+                </TabsTrigger>
+              </TabsList>
+            </div>
             
-            {/* Progress Tab */}
-            <TabsContent value="progress" className="mt-6">
-              <GlassmorphicCard>
-                <div className="p-6">
-                  <h3 className="font-orbitron text-xl mb-6 flex items-center">
-                    <BookIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                    Labs Progress
-                  </h3>
-                  
-                  {labProgress.length > 0 ? (
-                    <div className="space-y-6">
-                      <h4 className="text-sm uppercase text-gray-500 font-medium mb-2">In Progress</h4>
-                      {inProgressLabs.length > 0 ? (
-                        <div className="space-y-4">
-                          {inProgressLabs.map((item: any) => (
-                            <ProgressTracker
-                              key={item.lab.id}
-                              type="lab"
-                              title={item.lab.title}
-                              id={item.lab.id}
-                              progress={item.progress.completedTasks?.length || 0}
-                              total={5} // Placeholder, ideally from the API
-                              xpEarned={item.progress.xpEarned || 0}
-                              xpTotal={item.lab.xpReward}
-                              difficulty={item.lab.difficulty}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 py-2">No labs in progress. Start a new lab!</p>
-                      )}
-                      
-                      <div className="border-t border-[#9ecfff]/10 pt-6 mt-6">
-                        <h4 className="text-sm uppercase text-gray-500 font-medium mb-2">Completed</h4>
-                        {completedLabs.length > 0 ? (
-                          <div className="space-y-4">
-                            {completedLabs.map((item: any) => (
-                              <ProgressTracker
-                                key={item.lab.id}
-                                type="lab"
-                                title={item.lab.title}
-                                id={item.lab.id}
-                                progress={5} // Completed, so max value
-                                total={5}
-                                xpEarned={item.lab.xpReward}
-                                xpTotal={item.lab.xpReward}
-                                difficulty={item.lab.difficulty}
-                                isCompleted
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 py-2">You haven't completed any labs yet.</p>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <BookIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                      <p className="text-gray-500 mb-4">You haven't started any labs yet.</p>
-                      <Button asChild>
-                        <Link href="/labs">Browse Labs</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </GlassmorphicCard>
-              
-              <GlassmorphicCard className="mt-6">
-                <div className="p-6">
-                  <h3 className="font-orbitron text-xl mb-6 flex items-center">
-                    <GitForkIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                    Projects Progress
-                  </h3>
-                  
-                  {projectProgress.length > 0 ? (
-                    <div className="space-y-6">
-                      <h4 className="text-sm uppercase text-gray-500 font-medium mb-2">In Progress</h4>
-                      {inProgressProjects.length > 0 ? (
-                        <div className="space-y-4">
-                          {inProgressProjects.map((item: any) => (
-                            <ProgressTracker
-                              key={item.project.id}
-                              type="project"
-                              title={item.project.title}
-                              id={item.project.id}
-                              progress={item.progress.completedTasks?.length || 0}
-                              total={5} // Placeholder, ideally from the API
-                              xpEarned={item.progress.xpEarned || 0}
-                              xpTotal={item.project.xpReward}
-                              difficulty={item.project.difficulty}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 py-2">No projects in progress. Start a new project!</p>
-                      )}
-                      
-                      <div className="border-t border-[#9ecfff]/10 pt-6 mt-6">
-                        <h4 className="text-sm uppercase text-gray-500 font-medium mb-2">Completed</h4>
-                        {completedProjects.length > 0 ? (
-                          <div className="space-y-4">
-                            {completedProjects.map((item: any) => (
-                              <ProgressTracker
-                                key={item.project.id}
-                                type="project"
-                                title={item.project.title}
-                                id={item.project.id}
-                                progress={5} // Completed, so max value
-                                total={5}
-                                xpEarned={item.project.xpReward}
-                                xpTotal={item.project.xpReward}
-                                difficulty={item.project.difficulty}
-                                isCompleted
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 py-2">You haven't completed any projects yet.</p>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <GitForkIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                      <p className="text-gray-500 mb-4">You haven't started any projects yet.</p>
-                      <Button asChild>
-                        <Link href="/projects">Browse Projects</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </GlassmorphicCard>
-            </TabsContent>
-            
-            {/* Notes Tab */}
-            <TabsContent value="notes" className="mt-6">
-              <GlassmorphicCard>
-                <div className="p-6">
-                  <h3 className="font-orbitron text-xl mb-6 flex items-center">
-                    <NotebookPenIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                    Your Notes
-                  </h3>
-                  
-                  <div className="space-y-6">
-                    {labProgress.filter((item: any) => item.progress.notes).length > 0 || 
-                     projectProgress.filter((item: any) => item.progress.notes).length > 0 ? (
-                      <>
-                        {/* Lab Notes */}
-                        {labProgress.filter((item: any) => item.progress.notes).map((item: any) => (
-                          <div key={`lab-${item.lab.id}`} className="bg-[#1e2535]/50 rounded-lg p-4 border border-[#9ecfff]/10">
-                            <h4 className="font-medium mb-2 flex items-center">
-                              <BookIcon className="h-4 w-4 mr-2" />
-                              <Link href={`/labs/${item.lab.id}`}>
-                                <a className="hover:text-[#9ecfff] transition-colors">
-                                  {item.lab.title}
-                                </a>
-                              </Link>
-                            </h4>
-                            <Textarea 
-                              className="min-h-[100px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                              value={item.progress.notes}
-                              readOnly
-                            />
-                            <div className="mt-2 text-right">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                asChild
-                                className="text-xs"
-                              >
-                                <Link href={`/labs/${item.lab.id}`}>
-                                  <a>Edit in Lab</a>
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                        
-                        {/* Project Notes */}
-                        {projectProgress.filter((item: any) => item.progress.notes).map((item: any) => (
-                          <div key={`project-${item.project.id}`} className="bg-[#1e2535]/50 rounded-lg p-4 border border-[#9ecfff]/10">
-                            <h4 className="font-medium mb-2 flex items-center">
-                              <GitForkIcon className="h-4 w-4 mr-2" />
-                              <Link href={`/projects/${item.project.id}`}>
-                                <a className="hover:text-[#9ecfff] transition-colors">
-                                  {item.project.title}
-                                </a>
-                              </Link>
-                            </h4>
-                            <Textarea 
-                              className="min-h-[100px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                              value={item.progress.notes}
-                              readOnly
-                            />
-                            <div className="mt-2 text-right">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                asChild
-                                className="text-xs"
-                              >
-                                <Link href={`/projects/${item.project.id}`}>
-                                  <a>Edit in Project</a>
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    ) : (
-                      <div className="text-center py-6">
-                        <NotebookPenIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                        <p className="text-gray-500">
-                          You haven't taken any notes yet. Notes you take in labs and projects will appear here.
-                        </p>
-                      </div>
-                    )}
+            <TabsContent value="labs" className="h-full">
+              <div className="space-y-4">
+                {isLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-28 w-full rounded-xl" />
+                  ))
+                ) : display.labProgress && display.labProgress.length > 0 ? (
+                  display.labProgress.map((item: any) => (
+                    <ProgressTracker
+                      key={item.lab.id}
+                      type="lab"
+                      title={item.lab.title}
+                      id={item.lab.id}
+                      progress={item.progress.completedTasks.length}
+                      total={5} // Assuming 5 tasks per lab
+                      xpEarned={item.progress.xpEarned}
+                      xpTotal={item.lab.xpReward}
+                      difficulty={item.lab.difficulty}
+                      isCompleted={item.progress.isCompleted}
+                    />
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
+                    <p className="text-gray-400 mb-6 text-center">You haven't started any labs yet. Explore our labs to begin your journey!</p>
+                    <Button 
+                      variant="outline"
+                      className="bg-gradient-to-r from-[#9ecfff]/10 to-[#88c9b7]/10 hover:from-[#9ecfff]/20 hover:to-[#88c9b7]/20"
+                    >
+                      Browse Labs
+                    </Button>
                   </div>
-                </div>
-              </GlassmorphicCard>
+                )}
+              </div>
             </TabsContent>
             
-            {/* Badges Tab */}
-            <TabsContent value="badges" className="mt-6">
-              <GlassmorphicCard>
-                <div className="p-6">
-                  <h3 className="font-orbitron text-xl mb-6 flex items-center">
-                    <AwardIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                    Your Badges
-                  </h3>
-                  
-                  {badges.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                      {badges.map((badge: any) => (
-                        <div key={badge.id} className="bg-[#1e2535]/50 rounded-lg p-6 border border-[#9ecfff]/10 flex flex-col items-center text-center">
-                          <div className="w-24 h-24 mb-4 bg-gradient-to-br from-[#9ecfff]/10 to-[#88c9b7]/10 border border-[#9ecfff]/20 rounded-full flex items-center justify-center">
-                            <img
-                              src={badge.iconUrl || `https://api.dicebear.com/6.x/shapes/svg?seed=${badge.name}`}
-                              alt={badge.name}
-                              className="w-16 h-16"
-                            />
-                          </div>
-                          <h4 className="font-medium mb-2">{badge.name}</h4>
-                          <p className="text-sm text-gray-400 mb-3">{badge.description}</p>
-                          <Badge variant="outline" className="bg-[#1e2535]/80 text-gray-300 text-xs">
-                            Earned on {new Date(badge.earnedAt).toLocaleDateString()}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <AwardIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                      <p className="text-gray-500 mb-4">
-                        You haven't earned any badges yet. Complete labs and projects to earn badges!
-                      </p>
-                      <div className="flex gap-4 justify-center">
-                        <Button asChild variant="outline">
-                          <Link href="/labs">Browse Labs</Link>
-                        </Button>
-                        <Button asChild>
-                          <Link href="/projects">Browse Projects</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </GlassmorphicCard>
-            </TabsContent>
-            
-            {/* Notifications Tab */}
-            <TabsContent value="notifications" className="mt-6">
-              <GlassmorphicCard>
-                <div className="p-6">
-                  <h3 className="font-orbitron text-xl mb-6 flex items-center">
-                    <BellIcon className="mr-2 h-5 w-5 text-[#9ecfff]" />
-                    Notifications
-                  </h3>
-                  
-                  <div className="text-center py-6">
-                    <BellIcon className="h-12 w-12 mx-auto text-gray-500 mb-2" />
-                    <p className="text-gray-500">
-                      You have no notifications yet. Interactions with your content will appear here.
-                    </p>
+            <TabsContent value="projects" className="h-full">
+              <div className="space-y-4">
+                {isLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-28 w-full rounded-xl" />
+                  ))
+                ) : display.projectProgress && display.projectProgress.length > 0 ? (
+                  display.projectProgress.map((item: any) => (
+                    <ProgressTracker
+                      key={item.project.id}
+                      type="project"
+                      title={item.project.title}
+                      id={item.project.id}
+                      progress={item.progress.completedTasks.length}
+                      total={4} // Assuming 4 tasks per project
+                      xpEarned={item.progress.xpEarned}
+                      xpTotal={item.project.xpReward}
+                      difficulty={item.project.difficulty}
+                      isCompleted={item.progress.isCompleted}
+                    />
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
+                    <p className="text-gray-400 mb-6 text-center">You haven't started any projects yet. Take on a project challenge!</p>
+                    <Button 
+                      variant="outline"
+                      className="bg-gradient-to-r from-[#9ecfff]/10 to-[#88c9b7]/10 hover:from-[#9ecfff]/20 hover:to-[#88c9b7]/20"
+                    >
+                      Browse Projects
+                    </Button>
                   </div>
-                </div>
-              </GlassmorphicCard>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
       </div>
+      
+      <section className="mb-8">
+        <h2 className="font-orbitron text-2xl mb-6">Recent Activity</h2>
+        <GlassmorphicCard className="p-6">
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array(3).fill(0).map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 py-2 border-b border-gray-800">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#9ecfff]/20 text-[#9ecfff]">
+                  🏆
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-300">You earned the <span className="text-[#9ecfff]">Beginner's Mind</span> badge for completing your first lab.</p>
+                  <p className="text-xs text-gray-500">2 days ago</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 py-2 border-b border-gray-800">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-green-500/20 text-green-500">
+                  ✓
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-300">You completed <span className="text-green-500">2/5</span> tasks in <span className="text-[#9ecfff]">Quantum Computing Basics</span>.</p>
+                  <p className="text-xs text-gray-500">3 days ago</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 py-2">
+                <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#88c9b7]/20 text-[#88c9b7]">
+                  🚀
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-300">You started the <span className="text-[#88c9b7]">Mindful Meditation App</span> project.</p>
+                  <p className="text-xs text-gray-500">5 days ago</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </GlassmorphicCard>
+      </section>
+      
+      <section>
+        <h2 className="font-orbitron text-2xl mb-6">Recommended For You</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <GlassmorphicCard className="p-6 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-4">
+              <Badge className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30">Lab</Badge>
+              <Badge className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30">Intermediate</Badge>
+            </div>
+            <h3 className="font-orbitron text-lg mb-2">Neural Network Foundations</h3>
+            <p className="text-gray-400 text-sm mb-4 flex-1">Build a simple neural network from scratch and understand the math behind it.</p>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">750 XP</span>
+              <Button variant="outline" className="h-8 px-3 text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/30">
+                Start Lab
+              </Button>
+            </div>
+          </GlassmorphicCard>
+          
+          <GlassmorphicCard className="p-6 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-4">
+              <Badge className="bg-green-500/20 text-green-400 hover:bg-green-500/30">Project</Badge>
+              <Badge className="bg-red-500/20 text-red-400 hover:bg-red-500/30">Advanced</Badge>
+            </div>
+            <h3 className="font-orbitron text-lg mb-2">Decentralized AI Marketplace</h3>
+            <p className="text-gray-400 text-sm mb-4 flex-1">Build a platform for trading AI models on a decentralized network.</p>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">1500 XP</span>
+              <Button variant="outline" className="h-8 px-3 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/30">
+                Start Project
+              </Button>
+            </div>
+          </GlassmorphicCard>
+          
+          <GlassmorphicCard className="p-6 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-4">
+              <Badge className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">Community</Badge>
+              <Badge className="bg-[#88c9b7]/20 text-[#88c9b7] hover:bg-[#88c9b7]/30">Discussion</Badge>
+            </div>
+            <h3 className="font-orbitron text-lg mb-2">Balancing Tech & Mindfulness</h3>
+            <p className="text-gray-400 text-sm mb-4 flex-1">Join the discussion on techniques for maintaining mindfulness while coding.</p>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-500">24 Comments</span>
+              <Button variant="outline" className="h-8 px-3 text-xs bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/30">
+                Join Discussion
+              </Button>
+            </div>
+          </GlassmorphicCard>
+        </div>
+      </section>
     </div>
   );
 }

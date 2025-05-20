@@ -3,41 +3,28 @@ import { Footer } from "@/components/layout/Footer";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function DashboardPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
-        <Header />
-        <main className="container mx-auto py-12 px-4 flex justify-center items-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="animate-pulse h-12 w-12 mx-auto rounded-full bg-[#9ecfff]/20 mb-4" />
-            <h2 className="text-xl font-orbitron mb-2">Loading...</h2>
-            <p className="text-gray-500">Retrieving your dashboard information</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
+  const { isAuthenticated, loginAsUser } = useAuth();
+  const navigate = useNavigate();
+  
+  // If not authenticated, show login prompt
   if (!isAuthenticated) {
     return (
-      <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
+      <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
         <Header />
-        <main className="container mx-auto py-12 px-4 flex justify-center items-center min-h-[60vh]">
-          <div className="text-center max-w-md">
-            <AlertCircle className="h-12 w-12 mx-auto text-[#ff5c5c] mb-4" />
-            <h2 className="text-2xl font-orbitron mb-4">Authentication Required</h2>
+        <main className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto bg-[#1e2535]/70 backdrop-blur-md rounded-xl border border-[#9ecfff]/10 p-8 text-center">
+            <h1 className="font-orbitron text-2xl mb-6">Sign In Required</h1>
             <p className="text-gray-400 mb-8">
-              You must be signed in to access your dashboard. Please sign in to track your progress, 
-              view your badges, and manage your notes.
+              Please sign in to access your personalized dashboard.
             </p>
-            <Button asChild size="lg">
-              <a href="/api/login">Sign In</a>
+            <Button 
+              onClick={loginAsUser} 
+              className="w-full py-6 h-auto bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#9ecfff]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+            >
+              Sign In
             </Button>
           </div>
         </main>
@@ -47,9 +34,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
+    <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
       <Header />
-      <UserDashboard />
+      <main>
+        <UserDashboard />
+      </main>
       <Footer />
     </div>
   );
