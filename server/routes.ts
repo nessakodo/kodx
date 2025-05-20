@@ -13,91 +13,13 @@ import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
 import { ZodError } from "zod-validation-error";
 
-import adminRouter from './admin-routes';
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Register admin routes
-  app.use('/api/admin', adminRouter);
-
   // Auth endpoints are now handled by replitAuth.ts
   
-  // User auth endpoint for frontend authentication checks
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      // Get user progress data
-      let isNewUser = false;
-      
-      if (user.createdAt) {
-        // Calculate if this is a new user (account created less than 24 hours ago)
-        isNewUser = (
-          new Date().getTime() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000
-        ) && !user.completedOnboarding;
-      }
-      
-      // Return user data with auth-specific fields
-      const { password, ...safeUserData } = user;
-      res.json({
-        ...safeUserData,
-        isNewUser
-      });
-    } catch (error) {
-      console.error("Error fetching authenticated user:", error);
-      res.status(500).json({ message: "Failed to fetch user data" });
-    }
-  });
-  
-  // User onboarding completion endpoint
-  app.post('/api/user/onboarding', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { avatarId, username, interests, completed } = req.body;
-      
-      // Get the current user
-      const user = await storage.getUser(userId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      // Update user data
-      const updatedUser = await storage.upsertUser({
-        ...user,
-        id: userId,
-        profileImageUrl: avatarId ? `/avatars/${avatarId}.png` : user.profileImageUrl,
-        username: username || user.username,
-        interests: interests || user.interests,
-        completedOnboarding: true,
-        updatedAt: new Date()
-      });
-      
-      // Award the "First Steps" badge for completing onboarding
-      try {
-        // Get the badge ID for first steps
-        const badgeId = 1; // Using a numeric ID for the onboarding badge
-        await storage.awardBadge(userId, badgeId);
-      } catch (badgeError) {
-        console.error("Error awarding onboarding badge:", badgeError);
-        // Continue even if badge award fails
-      }
-      
-      res.json({ success: true, user: updatedUser });
-    } catch (error) {
-      console.error("Error updating onboarding data:", error);
-      res.status(500).json({ message: "Failed to update onboarding data" });
-    }
-  });
-  
-  // Legacy User profile endpoint - Protected route example
+  // User profile endpoint - Protected route example
   app.get('/api/profile', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;
@@ -172,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/labs/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const labId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Check if lab exists
       const [lab] = await db.select().from(labs).where(eq(labs.id, labId));
@@ -307,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/projects/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const projectId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Check if project exists
       const [project] = await db.select().from(projects).where(eq(projects.id, projectId));
@@ -389,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Progress & Dashboard routes
   app.get("/api/dashboard", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Get user
       const [user] = await db.select().from(users).where(eq(users.id, userId));
@@ -580,7 +502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/forum-posts", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       const { title, content, category } = req.body;
       
       if (!title || !content || !category) {
@@ -607,7 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/forum-posts/:id/comments", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       const { content } = req.body;
       
       if (!content) {
@@ -653,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/forum-posts/:id/save", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Check if post exists
       const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, postId));
@@ -699,7 +621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 app.get("/api/saved-posts", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Get all saved posts for the user with post and author details
       const savedPosts = await db
@@ -735,7 +657,7 @@ app.get("/api/saved-posts", isAuthenticated, async (req: any, res) => {
 app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Check if post exists
       const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, postId));
@@ -796,7 +718,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
   // Admin routes
   app.post("/api/admin/labs", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Get user role
       const [user] = await db
@@ -836,7 +758,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
 
   app.post("/api/admin/projects", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Get user role
       const [user] = await db
@@ -877,7 +799,7 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
 
   app.post("/api/admin/badges", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       
       // Get user role
       const [user] = await db
