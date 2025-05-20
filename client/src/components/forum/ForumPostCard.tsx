@@ -67,7 +67,7 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
   };
 
   return (
-    <GlassmorphicCard className={`flex flex-col h-full transition-all hover:border-[#9ecfff]/30 group ${className}`} hoverEffect>
+    <GlassmorphicCard className={`flex flex-col h-full transition-all hover:border-[#9ecfff]/30 group ${className}`}>
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center">
