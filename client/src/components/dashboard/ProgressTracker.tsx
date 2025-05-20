@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { BookIcon, GitForkIcon, ArrowRightIcon, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { XPRing } from "@/components/ui/xp-ring";
+import { DifficultyBadge } from "@/components/ui/difficulty-badge";
 
 interface ProgressTrackerProps {
   type: "lab" | "project";
@@ -84,11 +85,7 @@ export function ProgressTracker({
         </div>
         
         <div className="flex flex-wrap gap-2">
-          <Badge 
-            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${difficultyStyle.gradientClasses} px-2 py-1 rounded border ${difficultyStyle.borderClasses}`}
-          >
-            {difficultyStyle.label}
-          </Badge>
+          <DifficultyBadge level={difficulty} />
           
           {showAsCompleted && (
             <Badge className="bg-[#5cdc96]/20 text-[#5cdc96] border-[#5cdc96]/30 flex items-center gap-1">

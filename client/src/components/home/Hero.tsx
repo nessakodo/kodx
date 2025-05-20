@@ -60,7 +60,7 @@ export function Hero() {
           rel="noopener noreferrer"
         >
           <Button 
-            className="px-6 py-3 h-auto border border-[#88c9b7]/30 hover:bg-[#88c9b7]/10 bg-[#1e2535]/25 backdrop-blur-md transition-all font-medium tracking-wide flex items-center justify-center gap-2"
+            className="px-6 py-3 h-auto border border-[#88c9b7]/30 hover:bg-[#1e2535]/80 bg-[#1e2535]/60 backdrop-blur-md transition-all font-medium tracking-wide flex items-center justify-center gap-2 text-gray-100"
             size="lg"
           >
             <FaDiscord className="h-5 w-5" />

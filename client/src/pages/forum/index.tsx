@@ -90,7 +90,7 @@ export default function ForumPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1e2535] border-[#1e2535]">
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category: string) => (
                       <SelectItem key={category} value={category}>{category}</SelectItem>
                     ))}

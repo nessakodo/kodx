@@ -237,6 +237,57 @@ export function UserDashboard() {
           isLoading={isLoading}
         />
       </section>
+
+      <section className="mb-8">
+        <h2 className="font-orbitron text-2xl mb-6 flex items-center gap-2">
+          <BookOpenIcon className="h-5 w-5 text-[#9ecfff]" />
+          Your Notes
+        </h2>
+        <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
+          {isLoading ? (
+            <div className="p-6 space-y-4">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          ) : (
+            <>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-medium text-lg text-gray-200">Quantum Computing Basics</h3>
+                  <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">Lab</Badge>
+                </div>
+                <p className="text-gray-400 mb-2">Section: Introduction</p>
+                <div className="bg-[#1e293b]/50 rounded p-3 border border-[#1e293b]/90 text-gray-300">
+                  Qubit superposition and entanglement enable quantum parallelism. Need to review H-gate operations and Bell states further.
+                </div>
+                <div className="flex justify-end mt-3">
+                  <div className="text-xs text-gray-500">Last updated: 19 May 2025</div>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-medium text-lg text-gray-200">Mindful Meditation App</h3>
+                  <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">Project</Badge>
+                </div>
+                <p className="text-gray-400 mb-2">Section: Security Implementation</p>
+                <div className="bg-[#1e293b]/50 rounded p-3 border border-[#1e293b]/90 text-gray-300">
+                  Implemented encryption for user meditation history. Need to add validation and sanitization for meditation entry descriptions.
+                </div>
+                <div className="flex justify-end mt-3">
+                  <div className="text-xs text-gray-500">Last updated: 17 May 2025</div>
+                </div>
+              </div>
+              
+              <div className="p-4 flex justify-center">
+                <Button variant="outline" className="btn-kodex">
+                  Show More Notes <ChevronDownIcon className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
       
       <section>
         <h2 className="font-orbitron text-2xl mb-6">Recommended For You</h2>
