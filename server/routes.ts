@@ -13,9 +13,14 @@ import { eq, desc, and } from "drizzle-orm";
 import { z } from "zod";
 import { ZodError } from "zod-validation-error";
 
+import adminRouter from './admin-routes';
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Register admin routes
+  app.use('/api/admin', adminRouter);
 
   // Auth endpoints are now handled by replitAuth.ts
   
