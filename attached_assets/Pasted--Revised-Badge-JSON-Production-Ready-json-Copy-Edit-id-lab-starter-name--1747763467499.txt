@@ -1,0 +1,147 @@
+🏷️ Revised Badge JSON (Production-Ready)
+json
+Copy
+Edit
+[
+  {
+    "id": "lab_starter",
+    "name": "Lab Starter",
+    "description": "Completed your first lab",
+    "category": "labs",
+    "rarity": "common",
+    "timestampEarned": null
+  },
+  {
+    "id": "forum_poster",
+    "name": "First Post",
+    "description": "Made your first forum post",
+    "category": "community",
+    "rarity": "common",
+    "timestampEarned": null
+  },
+  {
+    "id": "founder",
+    "name": "Founding Member",
+    "description": "Early member of KODΞX.WORLD",
+    "category": "meta",
+    "rarity": "legendary",
+    "timestampEarned": null
+  },
+  {
+    "id": "level_10",
+    "name": "Level 10 Achiever",
+    "description": "Reached Level 10 – your power is growing",
+    "category": "leveling",
+    "rarity": "uncommon",
+    "timestampEarned": null
+  },
+  {
+    "id": "devlog_scribe",
+    "name": "Devlog Scribe",
+    "description": "Shared your first project reflection in the forum",
+    "category": "reflection",
+    "rarity": "common",
+    "timestampEarned": null
+  },
+  {
+    "id": "project_builder",
+    "name": "Project Builder",
+    "description": "Completed your first project",
+    "category": "projects",
+    "rarity": "common",
+    "timestampEarned": null
+  },
+  {
+    "id": "secure_thinker",
+    "name": "Secure Thinker",
+    "description": "Completed a lab in the Cybersecurity Pathway",
+    "category": "security",
+    "rarity": "uncommon",
+    "timestampEarned": null
+  },
+  {
+    "id": "creative_agent",
+    "name": "Creative Agent",
+    "description": "Completed a project in the Creative Coding Pathway",
+    "category": "creativity",
+    "rarity": "uncommon",
+    "timestampEarned": null
+  },
+  {
+    "id": "ritualist",
+    "name": "Digital Ritualist",
+    "description": "Submitted a reflection on tech and intention",
+    "category": "mindful-tech",
+    "rarity": "uncommon",
+    "timestampEarned": null
+  },
+  {
+    "id": "mentor",
+    "name": "Community Mentor",
+    "description": "Marked as helpful in 3 forum threads",
+    "category": "community",
+    "rarity": "rare",
+    "timestampEarned": null
+  },
+  {
+    "id": "deep_dive",
+    "name": "Deep Diver",
+    "description": "Completed 5+ labs in one learning path",
+    "category": "labs",
+    "rarity": "uncommon",
+    "timestampEarned": null
+  },
+  {
+    "id": "night_runner",
+    "name": "Night Runner",
+    "description": "Logged progress between 12:00 AM and 5:00 AM",
+    "category": "quirky",
+    "rarity": "rare",
+    "timestampEarned": null
+  },
+  {
+    "id": "open_source_contributor",
+    "name": "Open Source Contributor",
+    "description": "Linked a GitHub repo in your project submission",
+    "category": "projects",
+    "rarity": "rare",
+    "timestampEarned": null
+  },
+  {
+    "id": "signal_seeker",
+    "name": "Newsletter Subscriber",
+    "description": "Subscribed to the KODΞX SIGNAL newsletter",
+    "category": "meta",
+    "rarity": "common",
+    "timestampEarned": null
+  },
+  {
+    "id": "early_supporter",
+    "name": "Early Supporter",
+    "description": "Supported KODΞX in its first year of launch",
+    "category": "meta",
+    "rarity": "legendary",
+    "timestampEarned": null
+  },
+  {
+    "id": "glowkeeper",
+    "name": "Glowkeeper",
+    "description": "Completed 3 projects with a glowing review",
+    "category": "projects",
+    "rarity": "epic",
+    "timestampEarned": null
+  }
+]
+🧩 Usage Notes
+timestampEarned should be set when badge is awarded:
+
+json
+Copy
+Edit
+"timestampEarned": "2025-05-20T18:45:00Z"
+rarity can help filter in the UI (with custom animations for “epic” and “legendary”)
+
+Keep id slug-friendly for CSS or logic triggers (glowkeeper, not Glow Keeper)
+
+Use category to group in dashboards or display different badge shelves
+

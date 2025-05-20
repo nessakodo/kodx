@@ -240,3 +240,17 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
   
   return next();
 };
+
+// Middleware to check if the user is an admin
+export const isAdmin: RequestHandler = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  const user = req.user as any;
+  if (user.role !== 'admin') {
+    return res.status(403).json({ message: "Forbidden: Admin access required" });
+  }
+  
+  return next();
+};

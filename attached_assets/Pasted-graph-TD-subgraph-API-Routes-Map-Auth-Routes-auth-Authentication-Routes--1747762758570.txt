@@ -1,0 +1,121 @@
+graph TD
+    subgraph "API Routes Map"
+        %% Auth Routes
+        auth[Authentication Routes]
+        auth --> auth_login[POST /api/auth/login]
+        auth --> auth_register[POST /api/auth/register]
+        
+        %% User Routes
+        user[User Routes]
+        user --> user_get[GET /api/user]
+        user --> user_avatar[POST /api/user/avatar]
+        user --> dashboard[GET /api/dashboard]
+        
+        %% Labs Routes
+        labs[Labs Routes]
+        labs --> labs_all[GET /api/labs]
+        labs --> labs_single[GET /api/labs/:id]
+        labs --> labs_complete[POST /api/labs/:id/complete]
+        
+        %% Projects Routes
+        projects[Projects Routes]
+        projects --> projects_all[GET /api/projects]
+        projects --> projects_single[GET /api/projects/:id]
+        projects --> projects_complete[POST /api/projects/:id/complete]
+        
+        %% Notes Routes
+        notes[Notes Routes]
+        notes --> notes_post[POST /api/notes]
+        
+        %% Forum Routes
+        forum[Forum Routes]
+        forum --> forum_all[GET /api/forum-posts]
+        forum --> forum_single[GET /api/forum-posts/:id]
+        forum --> forum_post[POST /api/forum-posts]
+        forum --> forum_comment[POST /api/forum-posts/:id/comment]
+        forum --> forum_like[POST /api/forum-posts/:id/like]
+        forum --> forum_delete[DELETE /api/forum-posts/:id]
+        
+        %% Progress Routes
+        progress[Progress Routes]
+        progress --> badges_get[GET /api/badges]
+        progress --> xp_get[GET /api/xp]
+        progress --> progress_update[POST /api/progress/update]
+        
+        %% Newsletter Routes
+        newsletter[Newsletter Routes]
+        newsletter --> newsletter_get[GET /api/newsletter]
+        newsletter --> newsletter_signup[POST /api/newsletter/signup]
+        
+        %% Admin Routes
+        admin[Admin Routes]
+        admin --> admin_labs[POST /api/admin/labs]
+        admin --> admin_projects[POST /api/admin/projects]
+        admin --> admin_users_delete[DELETE /api/users/:id]
+        
+        %% Saved Items Routes
+        saved[Saved Items Routes]
+        saved --> saved_get[GET /api/saved]
+        saved --> saved_post[POST /api/saved]
+        saved --> saved_delete[DELETE /api/saved/:id]
+    end
+    
+    subgraph "Data Flow"
+        %% Auth Flow
+        auth_register --> |Creates| Users[(Users)]
+        auth_login --> |Validates| Users
+        
+        %% User Flow
+        user_get --> |Retrieves| Users
+        user_avatar --> |Updates| Users
+        dashboard --> |Aggregates| Users
+        dashboard --> |Retrieves| SavedItems[(SavedItems)]
+        dashboard --> |Retrieves| XPEvents[(XPEvents)]
+        dashboard --> |Retrieves| Badges[(Badges)]
+        dashboard --> |Retrieves| Notes[(Notes)]
+        
+        %% Labs Flow
+        labs_all --> |Retrieves| Labs[(Labs)]
+        labs_single --> |Retrieves| Labs
+        labs_complete --> |Updates| XPEvents
+        labs_complete --> |Checks| Badges
+        
+        %% Projects Flow
+        projects_all --> |Retrieves| Projects[(Projects)]
+        projects_single --> |Retrieves| Projects
+        projects_complete --> |Updates| XPEvents
+        projects_complete --> |Checks| Badges
+        
+        %% Notes Flow
+        notes_post --> |Creates| Notes
+        
+        %% Forum Flow
+        forum_all --> |Retrieves| ForumPosts[(ForumPosts)]
+        forum_single --> |Retrieves| ForumPosts
+        forum_post --> |Creates| ForumPosts
+        forum_comment --> |Updates| ForumPosts
+        forum_like --> |Updates| ForumPosts
+        forum_delete --> |Deletes| ForumPosts
+        
+        %% Progress Flow
+        badges_get --> |Retrieves| Badges
+        xp_get --> |Aggregates| XPEvents
+        progress_update --> |Creates| XPEvents
+        progress_update --> |Updates| Users
+        
+        %% Newsletter Flow
+        newsletter_signup --> |Updates| Users
+        
+        %% Admin Flow
+        admin_labs --> |Creates/Updates| Labs
+        admin_projects --> |Creates/Updates| Projects
+        admin_users_delete --> |Deletes| Users
+        
+        %% Saved Items Flow
+        saved_get --> |Retrieves| SavedItems
+        saved_post --> |Creates| SavedItems
+        saved_delete --> |Deletes| SavedItems
+        
+        %% Avatar Relation
+        user_avatar --> |Relates To| Avatars[(Avatars)]
+    end
