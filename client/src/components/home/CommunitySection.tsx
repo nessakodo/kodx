@@ -19,10 +19,11 @@ export function CommunitySection() {
           Community <span className="bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">Forum</span>
         </h2>
         
-        <Link href="/forum">
-          <a className="text-[#9ecfff] hover:underline flex items-center gap-1">
-            Visit Forum <ArrowRightIcon size={14} />
-          </a>
+        <Link 
+          href="/forum"
+          className="text-[#9ecfff] hover:underline flex items-center gap-1"
+        >
+          Visit Forum <ArrowRightIcon size={14} />
         </Link>
       </div>
       
