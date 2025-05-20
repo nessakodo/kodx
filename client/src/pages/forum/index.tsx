@@ -91,7 +91,7 @@ export default function ForumPage() {
   const filteredPosts = forumPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          post.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
+    const matchesCategory = selectedCategory && selectedCategory !== "all" ? post.category === selectedCategory : true;
     
     return matchesSearch && matchesCategory;
   });
@@ -125,7 +125,7 @@ export default function ForumPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#0f172a] border border-[#1e293b] text-white">
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map(category => (
                       <SelectItem key={category} value={category}>{category.charAt(0).toUpperCase() + category.slice(1)}</SelectItem>
                     ))}
