@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { LightbulbIcon, TrophyIcon, SparklesIcon } from "lucide-react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 
 interface XpRingProgressProps {
   xp: number;

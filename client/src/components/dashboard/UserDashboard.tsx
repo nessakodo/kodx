@@ -10,7 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
 import { Progress } from "@/components/ui/progress";
-import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon } from "lucide-react";
+import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon, BookmarkIcon } from "lucide-react";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
 import { Link } from "wouter";
 
@@ -360,78 +361,99 @@ export function UserDashboard() {
           
           <TabsContent value="saved" className="h-full">
             <div className="glassmorphic card-kodex divide-y divide-[#1e293b]/70">
-              {isLoading ? (
+              {isLoading || isSavedPostsLoading ? (
                 <div className="p-6 space-y-4">
                   <Skeleton className="h-20 w-full" />
                   <Skeleton className="h-20 w-full" />
                 </div>
-              ) : (
+              ) : savedPosts && savedPosts.length > 0 ? (
                 <>
-                  <div className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
-                      <h3 className="font-medium text-lg text-gray-200">Secure Password Storage – Best Practices</h3>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-[#10b981]">Resources</Badge>
-                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">security</Badge>
+                  {savedPosts.map((post: any) => (
+                    <div className="p-6" key={post.id}>
+                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+                        <h3 className="font-medium text-lg text-gray-200">{post.title}</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {/* Dynamically generate color by category */}
+                          <Badge className={`bg-[#1e293b]/60 border-[#9ecfff]/20 ${
+                            post.category === 'RESOURCES' ? 'text-[#10b981]' : 
+                            post.category === 'DISCUSSION' ? 'text-[#8b5cf6]' : 
+                            post.category === 'SHOWCASE' ? 'text-[#facc15]' : 
+                            post.category === 'QUESTIONS' ? 'text-[#3b82f6]' : 
+                            post.category === 'FEEDBACK' ? 'text-[#f87171]' : 
+                            post.category === 'ANNOUNCEMENTS' ? 'text-[#e879f9]' : 
+                            'text-gray-300'
+                          }`}>{post.category.charAt(0) + post.category.slice(1).toLowerCase()}</Badge>
+                          {/* Add a tag based on the post content */}
+                          <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">
+                            {post.content.split(' ').length > 5 ? post.content.split(' ')[2].toLowerCase() : 'coding'}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center text-xs text-gray-500 mb-3">
+                        <span>Posted by </span>
+                        <span className="font-medium ml-1 text-[#9ecfff]">@{post.user.username}</span>
+                        <span className="mx-2">•</span>
+                        <span>{new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
+                      
+                      <div className="text-gray-400 mb-3 line-clamp-3">
+                        {post.content}
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <Link href={`/forum/post/${post.id}`}>
+                          <Button variant="link" className="text-[#9ecfff] p-0 h-auto">
+                            Read Post
+                          </Button>
+                        </Link>
+                        
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 text-gray-500">
+                            <MessageCircleIcon className="h-4 w-4" />
+                            <span>{post.commentsCount || 0} comments</span>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 text-xs text-gray-400"
+                            onClick={() => {
+                              apiRequest("POST", `/api/forum-posts/${post.id}/save`, {})
+                                .then(() => {
+                                  queryClient.invalidateQueries({ queryKey: ["/api/saved-posts"] });
+                                })
+                                .catch((err: Error) => console.error("Error unsaving post:", err));
+                            }}
+                          >
+                            <span className="sr-only">Unsave</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#9ecfff]">
+                              <path d="M3.53 2.47a.75.75 0 00-1.06 1.06l18 18a.75.75 0 101.06-1.06l-18-18zM20.25 5.507v11.561L5.853 2.671c.15-.043.306-.075.467-.094a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93zM3.75 21V6.932l14.063 14.063L12 18.088l-7.165 3.583A.75.75 0 013.75 21z" />
+                            </svg>
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center text-xs text-gray-500 mb-3">
-                      <span>Posted by </span>
-                      <span className="font-medium ml-1 text-[#9ecfff]">@securityGuru</span>
-                      <span className="mx-2">•</span>
-                      <span>18 May 2025</span>
-                    </div>
-                    <div className="text-gray-400 mb-3 line-clamp-3">
-                      When it comes to storing passwords securely, hashing is just the beginning. This post outlines modern techniques including salting, peppers, and appropriate hash functions that...
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <Link href="/forum/post/25">
-                        <Button variant="link" className="text-[#9ecfff] p-0 h-auto">
-                          Read Post
-                        </Button>
-                      </Link>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-gray-400">
-                        <span className="sr-only">Unsave</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-[#9ecfff]">
-                          <path d="M3.53 2.47a.75.75 0 00-1.06 1.06l18 18a.75.75 0 101.06-1.06l-18-18zM20.25 5.507v11.561L5.853 2.671c.15-.043.306-.075.467-.094a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93zM3.75 21V6.932l14.063 14.063L12 18.088l-7.165 3.583A.75.75 0 013.75 21z" />
-                        </svg>
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
-                      <h3 className="font-medium text-lg text-gray-200">Creating Ethical AI: A Developer's Responsibility</h3>
-                      <div className="flex items-center gap-2">
-                        <Badge style={{
-                          backgroundColor: `rgba(100, 149, 237, 0.2)`,
-                          color: `rgb(100, 149, 237)`,
-                          borderColor: `rgba(100, 149, 237, 0.4)`
-                        }} className="border">DISCUSSION</Badge>
-                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">ethics</Badge>
-                        <Badge className="bg-[#1e293b]/60 border-[#9ecfff]/20 text-gray-300">ai</Badge>
-                      </div>
-                    </div>
-                    <div className="text-gray-400 mb-3 line-clamp-3">
-                      As AI becomes more embedded in society, our responsibility as developers extends beyond just making it work. This discussion explores frameworks for ethical decision-making...
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-1 text-gray-500">
-                        <MessageCircleIcon className="h-4 w-4" />
-                        <span>27 comments</span>
-                      </div>
-                      <div className="text-xs text-gray-500">Saved: 15 May 2025</div>
-                    </div>
-                  </div>
+                  ))}
                   
                   <div className="p-4 flex justify-center">
                     <Link href="/forum">
                       <Button variant="outline" className="btn-kodex">
-                        View All Saved Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
+                        View All Posts <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </Button>
                     </Link>
                   </div>
                 </>
+              ) : (
+                <div className="p-8 text-center">
+                  <BookmarkIcon className="h-12 w-12 mx-auto text-gray-500 mb-4" />
+                  <h3 className="text-lg font-orbitron mb-2">No Saved Posts</h3>
+                  <p className="text-gray-500 mb-4">You haven't saved any posts yet. Browse the forum and bookmark posts that interest you.</p>
+                  <Link href="/forum">
+                    <Button variant="outline" className="btn-kodex">
+                      Browse Forum
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </TabsContent>

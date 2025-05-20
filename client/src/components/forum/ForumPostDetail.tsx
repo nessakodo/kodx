@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { HeartIcon, MessageSquareIcon, ArrowLeftIcon } from "lucide-react";
+import { HeartIcon, MessageSquareIcon, ArrowLeftIcon, BookmarkIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -39,6 +39,7 @@ interface ForumPost {
   user: User;
   comments: Comment[];
   liked?: boolean;
+  saved?: boolean;
 }
 
 export function ForumPostDetail() {
@@ -63,6 +64,30 @@ export function ForumPostDetail() {
       toast({
         title: "Error",
         description: "Failed to like/unlike post. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Save post mutation
+  const saveMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/forum-posts/${id}/save`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/forum-posts/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/saved-posts"] });
+      
+      toast({
+        title: post?.saved ? "Post unsaved" : "Post saved",
+        description: post?.saved 
+          ? "This post has been removed from your saved posts." 
+          : "This post has been added to your saved posts.",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save/unsave post. Please try again.",
         variant: "destructive",
       });
     },
@@ -159,6 +184,19 @@ export function ForumPostDetail() {
     }
     
     likeMutation.mutate();
+  };
+  
+  const handleSaveToggle = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to save posts.",
+        variant: "default",
+      });
+      return;
+    }
+    
+    saveMutation.mutate();
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -308,6 +346,16 @@ export function ForumPostDetail() {
               onClick={() => document.getElementById('comment-form')?.focus()}
             >
               <MessageSquareIcon className="h-4 w-4" /> {post.comments?.length || 0}
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className={`flex items-center gap-1 ml-4 ${post.saved ? 'text-amber-400 border-amber-400/30' : 'text-gray-400'}`}
+              onClick={handleSaveToggle}
+              disabled={saveMutation.isPending}
+            >
+              <BookmarkIcon className="h-4 w-4" /> {post.saved ? 'Saved' : 'Save'}
             </Button>
           </div>
         </div>
