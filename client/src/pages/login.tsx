@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { X as CloseIcon } from "lucide-react";
 
 type LoginFormData = {
   username: string;
@@ -71,35 +72,45 @@ export default function LoginPage() {
 
   return (
     <div className="container flex flex-col items-center justify-center min-h-screen py-12">
-      <Card className="w-full max-w-md shadow-lg border-0 bg-black/10 backdrop-blur-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
-          <CardDescription className="text-center">
+      <Card className="relative w-full max-w-md shadow-lg border border-gray-800 bg-black/70 backdrop-blur-xl">
+        {/* Close button to allow browsing without authentication */}
+        <button 
+          className="absolute top-4 right-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-800/50 transition-colors"
+          onClick={() => setLocation("/")}
+          aria-label="Close"
+        >
+          <CloseIcon size={18} />
+        </button>
+        
+        <CardHeader className="space-y-1 pb-3">
+          <CardTitle className="text-2xl font-bold text-center text-blue-400">Sign In</CardTitle>
+          <CardDescription className="text-center text-gray-400">
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
+        
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username" className="text-gray-300">Username</Label>
               <Input
                 id="username"
                 type="text"
                 placeholder="Enter your username"
                 {...register("username", { required: "Username is required" })}
-                className="bg-black/20 border-gray-700"
+                className="bg-black/40 border-gray-700 text-white"
               />
               {errors.username && (
-                <p className="text-sm text-red-500">{errors.username.message}</p>
+                <p className="text-sm text-red-400">{errors.username.message}</p>
               )}
             </div>
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-gray-300">Password</Label>
                 <a 
                   href="#" 
-                  className="text-xs text-blue-500 hover:text-blue-400"
+                  className="text-xs text-blue-400 hover:text-blue-300"
                   onClick={(e) => {
                     e.preventDefault();
                     toast({
@@ -116,10 +127,10 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 {...register("password", { required: "Password is required" })}
-                className="bg-black/20 border-gray-700"
+                className="bg-black/40 border-gray-700 text-white"
               />
               {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
+                <p className="text-sm text-red-400">{errors.password.message}</p>
               )}
             </div>
             
@@ -127,19 +138,31 @@ export default function LoginPage() {
               <input 
                 type="checkbox" 
                 id="remember" 
-                className="rounded text-primary-500 focus:ring-primary-500" 
+                className="rounded text-blue-500 focus:ring-blue-500 bg-black/40 border-gray-700" 
               />
-              <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
+              <Label htmlFor="remember" className="text-sm font-normal text-gray-300">Remember me</Label>
             </div>
           </CardContent>
-          <CardFooter>
+          
+          <CardFooter className="flex flex-col space-y-4">
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+              className="w-full bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
+            
+            <div className="flex justify-center">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="text-gray-400 hover:text-white hover:bg-transparent"
+                onClick={() => setLocation("/")}
+              >
+                Browse without logging in
+              </Button>
+            </div>
           </CardFooter>
         </form>
         
@@ -148,7 +171,7 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <a 
               href="#" 
-              className="text-blue-500 hover:text-blue-400"
+              className="text-blue-400 hover:text-blue-300"
               onClick={(e) => {
                 e.preventDefault();
                 setLocation("/register");
