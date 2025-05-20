@@ -90,28 +90,44 @@ export function ForumPostDetail() {
 
   // Format category badge style based on category type
   const getCategoryStyle = (category: string) => {
-    switch (category?.toLowerCase()) {
-      case 'announcement':
-        return {
-          gradient: "from-[#88c9b7]/10 to-[#88c9b7]/10",
-          border: "border-[#88c9b7]/20"
-        };
-      case 'question':
-        return {
-          gradient: "from-[#9ecfff]/10 to-[#9ecfff]/10",
-          border: "border-[#9ecfff]/20"
-        };
-      case 'devlog':
-        return {
-          gradient: "from-[#b166ff]/10 to-[#9ecfff]/10",
-          border: "border-[#b166ff]/20"
-        };
-      default:
-        return {
-          gradient: "from-gray-500/10 to-gray-500/10",
-          border: "border-gray-500/20"
-        };
-    }
+    const categoryMap = {
+      'DISCUSSION': {
+        gradient: "from-[#8b5cf6]/10 to-[#8b5cf6]/10",
+        border: "border-[#8b5cf6]/20",
+        text: "#8b5cf6"
+      },
+      'RESOURCES': {
+        gradient: "from-[#10b981]/10 to-[#10b981]/10",
+        border: "border-[#10b981]/20",
+        text: "#10b981"
+      },
+      'SHOWCASE': {
+        gradient: "from-[#facc15]/10 to-[#facc15]/10",
+        border: "border-[#facc15]/20",
+        text: "#facc15"
+      },
+      'QUESTIONS': {
+        gradient: "from-[#3b82f6]/10 to-[#3b82f6]/10",
+        border: "border-[#3b82f6]/20",
+        text: "#3b82f6"
+      },
+      'FEEDBACK': {
+        gradient: "from-[#f87171]/10 to-[#f87171]/10",
+        border: "border-[#f87171]/20",
+        text: "#f87171"
+      },
+      'ANNOUNCEMENTS': {
+        gradient: "from-[#e879f9]/10 to-[#e879f9]/10",
+        border: "border-[#e879f9]/20",
+        text: "#e879f9"
+      }
+    };
+    
+    return categoryMap[category as keyof typeof categoryMap] || {
+      gradient: "from-gray-500/10 to-gray-500/10",
+      border: "border-gray-500/20",
+      text: "#9ca3af"
+    };
   };
 
   // Format relative time
@@ -265,6 +281,7 @@ export function ForumPostDetail() {
             
             <Badge 
               className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border}`}
+              style={{ color: categoryStyle.text }}
             >
               {post.category}
             </Badge>
