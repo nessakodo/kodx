@@ -83,7 +83,7 @@ export function Newsletter() {
               />
               <Button 
                 type="submit"
-                className="bg-[#1e2535]/60 hover:bg-[#1e2535]/90 backdrop-blur-md rounded-lg border border-[#9ecfff]/30 hover:border-[#9ecfff]/50 text-gray-200 transition-all font-medium px-6 py-3 h-auto hover-glow"
+                className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 rounded-lg border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30 transition-all font-medium px-6 py-3 h-auto"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Subscribing..." : "Subscribe"}
