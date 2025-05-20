@@ -31,26 +31,24 @@ export function Header() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-8">
             {/* Logo */}
-            <Link href="/">
-              <a className="flex items-center">
+            <Link href="/" className="flex items-center">
                 <KodexLogo size="md" />
-              </a>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
-                <Link key={item.name} href={item.href}>
-                  <a
-                    className={cn(
-                      "transition-colors",
-                      location === item.href
-                        ? "text-[#9ecfff]"
-                        : "text-gray-300 hover:text-[#9ecfff]"
-                    )}
-                  >
-                    {item.name}
-                  </a>
+                <Link 
+                  key={item.name} 
+                  href={item.href}
+                  className={cn(
+                    "transition-colors",
+                    location === item.href
+                      ? "text-[#9ecfff]"
+                      : "text-gray-300 hover:text-[#9ecfff]"
+                  )}
+                >
+                  {item.name}
                 </Link>
               ))}
             </nav>
@@ -110,15 +108,15 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link href="/dashboard">Dashboard</Link>
                     </DropdownMenuItem>
                     {user?.role === "admin" && (
-                      <DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link href="/admin">Admin Panel</Link>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <a href="/api/logout">Sign Out</a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -150,18 +148,18 @@ export function Header() {
           <div className="md:hidden mt-4 pb-3 border-t border-[#9ecfff]/10 pt-3">
             <nav className="flex flex-col space-y-3">
               {navItems.map((item) => (
-                <Link key={item.name} href={item.href}>
-                  <a
-                    className={cn(
-                      "transition-colors py-2",
-                      location === item.href
-                        ? "text-[#9ecfff]"
-                        : "text-gray-300 hover:text-[#9ecfff]"
-                    )}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </a>
+                <Link 
+                  key={item.name} 
+                  href={item.href}
+                  className={cn(
+                    "transition-colors py-2",
+                    location === item.href
+                      ? "text-[#9ecfff]"
+                      : "text-gray-300 hover:text-[#9ecfff]"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
                 </Link>
               ))}
               {!isAuthenticated ? (
@@ -181,22 +179,20 @@ export function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/dashboard">
-                    <a
+                  <Link 
+                    href="/dashboard"
+                    className="text-gray-300 hover:text-[#9ecfff] py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  {user?.role === "admin" && (
+                    <Link 
+                      href="/admin"
                       className="text-gray-300 hover:text-[#9ecfff] py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Dashboard
-                    </a>
-                  </Link>
-                  {user?.role === "admin" && (
-                    <Link href="/admin">
-                      <a
-                        className="text-gray-300 hover:text-[#9ecfff] py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Admin Panel
-                      </a>
+                      Admin Panel
                     </Link>
                   )}
                   <a

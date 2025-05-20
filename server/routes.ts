@@ -91,10 +91,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Update user's total XP if they haven't already earned XP for this lab
         if (!existingProgress.isCompleted && existingProgress.xpEarned !== lab.xpReward) {
+          // Get current user first
+          const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+          
+          // Then update with calculated new total
           await db
             .update(users)
             .set({ 
-              totalXp: (user?.totalXp || 0) + lab.xpReward,
+              totalXp: (currentUser?.totalXp || 0) + lab.xpReward,
               updatedAt: new Date()
             })
             .where(eq(users.id, userId));
@@ -114,11 +118,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
           .returning();
         
+        // Get current user first
+        const [currentUser] = await db.select().from(users).where(eq(users.id, userId));
+        
         // Update user's total XP
         await db
           .update(users)
           .set({ 
-            totalXp: db.raw(`total_xp + ${lab.xpReward}`),
+            totalXp: (currentUser?.totalXp || 0) + lab.xpReward,
             updatedAt: new Date()
           })
           .where(eq(users.id, userId));
