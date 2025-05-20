@@ -31,14 +31,27 @@ export default function ForumPage() {
   
   // State for creating new posts
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+  const [isDraftsModalOpen, setIsDraftsModalOpen] = useState(false);
   const [newPost, setNewPost] = useState({
     title: "",
     content: "",
     category: "discussion"
   });
   
+  // State for post drafts
+  const [drafts, setDrafts] = useState<any[]>(() => {
+    // Load drafts from localStorage if available
+    const savedDrafts = localStorage.getItem('forum_drafts');
+    return savedDrafts ? JSON.parse(savedDrafts) : [];
+  });
+  const [selectedDraft, setSelectedDraft] = useState<number | null>(null);
+  
   // State for saving posts
-  const [savedPosts, setSavedPosts] = useState<number[]>([]);
+  const [savedPosts, setSavedPosts] = useState<number[]>(() => {
+    // Load saved posts from localStorage if available
+    const saved = localStorage.getItem('saved_posts');
+    return saved ? JSON.parse(saved) : [];
+  });
   
   // Prefill the query cache with mock data
   useEffect(() => {
