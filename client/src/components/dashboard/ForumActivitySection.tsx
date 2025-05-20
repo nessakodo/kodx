@@ -102,35 +102,39 @@ export function ForumActivitySection() {
           Your Forum Activity
         </h2>
         
-        <div className="flex space-x-2">
+        <div className="flex bg-[#0f172a] border border-[#1e293b] rounded-md overflow-hidden">
           <Button
-            variant={activeTab === 'posts' ? 'default' : 'outline'}
+            variant="ghost"
             onClick={() => setActiveTab('posts')}
-            className={activeTab === 'posts' 
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'}
+            className={`rounded-none border-0 px-6 ${
+              activeTab === 'posts' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-transparent text-gray-300 hover:bg-[#1e293b] hover:text-white'
+            }`}
           >
-            Your Posts
+            My Posts
           </Button>
           
           <Button
-            variant={activeTab === 'saved' ? 'default' : 'outline'}
+            variant="ghost"
             onClick={() => setActiveTab('saved')}
-            className={activeTab === 'saved'
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'}
+            className={`rounded-none border-0 px-6 ${
+              activeTab === 'saved' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-transparent text-gray-300 hover:bg-[#1e293b] hover:text-white'
+            }`}
           >
             Saved Posts
           </Button>
         </div>
       </div>
       
-      {isLoading ? (
-        // Loading skeleton
-        <div className="space-y-4">
-          {[1, 2].map(i => (
-            <Card key={i} className="p-4 border border-[#9ecfff]/10 bg-[#0f172a]/70">
-              <div className="flex items-start gap-3">
+      <Card className="border border-[#1e293b] bg-[#0c1527]/50">
+        {isLoading ? (
+          // Loading skeleton
+          <div className="p-8 space-y-4">
+            {[1, 2].map(i => (
+              <div key={i} className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-full bg-[#1e293b]/50 animate-pulse" />
                 <div className="flex-1">
                   <div className="h-4 bg-[#1e293b]/50 rounded mb-2 animate-pulse" />
@@ -139,28 +143,31 @@ export function ForumActivitySection() {
                   <div className="h-3 bg-[#1e293b]/50 rounded w-1/4 animate-pulse" />
                 </div>
               </div>
-            </Card>
-          ))}
-        </div>
-      ) : hasData ? (
-        <>
-          <div className="space-y-4">
-            {currentPosts.slice(0, 3).map((post: any) => renderPostItem(post))}
+            ))}
           </div>
-          
-          {currentPosts.length > 3 && (
-            <div className="text-center mt-6">
-              <Link href="/forum">
-                <Button variant="link" className="text-blue-300 hover:text-blue-200">
-                  View All Activity
-                </Button>
-              </Link>
+        ) : hasData ? (
+          <>
+            <div className="p-6 space-y-4">
+              {currentPosts.slice(0, 3).map((post: any) => renderPostItem(post))}
             </div>
-          )}
-        </>
-      ) : (
-        <EmptyForumState type={activeTab} />
-      )}
+            
+            {currentPosts.length > 3 && (
+              <div className="text-center py-6 border-t border-[#1e293b]">
+                <Link href="/forum">
+                  <Button 
+                    variant="outline" 
+                    className="border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20"
+                  >
+                    Explore Forum
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </>
+        ) : (
+          <EmptyForumState type={activeTab} />
+        )}
+      </Card>
     </section>
   );
 }

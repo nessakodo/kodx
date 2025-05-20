@@ -164,15 +164,15 @@ export function EmptyForumState({ type = "posts" }: { type?: "posts" | "saved" }
   );
 }
 
-// Empty Reflections State
-export function EmptyReflectionsState() {
+// Empty Notes State
+export function EmptyNotesState() {
   return (
     <EmptyState
       icon={<span className="font-orbitron text-emerald-400">🌱</span>}
-      title="No Reflections Recorded"
-      message="Reflections are your personal notes on your learning journey. Document insights, questions, and connections."
-      actionText="Start Reflecting"
-      actionLink="/reflect/new"
+      title="No Notes Recorded"
+      message="Notes are your personal documentation on your learning journey. Document insights, questions, and connections as you progress."
+      actionText="Create New Note"
+      actionLink="/notes/new"
       colorClass={defaultColors.reflection.text}
       borderClass={defaultColors.reflection.border}
     />

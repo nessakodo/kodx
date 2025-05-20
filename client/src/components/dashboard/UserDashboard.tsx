@@ -1,32 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
-import { XpRingProgress } from "@/components/dashboard/XpRingProgress";
-import { DashboardXPRing } from "@/components/dashboard/DashboardXPRing";
+import { XPRing } from "@/components/dashboard/XPRing";
 import { BadgeSection } from "@/components/dashboard/BadgeSection";
-import { ProgressTracker } from "@/components/dashboard/ProgressTracker";
-import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { ForumActivitySection } from "@/components/dashboard/ForumActivitySection";
+import { ActivitySection } from "@/components/dashboard/ActivitySection";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
-import { MOCK_DASHBOARD_DATA, EMPTY_DASHBOARD_DATA } from "@/lib/mockData";
-import { Progress } from "@/components/ui/progress";
-import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon, BookmarkIcon } from "lucide-react";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
+import { LevelUpModal } from "@/components/modals/LevelUpModal";
+import { BadgeModal } from "@/components/modals/BadgeModal";
+import { calculateLevel, calculateLevelProgress, getXpForNextLevel } from "@shared/constants/levels";
 import { Link } from "wouter";
+import { useState } from "react";
 import { 
   EmptyLabsState, 
   EmptyProjectsState, 
   EmptyBadgesState, 
-  EmptyReflectionsState,
-  EmptyXPState 
+  EmptyNotesState,
+  EmptyActivityState
 } from "@/components/dashboard/EmptyStates";
-import {
-  EmptyActivityState,
-  EmptyNotificationsState,
-  EmptyForumActivityState
-} from "@/components/dashboard/EmptyActivityState";
+import { 
+  Search,
+  BookOpen,
+  ChevronRight
+} from "lucide-react";
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
