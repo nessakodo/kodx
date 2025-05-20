@@ -19,6 +19,7 @@ import {
   BookmarkIcon,
   ClockIcon
 } from "lucide-react";
+import { ProjectCompletionModal } from "./ProjectCompletionModal";
 
 interface Task {
   id: string;
@@ -40,6 +41,7 @@ export function ProjectDetail() {
   const [activeTab, setActiveTab] = useState("overview");
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
   
   // Mock project data - would come from API in real implementation
   const { data: project, isLoading, error } = useQuery({
@@ -85,6 +87,13 @@ export function ProjectDetail() {
     }
   });
   
+  // Effect to check project completion
+  useEffect(() => {
+    if (project && completedTasks.length === project.tasks.length && completedTasks.length > 0) {
+      setShowCompletionModal(true);
+    }
+  }, [completedTasks, project]);
+
   const toggleTaskCompletion = (taskIndex: number) => {
     const taskId = `task-${taskIndex}`;
     
@@ -135,6 +144,17 @@ export function ProjectDetail() {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Project Completion Modal */}
+      {project && (
+        <ProjectCompletionModal
+          projectId={project.id}
+          projectTitle={project.title}
+          isOpen={showCompletionModal}
+          onClose={() => setShowCompletionModal(false)}
+          xpEarned={project.xp_reward}
+        />
+      )}
+      
       {/* Project header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
