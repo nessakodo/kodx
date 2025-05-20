@@ -1,0 +1,87 @@
+We are updating the KODEX Dashboard to better reflect its role as a self-tracking, motivational, and aesthetically aligned experience for mindful technologists.
+
+📍 Key Changes to Implement:
+
+🚫 Remove Emoji Usage
+
+Do not use emojis in the Recent Activity or Notifications section
+
+Replace all visual indicators with iconography or styled badge assets (see below)
+
+🧿 XP Ring & Progress Bar Enhancements
+
+Remove the current ring around the avatar
+
+Create a floating or framed animated XP ring separate from the avatar
+
+Should animate slowly or pulse subtly
+
+Reflect total XP with visual fill
+
+Add a secondary progress bar (under the XP ring) that clearly shows:
+→ XP to next level (e.g. “1250 XP — 25% to Level 3”)
+
+🏆 Badges Section (Expanded)
+
+Move badges to their own section below XP or in a side column
+
+Display a grid of max 5 badges per level
+
+Each badge should:
+
+Use a glowing glassmorphic button design (no emoji)
+
+Show badge name + hover description
+
+On mobile: clicking a badge opens a modal with title, XP value, unlock requirements
+
+Add pagination or tabs to view:
+
+“Unlocked” badges
+
+“Locked” (next level) badges
+
+“All” badges
+
+🔄 Recent Activity Feed
+
+Sync Recent Activity with data from the Notification system (e.g. new lab drops, comments, XP gains)
+
+Remove emoji prefixes
+
+Each entry should include:
+
+Action summary (e.g. “You completed 2/5 tasks in…”)
+
+Linked object (e.g. link to that project or lab)
+
+Timestamp (e.g. “3 days ago”)
+
+Enable pagination if activity exceeds 5 entries
+
+🔔 Notifications Panel
+
+Leave as-is functionally, but confirm that all events shown in the Dashboard are also visible in the Notification dropdown
+
+Link "View all in Dashboard" should scroll or route to this same Recent Activity section
+
+🧠 Optional for Replit AI or Designer:
+
+Where badge titles, descriptions, or recent activity phrasing is unclear, intelligently fill with descriptive microcopy aligned to the KODEX tone:
+
+Tone = Cyber-Zen, intentional, technically clear, poetic when fitting
+
+Avoid excessive excitement or gamification. Think: “You advanced. Well done.” not “Awesome job!”
+
+Badge Descriptions: Include purpose (e.g. “Awarded for completing your first project using GitHub Pages.”)
+
+📌 Bonus: Animate the XP ring slightly on hover and level-up
+📌 Keep Orbitron font with increased letter-spacing for all XP/badge elements
+
+Please align with existing design language used in:
+
+Labs and Projects cards
+
+Navbar notification dropdown
+
+XP and badge progress styling

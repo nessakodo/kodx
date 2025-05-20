@@ -32,13 +32,30 @@ export const MOCK_LABS = [
 export const MOCK_PROJECTS = [
   {
     id: 1,
-    title: "Mindful Meditation App",
-    description: "Build a meditation app with guided sessions and progress tracking.",
+    title: "Build Your Own Password Manager",
+    description: "Create a local password manager app using JavaScript, secure storage patterns, and a minimal UI with encryption best practices.",
     difficulty: "beginner",
-    repoUrl: "https://github.com/example/meditation-app",
-    xpReward: 800,
+    repoUrl: "https://github.com/nessakodo/password-manager-starter",
+    xpReward: 40,
     createdAt: "2025-05-15T00:00:00.000Z",
-    updatedAt: "2025-05-15T00:00:00.000Z"
+    updatedAt: "2025-05-15T00:00:00.000Z",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    timestamps: [
+      { time: "00:00", title: "Project Intro" },
+      { time: "01:25", title: "Setting up HTML/CSS" },
+      { time: "05:40", title: "JavaScript encryption logic" },
+      { time: "12:10", title: "UI hooks and button interactions" },
+      { time: "18:45", title: "Finishing touches" }
+    ],
+    tasks: [
+      { id: "task-1", description: "Set up base HTML and CSS structure", completed: false },
+      { id: "task-2", description: "Add form inputs for site/account and password fields", completed: false },
+      { id: "task-3", description: "Use Web Crypto API or a JS library to encrypt password data", completed: false },
+      { id: "task-4", description: "Store and retrieve encrypted data using localStorage or IndexedDB", completed: false },
+      { id: "task-5", description: "Implement copy-to-clipboard and password visibility toggle", completed: false },
+      { id: "task-6", description: "Style the interface with dark theme and finalize layout", completed: false },
+      { id: "task-7", description: "Deploy the finished version to GitHub Pages", completed: false }
+    ]
   },
   {
     id: 2,
@@ -46,9 +63,17 @@ export const MOCK_PROJECTS = [
     description: "Create a dashboard to monitor and visualize security threats in real-time.",
     difficulty: "intermediate",
     repoUrl: "https://github.com/example/security-dashboard",
-    xpReward: 1200,
+    xpReward: 80,
     createdAt: "2025-05-14T00:00:00.000Z",
-    updatedAt: "2025-05-14T00:00:00.000Z"
+    updatedAt: "2025-05-14T00:00:00.000Z",
+    tasks: [
+      { id: "task-1", description: "Set up project structure with proper modules", completed: false },
+      { id: "task-2", description: "Implement data visualization components", completed: false },
+      { id: "task-3", description: "Add real-time updates with WebSockets", completed: false },
+      { id: "task-4", description: "Create threat classification algorithms", completed: false },
+      { id: "task-5", description: "Implement user authentication and roles", completed: false },
+      { id: "task-6", description: "Add notification system for critical alerts", completed: false }
+    ]
   },
   {
     id: 3,
@@ -56,9 +81,18 @@ export const MOCK_PROJECTS = [
     description: "Build a platform for trading AI models on a decentralized network.",
     difficulty: "advanced",
     repoUrl: "https://github.com/example/ai-marketplace",
-    xpReward: 1500,
+    xpReward: 120,
     createdAt: "2025-05-13T00:00:00.000Z",
-    updatedAt: "2025-05-13T00:00:00.000Z"
+    updatedAt: "2025-05-13T00:00:00.000Z",
+    tasks: [
+      { id: "task-1", description: "Set up blockchain integration for transactions", completed: false },
+      { id: "task-2", description: "Implement AI model verification system", completed: false },
+      { id: "task-3", description: "Create decentralized storage solution", completed: false },
+      { id: "task-4", description: "Build smart contract for model ownership", completed: false },
+      { id: "task-5", description: "Develop front-end marketplace interface", completed: false },
+      { id: "task-6", description: "Implement secure payment and escrow system", completed: false },
+      { id: "task-7", description: "Add reputation and review mechanisms", completed: false }
+    ]
   }
 ];
 

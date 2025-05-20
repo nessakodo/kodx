@@ -1,188 +1,193 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export interface XPRingProps {
+interface XPRingProps {
   percentage: number;
   size?: "sm" | "md" | "lg";
-  className?: string;
-  pulseEffect?: boolean;
   showValue?: boolean;
-  animationSpeed?: "slow" | "normal" | "fast";
   currentValue?: number;
   totalValue?: number;
+  pulseEffect?: boolean;
+  animationSpeed?: "slow" | "medium" | "fast";
 }
 
-export function XPRing({ 
-  percentage,
-  size = "md",
-  className,
-  pulseEffect = false,
+export function XPRing({
+  percentage = 0,
+  size = "md", 
   showValue = false,
-  animationSpeed = "normal",
   currentValue,
-  totalValue
+  totalValue,
+  pulseEffect = false,
+  animationSpeed = "medium"
 }: XPRingProps) {
-  const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const [rotationAngle, setRotationAngle] = useState(0);
   
-  // Determine the size of the ring
-  const sizeClasses = {
-    sm: "w-10 h-10",
-    md: "w-16 h-16",
-    lg: "w-24 h-24"
-  };
-  
-  const strokeWidth = {
-    sm: 3,
-    md: 4,
-    lg: 6
-  };
-  
-  const animationSpeedValues = {
-    slow: 3000,
-    normal: 1200,
-    fast: 800
-  };
-  
-  // Animate the percentage on mount
+  // Canvas ring animation
   useEffect(() => {
-    const duration = animationSpeedValues[animationSpeed]; 
-    const startTime = Date.now();
-    const endValue = percentage;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     
-    const animatePercentage = () => {
-      const currentTime = Date.now();
-      const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / duration, 1);
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const ringRadius = (size === "sm" ? 30 : size === "md" ? 40 : 50);
+    const ringThickness = (size === "sm" ? 4 : size === "md" ? 5 : 6);
+    
+    const drawRing = () => {
+      context.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Use ease-out cubic function for smoother animation
-      const progressEased = 1 - Math.pow(1 - progress, 3);
-      setAnimatedPercentage(progressEased * endValue);
+      // Draw background ring
+      context.beginPath();
+      context.arc(centerX, centerY, ringRadius, 0, 2 * Math.PI);
+      context.strokeStyle = "rgba(30, 41, 59, 0.5)";
+      context.lineWidth = ringThickness;
+      context.stroke();
       
-      if (progress < 1) {
-        requestAnimationFrame(animatePercentage);
+      // Draw progress ring
+      if (percentage > 0) {
+        const startAngle = -Math.PI / 2; // Start at top
+        const endAngle = (-Math.PI / 2) + (2 * Math.PI * (percentage / 100));
+        
+        // Gradient for progress ring
+        const gradient = context.createLinearGradient(
+          centerX - ringRadius, 
+          centerY, 
+          centerX + ringRadius, 
+          centerY
+        );
+        gradient.addColorStop(0, "#9ecfff");
+        gradient.addColorStop(0.5, "#88c9b7");
+        gradient.addColorStop(1, "#6fcf97");
+        
+        context.beginPath();
+        context.arc(centerX, centerY, ringRadius, startAngle, endAngle);
+        context.strokeStyle = gradient;
+        context.lineWidth = ringThickness;
+        context.stroke();
+        
+        // Add glowing effect to progress ring
+        context.beginPath();
+        context.arc(centerX, centerY, ringRadius, startAngle, endAngle);
+        context.strokeStyle = "rgba(158, 207, 255, 0.3)";
+        context.lineWidth = ringThickness + 3;
+        context.globalAlpha = 0.5;
+        context.stroke();
+        context.globalAlpha = 1;
+        
+        // Draw small circles along the progress ring (particle effect)
+        const particleCount = 3;
+        for (let i = 0; i < particleCount; i++) {
+          const particleAngle = startAngle + ((endAngle - startAngle) * (i / (particleCount - 1)));
+          const particleX = centerX + (ringRadius * Math.cos(particleAngle));
+          const particleY = centerY + (ringRadius * Math.sin(particleAngle));
+          
+          context.beginPath();
+          context.arc(particleX, particleY, ringThickness / 2, 0, 2 * Math.PI);
+          context.fillStyle = "rgba(158, 207, 255, 0.8)";
+          context.fill();
+        }
       }
     };
     
-    requestAnimationFrame(animatePercentage);
-  }, [percentage, animationSpeed]);
-
-  // Calculate the ring properties
-  const circleRadius = {
-    sm: 16,
-    md: 26,
-    lg: 40
-  }[size];
+    drawRing();
+    
+    // Rotate the entire canvas for animation effect
+    const animateRotation = () => {
+      const speedFactor = animationSpeed === "slow" ? 0.1 : animationSpeed === "medium" ? 0.2 : 0.3;
+      setRotationAngle(prev => (prev + speedFactor) % 360);
+    };
+    
+    // Only animate if there's progress
+    let animationFrame: number;
+    if (percentage > 0) {
+      const animate = () => {
+        animateRotation();
+        animationFrame = requestAnimationFrame(animate);
+      };
+      animate();
+    }
+    
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
+  }, [percentage, size, animationSpeed]);
   
-  const circumference = 2 * Math.PI * circleRadius;
-  const dashOffset = circumference * (1 - animatedPercentage / 100);
+  // Apply rotation to the ring wrapper
+  useEffect(() => {
+    if (ringRef.current && percentage > 0) {
+      ringRef.current.style.transform = `rotate(${rotationAngle}deg)`;
+    }
+  }, [rotationAngle, percentage]);
   
-  // Subtle constant rotation effect
-  const rotationAnimation = "animate-ring-rotate";
+  // Size classes
+  const sizeClasses = {
+    sm: "w-16 h-16",
+    md: "w-24 h-24",
+    lg: "w-32 h-32"
+  };
+  
+  // Font size classes
+  const fontSizeClasses = {
+    sm: "text-xs",
+    md: "text-sm",
+    lg: "text-base"
+  };
   
   return (
-    <div className={cn("relative flex flex-col items-center justify-center", className)}>
-      <div className={cn("relative flex items-center justify-center", sizeClasses[size])}>
-        {/* Background Circle */}
-        <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0">
-          <circle 
-            cx="50" 
-            cy="50" 
-            r={circleRadius} 
-            strokeWidth={strokeWidth[size]} 
-            stroke="#1e293b" 
-            fill="none" 
-            strokeDasharray={circumference} 
-            strokeDashoffset="0"
-            className="opacity-30"
-          />
-        </svg>
-        
-        {/* Glow effect for progress near completion */}
-        {percentage > 85 && (
-          <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0 -rotate-90 transform">
-            <circle 
-              cx="50" 
-              cy="50" 
-              r={circleRadius + 2} 
-              strokeWidth="1" 
-              stroke="url(#gradientGlow)" 
-              fill="none" 
-              strokeLinecap="round"
-              filter="blur(4px)"
-              className="opacity-70 animate-pulse"
-            />
-            <defs>
-              <linearGradient id="gradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#9ecfff" />
-                <stop offset="100%" stopColor="#88c9b7" />
-              </linearGradient>
-            </defs>
-          </svg>
+    <div className="relative inline-flex items-center justify-center">
+      {/* Rotating canvas for ambient effect */}
+      <div 
+        ref={ringRef}
+        className={cn(
+          "absolute inset-0 transition-transform duration-1000",
+          sizeClasses[size]
         )}
-        
-        {/* Subtle rotating background to create motion */}
-        <svg width="100%" height="100%" viewBox="0 0 100 100" className={cn("absolute inset-0", rotationAnimation)}>
-          <circle 
-            cx="50" 
-            cy="50" 
-            r={circleRadius + 1} 
-            strokeWidth="1" 
-            stroke="url(#gradientAmbient)" 
-            fill="none" 
-            strokeDasharray="3,5" 
-            className="opacity-20"
-          />
-          <defs>
-            <linearGradient id="gradientAmbient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Progress Circle with Animation */}
-        <svg width="100%" height="100%" viewBox="0 0 100 100" className="absolute inset-0 -rotate-90 transform">
-          <circle 
-            cx="50" 
-            cy="50" 
-            r={circleRadius} 
-            strokeWidth={strokeWidth[size]} 
-            stroke="url(#gradientXP)" 
-            fill="none" 
-            strokeLinecap="round"
-            strokeDasharray={circumference} 
-            strokeDashoffset={dashOffset}
-            className={cn(
-              "transition-all duration-1000 ease-out",
-              pulseEffect && "animate-pulse"
-            )}
-          />
-          <defs>
-            <linearGradient id="gradientXP" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#9ecfff" />
-              <stop offset="100%" stopColor="#88c9b7" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Percentage Display in Center */}
-        <div className="z-10 text-center flex items-center justify-center font-medium">
-          <span className={cn(
-            "bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent",
-            size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-base"
-          )}>
-            {Math.round(animatedPercentage)}%
-          </span>
-        </div>
+      >
+        <canvas 
+          ref={canvasRef}
+          width={size === "sm" ? 80 : size === "md" ? 120 : 160}
+          height={size === "sm" ? 80 : size === "md" ? 120 : 160}
+          className="w-full h-full"
+        />
       </div>
       
-      {/* XP Value Below (Optional) */}
-      {showValue && currentValue !== undefined && totalValue !== undefined && (
-        <div className="mt-1 text-xs text-center">
-          <span className="text-[#9ecfff] font-medium">{currentValue}</span>
-          <span className="text-gray-500"> / {totalValue} XP</span>
-        </div>
-      )}
+      {/* Inner content */}
+      <div 
+        className={cn(
+          "absolute inset-0 flex items-center justify-center",
+          sizeClasses[size],
+          pulseEffect && percentage > 0 && "animate-pulse-slow"
+        )}
+      >
+        {showValue ? (
+          <div className="text-center">
+            <div className={cn("font-orbitron text-white", {
+              "text-lg": size === "lg",
+              "text-base": size === "md",
+              "text-sm": size === "sm",
+            })}>
+              {currentValue || percentage}
+            </div>
+            {totalValue && (
+              <div className={cn("text-gray-400", fontSizeClasses[size])}>
+                / {totalValue}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={cn("font-orbitron text-white", {
+            "text-lg": size === "lg",
+            "text-base": size === "md",
+            "text-sm": size === "sm",
+          })}>
+            {percentage}%
+          </div>
+        )}
+      </div>
     </div>
   );
 }
