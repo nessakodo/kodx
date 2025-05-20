@@ -24,7 +24,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth endpoints are now handled by replitAuth.ts
   
-  // User profile endpoint - Protected route example
+  // User auth endpoint for frontend authentication checks
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get user progress data
+      let isNewUser = false;
+      
+      if (user.createdAt) {
+        // Calculate if this is a new user (account created less than 24 hours ago)
+        isNewUser = (
+          new Date().getTime() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000
+        ) && !user.completedOnboarding;
+      }
+      
+      // Return user data with auth-specific fields
+      const { password, ...safeUserData } = user;
+      res.json({
+        ...safeUserData,
+        isNewUser
+      });
+    } catch (error) {
+      console.error("Error fetching authenticated user:", error);
+      res.status(500).json({ message: "Failed to fetch user data" });
+    }
+  });
+  
+  // User onboarding completion endpoint
+  app.post('/api/user/onboarding', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { avatarId, username, interests, completed } = req.body;
+      
+      // Get the current user
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update user data
+      const updatedUser = await storage.upsertUser({
+        ...user,
+        id: userId,
+        profileImageUrl: avatarId ? `/avatars/${avatarId}.png` : user.profileImageUrl,
+        username: username || user.username,
+        interests: interests || user.interests,
+        completedOnboarding: true,
+        updatedAt: new Date()
+      });
+      
+      // Award the "First Steps" badge for completing onboarding
+      try {
+        await storage.awardBadge(userId, "onboarding_complete");
+      } catch (badgeError) {
+        console.error("Error awarding onboarding badge:", badgeError);
+        // Continue even if badge award fails
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating onboarding data:", error);
+      res.status(500).json({ message: "Failed to update onboarding data" });
+    }
+  });
+  
+  // Legacy User profile endpoint - Protected route example
   app.get('/api/profile', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id;

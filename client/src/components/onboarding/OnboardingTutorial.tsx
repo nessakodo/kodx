@@ -1,264 +1,300 @@
-import React, { useState, useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { useLocation } from 'wouter';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/useAuth';
-import { apiRequest } from '@/lib/queryClient';
-import { queryClient } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { 
+  BookOpen, 
+  Code, 
+  Award, 
+  Lightbulb, 
+  Shield, 
+  Brain, 
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  ArrowLeft,
+  Settings
+} from 'lucide-react';
 
-type TutorialStep = {
-  title: string;
-  description: string;
-  target?: string; // CSS selector for element to highlight
-  position?: 'top' | 'bottom' | 'left' | 'right';
-};
-
-const tutorialSteps: TutorialStep[] = [
-  {
-    title: "Welcome to KODΞX",
-    description: "Your journey into mindful technology begins here. Let's explore what the platform has to offer.",
-    position: 'bottom',
-  },
-  {
-    title: "Your Dashboard",
-    description: "This is your personal hub where you can track your progress, achievements, and learning journey.",
-    target: '.dashboard-content',
-    position: 'top',
-  },
-  {
-    title: "XP & Level System",
-    description: "Complete labs and projects to earn experience points and level up. Watch your XP ring fill as you progress.",
-    target: '.xp-ring',
-    position: 'right',
-  },
-  {
-    title: "Badges & Achievements",
-    description: "Unlock badges by completing specific challenges and achievements. Each represents a milestone in your journey.",
-    target: '.badges-showcase',
-    position: 'left',
-  },
-  {
-    title: "Labs & Learning",
-    description: "Dive into interactive labs designed to build your skills. Each lab provides focused knowledge and experience.",
-    target: '.labs-section',
-    position: 'bottom',
-  },
-  {
-    title: "Projects",
-    description: "Apply your knowledge in practical projects that challenge you to create solutions for real-world problems.",
-    target: '.projects-section',
-    position: 'bottom',
-  },
-  {
-    title: "Community Forum",
-    description: "Connect with fellow learners, share your journey, and learn from others in our community forum.",
-    target: '.forum-link',
-    position: 'bottom',
-  },
-  {
-    title: "Your Profile",
-    description: "Personalize your experience and showcase your achievements through your profile settings.",
-    target: '.user-menu-button',
-    position: 'bottom',
-  },
-  {
-    title: "Ready to Begin?",
-    description: "Your journey into mindful technology starts now. Remember, the goal isn't just to learn technology—it's to use it with intention and awareness.",
-    position: 'bottom',
-  },
+const avatarOptions = [
+  { id: 'default', image: '/avatars/default.png', name: 'Default' },
+  { id: 'cyber1', image: '/avatars/cyber1.png', name: 'Cyber 1' },
+  { id: 'cyber2', image: '/avatars/cyber2.png', name: 'Cyber 2' },
+  { id: 'zen1', image: '/avatars/zen1.png', name: 'Zen 1' },
+  { id: 'zen2', image: '/avatars/zen2.png', name: 'Zen 2' },
+  { id: 'tech1', image: '/avatars/tech1.png', name: 'Tech 1' },
+  { id: 'tech2', image: '/avatars/tech2.png', name: 'Tech 2' },
+  { id: 'balance1', image: '/avatars/balance1.png', name: 'Balance 1' },
 ];
 
 const OnboardingTutorial: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const [targetElement, setTargetElement] = useState<DOMRect | null>(null);
+  const [open, setOpen] = useState(true);
+  const [selectedAvatar, setSelectedAvatar] = useState('default');
+  const [customUsername, setCustomUsername] = useState('');
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
-  // Calculate position for tooltip based on target element
-  useEffect(() => {
-    const step = tutorialSteps[currentStep];
-    if (step.target) {
-      const element = document.querySelector(step.target);
-      if (element) {
-        setTargetElement(element.getBoundingClientRect());
-      } else {
-        setTargetElement(null);
-      }
-    } else {
-      setTargetElement(null);
+  // Complete onboarding mutation
+  const { mutate: completeOnboarding, isPending } = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/user/onboarding', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      setOpen(false);
     }
-  }, [currentStep]);
+  });
 
-  const nextStep = () => {
-    if (currentStep < tutorialSteps.length - 1) {
+  const steps = [
+    {
+      title: "Welcome to KODΞX",
+      description: "Your journey into mindful technology begins here. Let's get you set up with a few quick steps.",
+      content: (
+        <div className="text-center space-y-6 py-4">
+          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] rounded-full flex items-center justify-center">
+            <Shield className="w-12 h-12 text-white" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold">Digital Security & Mindful Tech</h3>
+            <p className="text-gray-400 max-w-md mx-auto">
+              KODΞX is your guide to mastering digital security while maintaining a balanced relationship with technology.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Choose Your Avatar",
+      description: "Select an avatar that represents you in the digital realm.",
+      content: (
+        <div className="py-4">
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            {avatarOptions.map((avatar) => (
+              <div 
+                key={avatar.id}
+                className={`relative cursor-pointer transition-all ${
+                  selectedAvatar === avatar.id 
+                    ? 'scale-110 ring-2 ring-primary ring-offset-2 ring-offset-background' 
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+                onClick={() => setSelectedAvatar(avatar.id)}
+              >
+                <Avatar className="w-16 h-16 mx-auto">
+                  <AvatarImage src={avatar.image} />
+                  <AvatarFallback>{avatar.name[0]}</AvatarFallback>
+                </Avatar>
+                {selectedAvatar === avatar.id && (
+                  <CheckCircle2 className="w-5 h-5 text-primary absolute -top-2 -right-2" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Personalize Your Profile",
+      description: "You can customize your username or keep your current one.",
+      content: (
+        <div className="py-4 space-y-4">
+          <div className="flex items-center space-x-4">
+            <Avatar className="w-16 h-16">
+              <AvatarImage src={avatarOptions.find(a => a.id === selectedAvatar)?.image} />
+              <AvatarFallback>{user?.username?.[0] || '?'}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input 
+                id="username" 
+                placeholder={user?.username || "Your username"} 
+                value={customUsername}
+                onChange={(e) => setCustomUsername(e.target.value)}
+                className="max-w-xs"
+              />
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Your Interests",
+      description: "Select topics you're interested in exploring on KODΞX.",
+      content: (
+        <div className="py-4 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { id: 'security', label: 'Digital Security', icon: <Shield className="w-4 h-4 mr-2" /> },
+              { id: 'mindfulness', label: 'Tech Mindfulness', icon: <Brain className="w-4 h-4 mr-2" /> },
+              { id: 'coding', label: 'Coding & Projects', icon: <Code className="w-4 h-4 mr-2" /> },
+              { id: 'privacy', label: 'Privacy Protection', icon: <Lightbulb className="w-4 h-4 mr-2" /> },
+              { id: 'community', label: 'Community Learning', icon: <Users className="w-4 h-4 mr-2" /> },
+              { id: 'achievements', label: 'Achievements & Growth', icon: <Award className="w-4 h-4 mr-2" /> },
+            ].map((interest) => (
+              <div key={interest.id} className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id={interest.id}
+                  checked={selectedInterests.includes(interest.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedInterests([...selectedInterests, interest.id]);
+                    } else {
+                      setSelectedInterests(selectedInterests.filter(i => i !== interest.id));
+                    }
+                  }}
+                  className="rounded text-primary border-gray-700 bg-gray-800 focus:ring-primary"
+                />
+                <Label 
+                  htmlFor={interest.id}
+                  className="flex items-center cursor-pointer font-normal"
+                >
+                  {interest.icon}
+                  {interest.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Let's Begin",
+      description: "You're all set to start your journey with KODΞX.",
+      content: (
+        <div className="py-4 space-y-6 text-center">
+          <div className="w-24 h-24 mx-auto bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] rounded-full flex items-center justify-center">
+            <CheckCircle2 className="w-12 h-12 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold mb-2">Ready to explore?</h3>
+            <p className="text-gray-400 max-w-md mx-auto">
+              You'll find labs, projects, and a community ready to support your growth. Earn badges and XP as you progress!
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                <BookOpen className="w-6 h-6 text-blue-400" />
+              </div>
+              <p className="text-sm">Interactive Labs</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                <Code className="w-6 h-6 text-green-400" />
+              </div>
+              <p className="text-sm">Hands-on Projects</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 mx-auto bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                <Award className="w-6 h-6 text-purple-400" />
+              </div>
+              <p className="text-sm">Earn Badges</p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      completeTutorial();
+      // Submit onboarding data
+      completeOnboarding({
+        avatarId: selectedAvatar,
+        username: customUsername || undefined,
+        interests: selectedInterests
+      });
     }
   };
 
-  const prevStep = () => {
+  const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const skipTutorial = () => {
-    const confirmed = window.confirm("Are you sure you want to skip the tutorial? You can access it again from your profile settings.");
-    if (confirmed) {
-      completeTutorial();
-    }
+  const handleSkip = () => {
+    completeOnboarding({
+      completed: true
+    });
   };
-
-  const completeTutorial = async () => {
-    setVisible(false);
-    
-    if (user?.id) {
-      try {
-        await apiRequest('/api/users/onboarding/complete', {
-          method: 'POST',
-        });
-        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-        
-        // Award the onboarding badge
-        await apiRequest('/api/badges/award', {
-          method: 'POST',
-          body: JSON.stringify({ badgeId: 'onboarding_complete' }),
-        });
-        
-        toast({
-          title: "🎉 Onboarding Complete!",
-          description: "You've earned the Onboarding badge and 50 XP!",
-        });
-      } catch (error) {
-        console.error("Error completing onboarding:", error);
-      }
-    }
-  };
-
-  const calculatePosition = () => {
-    if (!targetElement) {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-    }
-
-    const step = tutorialSteps[currentStep];
-    const padding = 20; // Padding from target element
-    
-    switch (step.position) {
-      case 'top':
-        return {
-          top: `${targetElement.top - padding - 150}px`,
-          left: `${targetElement.left + targetElement.width / 2}px`,
-          transform: 'translateX(-50%)',
-        };
-      case 'bottom':
-        return {
-          top: `${targetElement.bottom + padding}px`,
-          left: `${targetElement.left + targetElement.width / 2}px`,
-          transform: 'translateX(-50%)',
-        };
-      case 'left':
-        return {
-          top: `${targetElement.top + targetElement.height / 2}px`,
-          left: `${targetElement.left - padding - 320}px`,
-          transform: 'translateY(-50%)',
-        };
-      case 'right':
-        return {
-          top: `${targetElement.top + targetElement.height / 2}px`,
-          left: `${targetElement.right + padding}px`,
-          transform: 'translateY(-50%)',
-        };
-      default:
-        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-    }
-  };
-
-  // If not visible, don't render
-  if (!visible) return null;
-
-  const position = calculatePosition();
 
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
-      {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-      
-      {/* Highlight around target element if it exists */}
-      {targetElement && (
-        <div 
-          className="absolute border-2 border-[#9ecfff] rounded-lg pointer-events-none"
-          style={{
-            top: targetElement.top - 5,
-            left: targetElement.left - 5,
-            width: targetElement.width + 10,
-            height: targetElement.height + 10,
-            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 15px 5px rgba(158, 207, 255, 0.5)',
-          }}
-        ></div>
-      )}
-      
-      {/* Tutorial tooltip */}
-      <div 
-        className="absolute w-full max-w-md pointer-events-auto bg-gray-900/90 backdrop-blur-md border border-[#9ecfff]/30 p-6 rounded-xl shadow-xl"
-        style={position}
-      >
-        {/* Close button */}
-        <button 
-          onClick={skipTutorial}
-          className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors"
-        >
-          <X size={20} />
-        </button>
-        
-        {/* Progress indicator */}
-        <div className="mb-4 flex items-center gap-1.5">
-          {tutorialSteps.map((_, index) => (
-            <div 
-              key={index}
-              className={`h-1.5 rounded-full ${
-                index === currentStep 
-                  ? 'w-6 bg-gradient-to-r from-[#9ecfff] to-[#6d28d9]' 
-                  : 'w-1.5 bg-gray-700'
-              } transition-all duration-300`}
-            ></div>
-          ))}
-        </div>
-        
-        {/* Content */}
-        <h3 className="text-xl font-bold bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] bg-clip-text text-transparent mb-2">
-          {tutorialSteps[currentStep].title}
-        </h3>
-        <p className="text-gray-300 mb-6">
-          {tutorialSteps[currentStep].description}
-        </p>
-        
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            className="text-gray-400"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back
-          </Button>
-          
-          <Button 
-            onClick={nextStep}
-            className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 transition-opacity"
-          >
-            {currentStep === tutorialSteps.length - 1 ? 'Complete' : 'Next'}
-            {currentStep !== tutorialSteps.length - 1 && (
-              <ChevronRight className="h-4 w-4 ml-1" />
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-md sm:max-w-lg border-0 bg-black/30 backdrop-blur-xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+            {steps[currentStep].title}
+          </DialogTitle>
+          <DialogDescription>
+            {steps[currentStep].description}
+          </DialogDescription>
+        </DialogHeader>
+
+        {steps[currentStep].content}
+
+        <DialogFooter className="flex justify-between items-center">
+          <div>
+            {currentStep > 0 && (
+              <Button
+                variant="ghost"
+                onClick={handlePrevious}
+                disabled={isPending}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
             )}
-          </Button>
-        </div>
-      </div>
-    </div>
+          </div>
+          <div className="flex gap-2">
+            {currentStep < steps.length - 1 && (
+              <Button
+                variant="ghost"
+                onClick={handleSkip}
+                disabled={isPending}
+              >
+                Skip
+              </Button>
+            )}
+            <Button
+              onClick={handleNext}
+              disabled={isPending}
+              className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90"
+            >
+              {currentStep === steps.length - 1 ? (
+                isPending ? "Saving..." : "Start Exploring"
+              ) : (
+                <>
+                  Next
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
