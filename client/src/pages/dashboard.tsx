@@ -7,7 +7,7 @@ import { useLocation } from "wouter";
 
 export default function DashboardPage() {
   const { isAuthenticated, loginAsUser } = useAuth();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   
   // If not authenticated, show login prompt
   if (!isAuthenticated) {
