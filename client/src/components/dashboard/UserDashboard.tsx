@@ -99,23 +99,6 @@ export function UserDashboard() {
   const currentLevel = calculateLevel(currentXp);
   const progress = calculateLevelProgress(currentXp);
   
-  // Handle unauthenticated state
-  if (!isAuthenticated) {
-    return (
-      <div className="container max-w-7xl mx-auto py-12">
-        <div className="flex flex-col items-center justify-center text-center">
-          <h2 className="text-2xl font-orbitron text-white mb-6">Sign in to view your dashboard</h2>
-          <p className="text-gray-300 mb-8 max-w-md">Access your personalized learning experience, track progress, and unlock achievements</p>
-          <Link href="/api/login">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-  
   return (
     <div className="container max-w-7xl mx-auto py-8">
       {/* Welcome Section with XP Ring */}
