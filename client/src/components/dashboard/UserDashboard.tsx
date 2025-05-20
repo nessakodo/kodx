@@ -9,12 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
-import { MOCK_DASHBOARD_DATA } from "@/lib/mockData";
+import { MOCK_DASHBOARD_DATA, EMPTY_DASHBOARD_DATA } from "@/lib/mockData";
 import { Progress } from "@/components/ui/progress";
 import { TrophyIcon, CheckCircleIcon, RocketIcon, ArrowRightCircleIcon, BookOpenIcon, ChevronDownIcon, MessageSquareIcon, MessageCircleIcon, BookmarkIcon } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { calculateLevel, calculateLevelProgress } from "@/lib/utils";
 import { Link } from "wouter";
+import { 
+  EmptyLabsState, 
+  EmptyProjectsState, 
+  EmptyBadgesState, 
+  EmptyReflectionsState,
+  EmptyXPState 
+} from "@/components/dashboard/EmptyStates";
 
 export function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
@@ -31,8 +38,15 @@ export function UserDashboard() {
     enabled: isAuthenticated,
   });
   
-  // Use mock data when no real data is available
-  const display = dashboardData || MOCK_DASHBOARD_DATA;
+  // Check if user is new (no progress data yet)
+  const isNewUser = !dashboardData || (
+    (!dashboardData.labProgress || dashboardData.labProgress.length === 0) &&
+    (!dashboardData.projectProgress || dashboardData.projectProgress.length === 0) &&
+    (!dashboardData.badges || dashboardData.badges.length === 0)
+  );
+  
+  // Use appropriate data based on user status
+  const display = dashboardData || (isNewUser ? EMPTY_DASHBOARD_DATA : MOCK_DASHBOARD_DATA);
   
   // Calculate level and progress
   const level = calculateLevel(user?.totalXp || 0);
@@ -180,17 +194,7 @@ export function UserDashboard() {
                     />
                   ))
                 ) : (
-                  <div className="flex flex-col items-center py-12 px-4 bg-[#1e2535]/40 rounded-xl border border-gray-800">
-                    <p className="text-gray-400 mb-6 text-center">You haven't started any labs yet. Explore our labs to begin your journey!</p>
-                    <Link href="/labs">
-                      <Button 
-                        variant="outline"
-                        className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
-                      >
-                        Browse Labs
-                      </Button>
-                    </Link>
-                  </div>
+                  <EmptyLabsState />
                 )}
               </div>
             </TabsContent>

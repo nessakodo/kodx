@@ -84,8 +84,8 @@ export function Header() {
     setUserMenuOpen(false);
     // Store a logout flag in session storage
     sessionStorage.setItem('kodex_logout', 'true');
-    // Use client-side navigation instead of direct API call
-    setLocation('/');
+    // Use direct navigation to homepage
+    window.location.href = '/';
     // Clear auth state after a short delay
     setTimeout(() => {
       sessionStorage.removeItem('kodex_user');

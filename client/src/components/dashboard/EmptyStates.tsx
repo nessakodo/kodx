@@ -1,149 +1,122 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { BadgeDisplay } from './BadgeDisplay';
-import { BADGES } from '@shared/constants/badges';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-// Empty state for when a user has no XP or progress
-export const EmptyProgressState: React.FC = () => {
+// Empty state for labs section
+export function EmptyLabsState() {
   return (
-    <div className="flex flex-col items-center justify-center h-64 px-8 py-10 space-y-4 text-center rounded-lg border border-gray-800 bg-black/20 backdrop-blur-sm">
-      <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-white">Your path is unwritten.</h3>
-      <p className="text-gray-400 max-w-md">
-        Begin your first Lab to earn XP and unlock your digital evolution.
+    <Card className="border border-indigo-500/30 bg-black/40 backdrop-blur-sm shadow-lg shadow-indigo-900/20 w-full">
+      <CardHeader>
+        <CardTitle className="text-indigo-300">No Labs In Progress</CardTitle>
+        <CardDescription className="text-indigo-200/80">
+          Your journey of digital enlightenment awaits
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-gray-300 text-sm">
+          Labs are interactive learning experiences that guide you through key concepts in technology, 
+          cybersecurity, and digital mindfulness. Each completed lab earns you XP and unlocks new possibilities.
+        </p>
+        <div className="flex justify-center">
+          <Button asChild className="bg-indigo-700 hover:bg-indigo-600 text-white border border-indigo-500/50">
+            <Link href="/labs">
+              Explore Labs
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Empty state for projects section
+export function EmptyProjectsState() {
+  return (
+    <Card className="border border-cyan-500/30 bg-black/40 backdrop-blur-sm shadow-lg shadow-cyan-900/20 w-full">
+      <CardHeader>
+        <CardTitle className="text-cyan-300">No Projects In Progress</CardTitle>
+        <CardDescription className="text-cyan-200/80">
+          Where theory meets practice on your learning path
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-gray-300 text-sm">
+          Projects are practical, hands-on challenges that help you apply your knowledge in real-world scenarios.
+          Each project you undertake expands your skillset and demonstrates your growing mastery.
+        </p>
+        <div className="flex justify-center">
+          <Button asChild className="bg-cyan-700 hover:bg-cyan-600 text-white border border-cyan-500/50">
+            <Link href="/projects">
+              Discover Projects
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Empty state for badges section
+export function EmptyBadgesState() {
+  return (
+    <Card className="border border-violet-500/30 bg-black/40 backdrop-blur-sm shadow-lg shadow-violet-900/20 w-full">
+      <CardHeader>
+        <CardTitle className="text-violet-300">No Badges Yet</CardTitle>
+        <CardDescription className="text-violet-200/80">
+          Your achievements will be recognized here
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-gray-300 text-sm">
+          Badges represent milestones in your journey through KodexZen. They're awarded for completing labs, 
+          projects, and contributing to the community. Your first badge awaits your actions.
+        </p>
+        <div className="flex justify-center">
+          <Button asChild className="bg-violet-700 hover:bg-violet-600 text-white border border-violet-500/50">
+            <Link href="/profile/badges">
+              Badge System
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Empty state for reflections section (renamed from Notes)
+export function EmptyReflectionsState() {
+  return (
+    <Card className="border border-emerald-500/30 bg-black/40 backdrop-blur-sm shadow-lg shadow-emerald-900/20 w-full">
+      <CardHeader>
+        <CardTitle className="text-emerald-300">No Reflections Yet</CardTitle>
+        <CardDescription className="text-emerald-200/80">
+          The mindful learner documents their path
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-gray-300 text-sm">
+          Reflections are your personal insights captured during labs and projects. They help you
+          process what you've learned and create a record of your growth journey through technology.
+        </p>
+        <div className="flex justify-center">
+          <Button className="bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-500/50">
+            Learn About Reflections
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Empty state for XP with 0 XP
+export function EmptyXPState() {
+  return (
+    <div className="flex flex-col items-center space-y-2 p-4 rounded-lg border border-blue-500/30 bg-black/40 backdrop-blur-sm shadow-lg shadow-blue-900/20">
+      <h3 className="text-blue-300 font-medium text-lg">No XP Yet</h3>
+      <p className="text-center text-gray-300 text-sm">
+        Embark on your first lab or project to begin earning experience points and advancing your journey.
       </p>
-      <p className="text-sm text-gray-500 italic">
-        No XP yet – but your journey starts with a single line of code.
-      </p>
-      <Link href="/labs">
-        <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white">
-          Explore Labs
-        </Button>
-      </Link>
     </div>
   );
-};
-
-// Empty state for when a user has no labs started
-export const EmptyLabsState: React.FC = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-64 px-8 py-10 space-y-4 text-center rounded-lg border border-gray-800 bg-black/20 backdrop-blur-sm">
-      <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 p-4 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-white">No Labs Started Yet</h3>
-      <p className="text-gray-400 max-w-md">
-        Explore topics like cybersecurity, AI, or mindful dev practices.
-        Begin with a Beginner Lab to get grounded in your flow.
-      </p>
-      <p className="text-sm text-gray-500 italic">
-        "In stillness, potential gathers. Choose a Lab to activate your path."
-      </p>
-      <Link href="/labs">
-        <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white">
-          Browse Labs
-        </Button>
-      </Link>
-    </div>
-  );
-};
-
-// Empty state for when a user has no projects
-export const EmptyProjectsState: React.FC = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-64 px-8 py-10 space-y-4 text-center rounded-lg border border-gray-800 bg-black/20 backdrop-blur-sm">
-      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-white">Your creative space is waiting.</h3>
-      <p className="text-gray-400 max-w-md">
-        Projects let you build real-world apps and deepen your learning.
-      </p>
-      <p className="text-sm text-gray-500 italic">
-        "What you create here becomes a reflection of your digital sovereignty."
-        Start with a simple project—or remix a template to begin.
-      </p>
-      <Link href="/projects">
-        <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white">
-          Discover Projects
-        </Button>
-      </Link>
-    </div>
-  );
-};
-
-// Empty state for when a user has no badges
-export const EmptyBadgesState: React.FC = () => {
-  // Show a few greyed-out badges to demonstrate what they can earn
-  const sampleBadges = [
-    BADGES.find(b => b.id === 'founder'),
-    BADGES.find(b => b.id === 'lab_starter'),
-    BADGES.find(b => b.id === 'project_builder')
-  ].filter(Boolean);
-  
-  return (
-    <div className="flex flex-col items-center justify-center px-8 py-10 space-y-6 text-center rounded-lg border border-gray-800 bg-black/20 backdrop-blur-sm">
-      <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 p-4 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-white">No badges yet, but infinite potential.</h3>
-      <p className="text-gray-400 max-w-md">
-        Complete Labs, Projects, and reflections to earn unique digital artifacts.
-      </p>
-      <p className="text-sm text-gray-500 italic">
-        "Badges aren't rewards—they're markers of transformation."
-      </p>
-      
-      <div className="grid grid-cols-3 gap-6 w-full max-w-md">
-        {sampleBadges.map(badge => badge && (
-          <div key={badge.id} className="flex flex-col items-center">
-            <BadgeDisplay badge={badge} size="md" />
-            <p className="mt-2 text-xs text-gray-500">{badge.name}</p>
-          </div>
-        ))}
-      </div>
-      
-      <Link href="/labs">
-        <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white">
-          Begin Your Journey
-        </Button>
-      </Link>
-    </div>
-  );
-};
-
-// Empty state for when a user has no reflections
-export const EmptyReflectionsState: React.FC = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-64 px-8 py-10 space-y-4 text-center rounded-lg border border-gray-800 bg-black/20 backdrop-blur-sm">
-      <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 p-4 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      </div>
-      <h3 className="text-xl font-semibold text-white">No reflections yet.</h3>
-      <p className="text-gray-400 max-w-md">
-        When you complete Labs or Projects, you'll be prompted to journal your insights.
-      </p>
-      <p className="text-sm text-gray-500 italic">
-        "Reflection makes experience meaningful. You'll know when it's time to pause and write."
-      </p>
-      <Link href="/forum">
-        <Button className="bg-gradient-to-r from-[#9ecfff] to-[#6d28d9] hover:opacity-90 text-white">
-          Browse Community Reflections
-        </Button>
-      </Link>
-    </div>
-  );
-};
+}
