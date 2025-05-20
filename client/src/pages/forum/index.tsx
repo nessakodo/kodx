@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Plus, SearchIcon, FilterIcon } from "lucide-react";
+import { AlertCircle, Plus, SearchIcon, FilterIcon, X } from "lucide-react";
 import { MOCK_FORUM_POSTS } from "@/lib/mockData";
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 
 export default function ForumPage() {
   const { isAuthenticated } = useAuth();
@@ -63,9 +64,13 @@ export default function ForumPage() {
           </div>
           
           {isAuthenticated && (
-            <Button className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white">
-              <Plus className="h-4 w-4 mr-2" /> Create Post
-            </Button>
+            <Link href="/forum/create">
+              <Button 
+                className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Create Post
+              </Button>
+            </Link>
           )}
         </div>
         

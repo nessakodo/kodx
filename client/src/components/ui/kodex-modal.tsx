@@ -1,98 +1,94 @@
-import React, { useState, useEffect, useRef } from "react";
-import { XIcon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef } from "react";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface KodexModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
-  showCloseButton?: boolean;
+  className?: string;
+  size?: "sm" | "md" | "lg" | "full";
 }
 
-export function KodexModal({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
-  showCloseButton = true 
+export function KodexModal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className,
+  size = "md",
 }: KodexModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   
-  // Handle clicking outside to close
+  // Handle click outside to close
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         onClose();
       }
-    }
+    };
+    
+    // Handle escape key to close
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
     
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // Prevent scrolling on body when modal is open
+      document.addEventListener("keydown", handleEscKey);
+      // Prevent scrolling when modal is open
       document.body.style.overflow = "hidden";
     }
     
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
-
-  // Close on ESC key
-  useEffect(() => {
-    function handleEscKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-    
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscKey);
-    }
-    
-    return () => {
       document.removeEventListener("keydown", handleEscKey);
+      // Restore scrolling when modal is closed
+      document.body.style.overflow = "auto";
     };
   }, [isOpen, onClose]);
-
+  
+  // Size classes
+  const sizeClasses = {
+    sm: "max-w-md",
+    md: "max-w-2xl",
+    lg: "max-w-4xl",
+    full: "max-w-none w-full h-full rounded-none",
+  };
+  
+  if (!isOpen) return null;
+  
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-        >
-          <motion.div
-            ref={modalRef}
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="kodex-modal relative w-full max-w-md max-h-[90vh] overflow-y-auto"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div 
+        ref={modalRef}
+        className={cn(
+          "relative flex flex-col bg-[#0e1424]/95 border border-[#9ecfff]/20 shadow-lg",
+          "rounded-lg overflow-hidden animate-in fade-in-50 duration-300",
+          sizeClasses[size],
+          className
+        )}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-[#9ecfff]/10">
+          {title && (
+            <h2 className="font-orbitron text-lg tracking-wider">{title}</h2>
+          )}
+          <button
+            onClick={onClose}
+            className="ml-auto flex items-center justify-center rounded-full w-8 h-8 transition-colors hover:bg-[#9ecfff]/10"
+            aria-label="Close"
           >
-            <div className="kodex-modal-header font-orbitron">
-              <h2 className="text-lg text-gray-200">{title}</h2>
-            </div>
-            
-            {showCloseButton && (
-              <button 
-                onClick={onClose}
-                className="kodex-modal-close"
-                aria-label="Close modal"
-              >
-                <XIcon className="h-4 w-4" />
-              </button>
-            )}
-            
-            <div className="mt-2">
-              {children}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="p-4 overflow-auto">
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }

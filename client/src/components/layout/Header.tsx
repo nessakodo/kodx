@@ -1,240 +1,224 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { KodexLogo } from "@/components/ui/kodex-logo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { BellIcon, MenuIcon } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { BellIcon, LogOutIcon, MenuIcon, SettingsIcon, XIcon } from "lucide-react";
+import { NotificationsPanel } from "./NotificationsPanel";
+import { calculateLevel } from "@/lib/utils";
+import { KodexModal } from "@/components/ui/kodex-modal";
 
 export function Header() {
-  const [location] = useLocation();
-  const { user, isAuthenticated, isAdmin, loginAsUser, loginAsAdmin, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const [currentLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Labs", href: "/labs" },
-    { name: "Projects", href: "/projects" },
-    { name: "Forum", href: "/forum" },
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  
+  // Mocked unread notifications count - would come from the API in a real app
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Close menus when clicking outside their containers
+      if (mobileMenuOpen || userMenuOpen) {
+        setMobileMenuOpen(false);
+        setUserMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mobileMenuOpen, userMenuOpen]);
+  
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [currentLocation]);
+  
+  // Get user level - would come from the API in a real app
+  const userLevel = user ? calculateLevel(user.totalXp || 0) : 0;
+  
+  const navLinks = [
+    { text: "Home", href: "/" },
+    { text: "Labs", href: "/labs" },
+    { text: "Projects", href: "/projects" },
+    { text: "Forum", href: "/forum" },
+    { text: "Resources", href: "/resources" },
   ];
-
+  
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return currentLocation === href;
+    }
+    return currentLocation.startsWith(href);
+  };
+  
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#9ecfff]/10 backdrop-blur-md bg-[#0e1525]/75">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-8">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-                <KodexLogo size="md" />
+    <header className="relative bg-[#0f172a]/70 backdrop-blur-sm border-b border-[#9ecfff]/10 z-40">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/">
+              <span className="font-orbitron text-xl tracking-wider bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent">
+                KOD<span className="text-white">•</span>X
+              </span>
             </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.name} 
-                  href={item.href}
-                  className={cn(
-                    "transition-colors",
-                    location === item.href
-                      ? "text-[#9ecfff]"
-                      : "text-gray-300 hover:text-[#9ecfff]"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-gray-300"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <MenuIcon size={24} />
-          </button>
-
-          {/* Auth/Profile Section */}
-          <div className="hidden md:flex items-center gap-4">
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-1">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`px-3 py-2 rounded-md text-sm ${
+                  isActive(link.href)
+                    ? "text-white bg-[#1e2535]/70 border-b-2 border-[#9ecfff]/50"
+                    : "text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+                } transition-colors duration-200`}
+              >
+                {link.text}
+              </Link>
+            ))}
+          </nav>
+          
+          {/* User Actions */}
+          <div className="flex items-center space-x-1">
             {isAuthenticated ? (
               <>
-                {/* Notifications */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="relative text-[#9ecfff]"
-                    >
-                      <BellIcon size={20} />
-                      {/* Notification dot - only shown when there are unread notifications */}
-                      <span className="absolute -top-1 -right-1 bg-[#b166ff] w-2 h-2 rounded-full animate-pulse"></span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-72">
-                    <div className="px-2 py-2 border-b border-[#9ecfff]/10">
-                      <div className="text-sm font-medium">Notifications</div>
-                    </div>
-                    <div className="max-h-[300px] overflow-y-auto">
-                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
-                        <div className="flex flex-col">
-                          <div className="text-sm"><span className="font-semibold">Quantum Mechanics</span> lab is now available</div>
-                          <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
-                        <div className="flex flex-col">
-                          <div className="text-sm"><span className="font-semibold">@codemaster</span> commented on your forum post</div>
-                          <div className="text-xs text-gray-400 mt-1">Yesterday</div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="cursor-pointer flex items-start py-3">
-                        <div className="flex flex-col">
-                          <div className="text-sm">Your post received <span className="font-semibold">5 new likes</span></div>
-                          <div className="text-xs text-gray-400 mt-1">3 days ago</div>
-                        </div>
-                      </DropdownMenuItem>
-                    </div>
-                    <div className="px-2 py-2 border-t border-[#9ecfff]/10">
-                      <Link href="/dashboard" className="text-sm text-[#9ecfff] hover:text-[#cae6ff] w-full text-center block">View all in Dashboard</Link>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* User Avatar */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      className="h-10 w-10 rounded-full p-0 border-2 border-[#9ecfff]/20 overflow-hidden"
-                      variant="ghost"
-                    >
-                      <div className="relative">
-                        <Avatar>
-                          <AvatarImage
-                            src={user.profileImageUrl}
-                            alt={user.username}
-                          />
-                          <AvatarFallback className="bg-gradient-to-br from-[#9ecfff]/30 to-[#88c9b7]/30">
-                            {user.username[0].toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                {/* Notifications Button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  onClick={() => {
+                    setNotificationsOpen(true);
+                  }}
+                >
+                  <BellIcon className="h-5 w-5" />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-[#9ecfff]"></span>
+                  )}
+                </Button>
+                
+                {/* User Menu */}
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 ml-2"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.profileImageUrl} alt={user?.username} />
+                      <AvatarFallback className="bg-[#1e2535]">
+                        {user?.username?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden sm:block text-left">
+                      <div className="text-xs font-medium truncate max-w-[100px]">
+                        {user?.username || "User"}
                       </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <div className="px-2 py-2 border-b border-[#9ecfff]/10">
-                      <div className="text-sm font-medium">{user.username}</div>
-                      <div className="text-xs text-gray-400">Level {Math.floor(user.totalXp / 1000) + 1} • {user.totalXp} XP</div>
+                      <div className="text-xs text-gray-500">Level {userLevel}</div>
                     </div>
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="cursor-pointer">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="cursor-pointer">Settings</Link>
-                    </DropdownMenuItem>
-                    {isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" className="cursor-pointer">Admin Panel</Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem className="cursor-pointer" onClick={logout}>
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </Button>
+                  
+                  {/* User Menu Dropdown */}
+                  {userMenuOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-48 py-2 bg-[#1e2535] border border-[#9ecfff]/10 rounded-md shadow-xl z-50"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link href="/dashboard">
+                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white">
+                          Dashboard
+                        </a>
+                      </Link>
+                      <Link href="/settings">
+                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white">
+                          <span className="flex items-center">
+                            <SettingsIcon className="h-4 w-4 mr-2" />
+                            Settings
+                          </span>
+                        </a>
+                      </Link>
+                      <Link href="/api/logout">
+                        <a className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#9ecfff]/10 hover:text-white border-t border-[#9ecfff]/10 mt-1 pt-1">
+                          <span className="flex items-center">
+                            <LogOutIcon className="h-4 w-4 mr-2" />
+                            Sign Out
+                          </span>
+                        </a>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
-              <>
-                <button
-                  onClick={loginAsUser}
-                  className="cta-button bg-transparent hover:bg-[rgba(158,207,255,0.1)]"
+              // Login Button for non-authenticated users
+              <Link href="/api/login">
+                <Button 
+                  variant="outline" 
+                  className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
                 >
                   Sign In
-                </button>
-
-                <button
-                  onClick={loginAsAdmin}
-                  className="cta-button"
-                >
-                  Admin Access
-                </button>
-              </>
+                </Button>
+              </Link>
+            )}
+            
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-[#0f172a]/95 backdrop-blur-sm border-b border-[#9ecfff]/10">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  isActive(link.href)
+                    ? "text-white bg-[#1e2535]/70 border-l-2 border-[#9ecfff]/50"
+                    : "text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+                } transition-colors duration-200`}
+              >
+                {link.text}
+              </Link>
+            ))}
+            
+            {isAuthenticated && (
+              <Link href="/dashboard">
+                <a className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-[#1e2535]/50">
+                  Dashboard
+                </a>
+              </Link>
             )}
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-3 border-t border-[#9ecfff]/10 pt-3">
-            <nav className="flex flex-col space-y-3">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.name} 
-                  href={item.href}
-                  className={cn(
-                    "transition-colors py-2",
-                    location === item.href
-                      ? "text-[#9ecfff]"
-                      : "text-gray-300 hover:text-[#9ecfff]"
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              {!isAuthenticated ? (
-                <>
-                  <button
-                    onClick={loginAsUser}
-                    className="text-gray-300 hover:text-[#9ecfff] py-2 flex"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={loginAsAdmin}
-                    className="text-[#9ecfff] hover:text-[#cae6ff] py-2 flex"
-                  >
-                    Admin Access
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link 
-                    href="/dashboard"
-                    className="text-gray-300 hover:text-[#9ecfff] py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  {isAdmin && (
-                    <Link 
-                      href="/admin"
-                      className="text-gray-300 hover:text-[#9ecfff] py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Admin Panel
-                    </Link>
-                  )}
-                  <button
-                    onClick={logout}
-                    className="text-gray-300 hover:text-[#9ecfff] py-2 flex"
-                  >
-                    Sign Out
-                  </button>
-                </>
-              )}
-            </nav>
-          </div>
-        )}
-      </div>
+      )}
+      
+      {/* Notifications Modal */}
+      <NotificationsPanel 
+        isOpen={notificationsOpen}
+        onClose={() => {
+          setNotificationsOpen(false);
+          // When closed, mark all as read
+          setUnreadNotifications(0);
+        }}
+      />
     </header>
   );
 }
