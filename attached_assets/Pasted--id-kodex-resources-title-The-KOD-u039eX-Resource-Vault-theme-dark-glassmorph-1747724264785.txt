@@ -1,0 +1,166 @@
+{
+  "id": "kodex-resources",
+  "title": "The KOD\u039eX Resource Vault",
+  "theme": "dark-glassmorphic",
+  "description": "A curated sanctuary of tools, videos, guides, and templates to support your journey through mindful tech and digital sovereignty.",
+  "sections": [
+    {
+      "id": "labs",
+      "title": "\ud83e\uddea LABS",
+      "description": "Interactive modules with guided tutorials, embedded walkthroughs, and checkpoint-based XP rewards.",
+      "features": [
+        "Timestamped YouTube videos",
+        "Downloadable PDFs & Notion templates",
+        "Lab-specific GitHub repos",
+        "Progress tracking & XP badges",
+        "Embedded quizzes with instant feedback"
+      ],
+      "link": "/labs"
+    },
+    {
+      "id": "projects",
+      "title": "\u2699\ufe0f PROJECTS",
+      "description": "Step-by-step project guides to build your showcase portfolio.",
+      "features": [
+        "Real-world starter repos",
+        "Tasks + reflection prompts",
+        "Sample devlogs",
+        "GitHub integration (fork & deploy)",
+        "Forum showcase & peer feedback"
+      ],
+      "link": "/projects"
+    },
+    {
+      "id": "forum",
+      "title": "\ud83c\udf10 FORUM",
+      "description": "A cyber-zen space to share, reflect, and co-create with community.",
+      "features": [
+        "Devlog templates",
+        "XP from feedback/likes",
+        "Topic channels: Quantum, Web3, Flow Tools",
+        "Monthly build prompts",
+        "Somatic tech check-ins"
+      ],
+      "link": "/forum"
+    },
+    {
+      "id": "vault",
+      "title": "\ud83d\udcda RESOURCE VAULT",
+      "description": "Curated tools, cheat sheets, guides, and embedded tutorials for learners of all levels.",
+      "resources": {
+        "essential_reading": [
+          {
+            "title": "The Cybersecurity Starter Kit",
+            "type": "pdf",
+            "url": "/resources/pdfs/cyberstarter.pdf"
+          },
+          {
+            "title": "Digital Minimalism (Cal Newport Summary)",
+            "type": "article",
+            "url": "https://nessakodo.com/blog/digital-minimalism"
+          }
+        ],
+        "video_playlists": [
+          {
+            "title": "Intro to Terminal & Git",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "timestamps": [
+              {
+                "time": "00:00",
+                "title": "Intro"
+              },
+              {
+                "time": "01:25",
+                "title": "Setup"
+              },
+              {
+                "time": "05:40",
+                "title": "Git Basics"
+              }
+            ]
+          },
+          {
+            "title": "Build Your Password Manager",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "timestamps": [
+              {
+                "time": "00:00",
+                "title": "Project Intro"
+              },
+              {
+                "time": "05:00",
+                "title": "JS Encryption"
+              },
+              {
+                "time": "12:30",
+                "title": "Final UI"
+              }
+            ]
+          }
+        ],
+        "toolkits": [
+          {
+            "title": "Command Line Cheat Sheet",
+            "type": "pdf",
+            "url": "/resources/pdfs/cli-cheatsheet.pdf"
+          },
+          {
+            "title": "GitHub Devlog Template",
+            "type": "notion",
+            "url": "https://notion.so/devlog-template"
+          }
+        ],
+        "recommended_extensions": [
+          "Bitwarden",
+          "Privacy Badger",
+          "uBlock Origin",
+          "Notion Web Clipper"
+        ]
+      },
+      "download_all_link": "/resources/vault.json"
+    },
+    {
+      "id": "pathways",
+      "title": "\ud83c\udf31 Pathways for Mastery",
+      "description": "Tiered learning tracks designed to help you grow at your own pace.",
+      "tiers": [
+        "The Cyber Initiate \u2013 foundational digital habits + web security",
+        "The Dev Alchemist \u2013 creative developer workflows",
+        "The Quantum Explorer \u2013 quantum computing & AI",
+        "The System Architect \u2013 personal & technical OS building"
+      ],
+      "link": "/labs/pathways"
+    },
+    {
+      "id": "newsletter",
+      "title": "\ud83d\udcec Join the Digest",
+      "description": "Seasonal signal from the Kod\u039ex vault. No noise. Just clarity.",
+      "features": [
+        "Tips from the forum",
+        "New labs & projects",
+        "Mindful tech rituals",
+        "Lunar cycle reflections"
+      ],
+      "link": "/subscribe"
+    },
+    {
+      "id": "learn-more",
+      "title": "\ud83d\udd2e Learn More",
+      "description": "Meet the mind behind KOD\u039eX, read the manifesto, or find ways to contribute.",
+      "buttons": [
+        {
+          "label": "About",
+          "url": "/about"
+        },
+        {
+          "label": "Manifesto",
+          "url": "/manifesto"
+        },
+        {
+          "label": "Collaborate",
+          "url": "/collab"
+        }
+      ]
+    }
+  ]
+}

@@ -12,10 +12,10 @@ export function ForumSidebar() {
 
   const featuredPost = {
     id: 1,
-    title: "How to secure your network with Quantum-resistant cryptography",
-    author: "CyberSage",
-    comments: 24,
-    likes: 156
+    title: "From Quantum Confusion to Clarity: A Beginner's Map",
+    author: "quantumOracle",
+    comments: 19,
+    likes: 138
   };
 
   const handleNewsletterSignup = (e: React.FormEvent) => {

@@ -51,11 +51,15 @@ export default function ForumPage() {
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesCategory = categoryFilter === "all" || post.category === categoryFilter;
+    const matchesCategory = categoryFilter === "" || categoryFilter === "all" || post.category === categoryFilter;
     
     const matchesTag = tagFilter === "" || 
-      (post.tags && post.tags.some((tag: string) => 
-        tag.toLowerCase() === tagFilter.toLowerCase()));
+      (post.tags && post.tags.some((tag: string) => {
+        // Strip the # if present in either string for comparison
+        const normalizedTag = tag.startsWith('#') ? tag.toLowerCase() : `#${tag.toLowerCase()}`;
+        const normalizedFilter = tagFilter.startsWith('#') ? tagFilter.toLowerCase() : `#${tagFilter.toLowerCase()}`;
+        return normalizedTag === normalizedFilter;
+      }));
     
     return matchesSearch && matchesCategory && matchesTag;
   }) : [];

@@ -100,26 +100,32 @@ export const TRENDING_TAGS = [
   { label: "#security", count: 35, route: "/forum/tags/security" },
   { label: "#ethical-hacking", count: 29, route: "/forum/tags/ethical-hacking" },
   { label: "#zero-knowledge", count: 23, route: "/forum/tags/zero-knowledge" },
-  { label: "#mindfulness", count: 18, route: "/forum/tags/mindfulness" }
+  { label: "#mindfulness", count: 18, route: "/forum/tags/mindfulness" },
+  { label: "#learning-path", count: 16, route: "/forum/tags/learning-path" },
+  { label: "#qiskit", count: 14, route: "/forum/tags/qiskit" },
+  { label: "#rust", count: 13, route: "/forum/tags/rust" },
+  { label: "#blockchain", count: 12, route: "/forum/tags/blockchain" },
+  { label: "#burnout", count: 10, route: "/forum/tags/burnout" },
+  { label: "#flow", count: 9, route: "/forum/tags/flow" }
 ];
 
 export const MOCK_FORUM_POSTS = [
   {
     id: 1,
-    title: "How to secure your network with Quantum-resistant cryptography",
-    content: "With the rapid advancement of quantum computing, our current encryption methods are becoming increasingly vulnerable. In this comprehensive guide, I'll walk through implementing quantum-resistant cryptography for your personal and enterprise networks, focusing on practical solutions that balance security with performance considerations.\n\nQuantum threats to classical cryptography:\n- Shor's algorithm can efficiently break RSA and ECC\n- Grover's algorithm reduces symmetric key security by half\n- Most PKI infrastructure relies on vulnerable algorithms\n\nImplementation steps:\n1. Assess your current cryptographic landscape\n2. Prioritize high-value data for protection\n3. Implement hybrid approaches where possible\n4. Monitor NIST standardization progress\n\nI've also included benchmark results comparing traditional vs. quantum-resistant approaches on various hardware configurations. The performance impact is significant but manageable with proper optimization.",
+    title: "From Quantum Confusion to Clarity: A Beginner's Map",
+    content: "After months feeling lost in Qiskit docs, I finally mapped out a learning sequence that actually worked. Sharing it here — hopefully it helps others on this wild quantum ride.\n\nMy Quantum Learning Path:\n\n1. Start with basic quantum computing principles - superposition, entanglement, and quantum gates\n2. Build foundational math skills - complex numbers, linear algebra, and probability theory\n3. Practice with simple circuits before diving into algorithms\n4. Use visualization tools (Bloch spheres, circuit diagrams) to build intuition\n5. Join study groups and forums (like this one!) to discuss concepts\n\nKey resources that helped me break through:\n- Qiskit Textbook chapters 1-3 (read BEFORE trying any code)\n- 'Quantum Computing for Computer Scientists' book\n- QuantumKatas on GitHub for hands-on exercises\n- Drawing circuits on paper before implementing them\n\nThe biggest breakthrough came when I stopped trying to perfectly understand everything and started building simple circuits. Experimentation helped me develop intuition that textbooks couldn't provide.",
     category: "RESOURCES",
-    tags: ["#quantum", "#security", "#cryptography"],
-    likes: 156,
+    tags: ["#quantum", "#qiskit", "#learning-path"],
+    likes: 138,
     isFeatured: true,
     createdAt: "2025-05-18T16:00:00Z",
     user: {
       id: "user001",
-      username: "CyberSage",
-      profileImageUrl: "https://ui-avatars.com/api/?name=Cyber+Sage",
+      username: "quantumOracle",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Quantum+Oracle",
       totalXp: 7450
     },
-    commentsCount: 24
+    commentsCount: 19
   },
   {
     id: 2,
@@ -200,6 +206,118 @@ export const MOCK_FORUM_POSTS = [
       totalXp: 6120
     },
     commentsCount: 15
+  },
+  {
+    id: 7,
+    title: "Flow state vs. burnout in security work",
+    content: "I've been exploring the line between deep focus and burnout while doing high-stakes pentesting. Anyone else ride this edge?\n\nAfter years in cybersecurity, I've noticed a concerning pattern: the same flow state that makes us excel at security work can lead straight to burnout if not carefully managed.\n\nMy observations:\n- The hyper-focus needed for vulnerability analysis creates a dopamine loop that can be addictive\n- Security work often involves 'negative creativity' (thinking about how things break) which can be mentally taxing\n- The high-stakes nature of the work creates pressure that's both motivating and exhausting\n\nStrategies I'm testing:\n- Time-boxing intensive analysis sessions to 90 minutes maximum\n- Alternating between offensive and defensive security tasks\n- Mindfulness practices specifically designed for high-cognitive-load work\n\nI'd love to hear from other security professionals about how you manage this balance.",
+    category: "DISCUSSION",
+    tags: ["#burnout", "#mindfulness", "#security"],
+    likes: 17,
+    createdAt: "2025-05-16T14:20:00Z",
+    user: {
+      id: "user568",
+      username: "cyberLotus",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Cyber+Lotus",
+      totalXp: 5430
+    },
+    commentsCount: 15
+  },
+  {
+    id: 8,
+    title: "Terminal rituals to start your coding day",
+    content: "Curious what practices help you enter the zone. I start each session with breathwork + a Bash mantra. Share yours!\n\nOver the past year, I've been experimenting with different rituals to transition my mind into a focused coding state. My current routine involves:\n\n1. Three minutes of 4-7-8 breathing (4 count inhale, 7 count hold, 8 count exhale)\n2. Running a custom Bash script that displays a randomized coding mantra and clears my workspace\n3. Setting an intention for the session in writing\n\nThe script includes affirmations like:\n```bash\necho \"You build with intention, not distraction\"\necho \"Each line of code is a deliberate creation\"\necho \"Complexity yields to patient exploration\"\n```\n\nI've found this helps create a consistent mental environment regardless of physical location. Has anyone else developed specific rituals or scripts to help transition into focused work?",
+    category: "DISCUSSION",
+    tags: ["#rituals", "#terminal", "#flow"],
+    likes: 43,
+    createdAt: "2025-05-17T09:20:00Z",
+    user: {
+      id: "user569",
+      username: "terminalMuse",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Terminal+Muse",
+      totalXp: 4920
+    },
+    commentsCount: 9
+  },
+  {
+    id: 9,
+    title: "What's the best way to learn Rust in 2025?",
+    content: "Rust is booming. Any solid guides, YouTubers, or creative ways to master it without getting overwhelmed?\n\nWith Rust continuing to gain adoption across systems programming, web development, and now AI infrastructure, I'm ready to dive in. However, the learning resources seem vast and sometimes contradictory.\n\nI'm particularly interested in:\n- Resources that emphasize practical projects over academic theory\n- Approaches that help build mental models of ownership and borrowing\n- Learning paths that connect Rust concepts to other language paradigms\n- Communities that are welcoming to beginners asking foundational questions\n\nMy background is primarily Python and JavaScript, and previous attempts to learn Rust left me feeling overwhelmed by the borrow checker. Any recommendations for resources specifically designed for people coming from high-level languages?",
+    category: "QUESTIONS",
+    tags: ["#rust", "#learning", "#2025"],
+    likes: 59,
+    createdAt: "2025-05-17T11:15:00Z",
+    user: {
+      id: "user570",
+      username: "rootflow",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Root+Flow",
+      totalXp: 3840
+    },
+    commentsCount: 14
+  },
+  {
+    id: 10,
+    title: "Building trustless systems with ZK proofs",
+    content: "Built my first proof using snarkJS and circom — wild stuff. Excited to hear how others are experimenting.\n\nAfter months of theoretical study, I finally implemented my first zero-knowledge application - a credential verification system that proves educational qualifications without revealing personal data.\n\nKey components I used:\n- circom for circuit design\n- snarkJS for proof generation and verification\n- Groth16 proving system\n- Solidity for on-chain verification\n\nThe most challenging aspect was designing circuits that balanced expressiveness with efficiency. My initial implementations had prohibitive proving times (~3 minutes), but after optimization, I got it down to around 20 seconds.\n\nI'm particularly interested in how others are balancing privacy guarantees with user experience. Have you found any clever optimizations or UX patterns that make ZK applications more accessible to non-technical users?",
+    category: "SHOWCASE",
+    tags: ["#zero-knowledge", "#zkp", "#blockchain"],
+    likes: 53,
+    createdAt: "2025-05-13T16:40:00Z",
+    user: {
+      id: "user571",
+      username: "codedSage",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Coded+Sage",
+      totalXp: 6750
+    },
+    commentsCount: 21
+  },
+  {
+    id: 11,
+    title: "My first CTF write-up: lessons + takeaways",
+    content: "Just published my first CTF write-up and wanted to share what I learned from the experience.\n\nAfter participating in the KOD∙X Defensive CTF last month, I finally published my complete write-up documenting my approach, tools, and mental process. This was my first time not only competing but also writing up my methodology.\n\nKey lessons learned:\n\n1. Documentation during the challenge is crucial - I used Obsidian with a custom CTF template to capture all commands, outputs, and thought processes\n2. Screenshots with annotations help tremendously when explaining visual aspects of exploitation\n3. Explaining your failures is often more valuable than just showcasing successful techniques\n4. Using ASCII diagrams to visualize attack paths makes complex exploits more understandable\n\nI found that writing the explanation forced me to develop a deeper understanding of the vulnerabilities I was exploiting. Concepts I thought I understood completely revealed gaps in my knowledge when I tried to explain them clearly.\n\nMy write-up is available at: [github.com/glitchcraft/kodex-ctf-2025](https://github.com) (includes full code samples and step-by-step walkthrough)",
+    category: "SHOWCASE",
+    tags: ["#ctf", "#writeup", "#ethical-hacking"],
+    likes: 86,
+    createdAt: "2025-05-12T10:30:00Z",
+    user: {
+      id: "user572",
+      username: "glitchcraft",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Glitch+Craft",
+      totalXp: 5230
+    },
+    commentsCount: 7
+  },
+  {
+    id: 12,
+    title: "Open source as sacred tech practice",
+    content: "Exploring how open-source dev can feel like spiritual offering — a practice of contribution and intention.\n\nOver the past few years, I've begun approaching open source contribution as a form of techno-spiritual practice - a way of creating meaning through mindful technical creation. This perspective has completely transformed how I select projects and contribute code.\n\nSome elements of this approach include:\n\n- Treating PRs as offerings rather than achievements\n- Setting intentions before coding sessions\n- Focusing on how my contributions might benefit others I'll never meet\n- Maintaining presence and attention to detail as a form of respect\n- Approaching documentation as a teaching practice\n\nThis mindset has helped me find deep satisfaction even when working on unglamorous tasks like fixing edge cases, improving error messages, or clarifying documentation. It's also made me more resilient to the occasional project maintainer who might be having a rough day.\n\nHas anyone else found ways to infuse meaning and purpose into their technical work beyond the functional outcomes?",
+    category: "RESOURCES",
+    tags: ["#opensource", "#spirituality", "#tech"],
+    likes: 88,
+    createdAt: "2025-05-15T14:20:00Z",
+    user: {
+      id: "user573",
+      username: "nighthawkZero",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Nighthawk+Zero",
+      totalXp: 7830
+    },
+    commentsCount: 20
+  },
+  {
+    id: 13,
+    title: "How I use TouchDesigner in my pen-testing demos",
+    content: "TouchDesigner is usually seen as a VJ tool, but I've been fusing it with Kali Linux and OBS. Here's how it plays out in demos.\n\nAfter years of delivering technical security presentations with standard slides and terminal windows, I started experimenting with TouchDesigner to create more engaging and conceptually clear demonstrations.\n\nMy current setup includes:\n\n1. A custom TouchDesigner interface that visualizes network traffic in real-time during exploitation\n2. Integration with Kali Linux tools via Python scripting and UDP messaging\n3. Visual representations of data exfiltration and lateral movement that help non-technical audiences grasp the concepts\n4. Dynamic highlighting of code and process relationships during explanation\n\nThe most effective aspect has been creating visualizations that respond to actual attack techniques as they're performed. For example, when demonstrating SQL injection, the interface shows the query structure being manipulated and database tables being exposed in a visual format that's much more intuitive than watching raw SQL commands.\n\nThe response from clients has been overwhelmingly positive - especially from management and board members who previously struggled to understand the technical details of penetration testing reports.\n\nHappy to share some example patches if anyone's interested in this approach!",
+    category: "SHOWCASE",
+    tags: ["#touchdesigner", "#demos", "#pentesting"],
+    likes: 33,
+    createdAt: "2025-05-15T09:15:00Z",
+    user: {
+      id: "user574",
+      username: "synaptek",
+      profileImageUrl: "https://ui-avatars.com/api/?name=Synaptek",
+      totalXp: 6480
+    },
+    commentsCount: 5
   }
 ];
 

@@ -1,0 +1,124 @@
+{
+  "featured": {
+    "username": "quantumOracle",
+    "title": "From Quantum Confusion to Clarity: A Beginner\u2019s Map",
+    "body": "After months feeling lost in Qiskit docs, I finally mapped out a learning sequence that actually worked. Sharing it here \u2014 hopefully it helps others on this wild quantum ride.",
+    "category": "RESOURCES",
+    "tags": [
+      "#quantum",
+      "#qiskit",
+      "#learning-path"
+    ],
+    "posted_ago": "2 days ago",
+    "likes": 138,
+    "comments": 19,
+    "read_more": "Read More"
+  },
+  "posts": [
+    {
+      "username": "cyberLotus",
+      "title": "Flow state vs. burnout in security work",
+      "body": "I've been exploring the line between deep focus and burnout while doing high-stakes pentesting. Anyone else ride this edge?",
+      "category": "DISCUSSION",
+      "tags": [
+        "#burnout",
+        "#mindfulness",
+        "#security"
+      ],
+      "posted_ago": "4 days ago",
+      "likes": 17,
+      "comments": 15,
+      "read_more": "Read More"
+    },
+    {
+      "username": "terminalMuse",
+      "title": "Terminal rituals to start your coding day",
+      "body": "Curious what practices help you enter the zone. I start each session with breathwork + a Bash mantra. Share yours!",
+      "category": "DISCUSSION",
+      "tags": [
+        "#rituals",
+        "#terminal",
+        "#flow"
+      ],
+      "posted_ago": "3 days ago",
+      "likes": 43,
+      "comments": 9,
+      "read_more": "Read More"
+    },
+    {
+      "username": "rootflow",
+      "title": "What's the best way to learn Rust in 2025?",
+      "body": "Rust is booming. Any solid guides, YouTubers, or creative ways to master it without getting overwhelmed?",
+      "category": "QUESTIONS",
+      "tags": [
+        "#rust",
+        "#learning",
+        "#2025"
+      ],
+      "posted_ago": "3 days ago",
+      "likes": 59,
+      "comments": 14,
+      "read_more": "Read More"
+    },
+    {
+      "username": "codedSage",
+      "title": "Building trustless systems with ZK proofs",
+      "body": "Built my first proof using snarkJS and circom \u2014 wild stuff. Excited to hear how others are experimenting.",
+      "category": "SHOWCASE",
+      "tags": [
+        "#zero-knowledge",
+        "#zkp",
+        "#blockchain"
+      ],
+      "posted_ago": "7 days ago",
+      "likes": 53,
+      "comments": 21,
+      "read_more": "Read More"
+    },
+    {
+      "username": "glitchcraft",
+      "title": "My first CTF write-up: lessons + takeaways",
+      "body": "Just published my first CTF write-up and wanted to share what I learned from the experience.",
+      "category": "SHOWCASE",
+      "tags": [
+        "#ctf",
+        "#writeup",
+        "#ethical-hacking"
+      ],
+      "posted_ago": "8 days ago",
+      "likes": 86,
+      "comments": 7,
+      "read_more": "Read More"
+    },
+    {
+      "username": "nighthawkZero",
+      "title": "Open source as sacred tech practice",
+      "body": "Exploring how open-source dev can feel like spiritual offering \u2014 a practice of contribution and intention.",
+      "category": "RESOURCES",
+      "tags": [
+        "#opensource",
+        "#spirituality",
+        "#tech"
+      ],
+      "posted_ago": "5 days ago",
+      "likes": 88,
+      "comments": 20,
+      "read_more": "Read More"
+    },
+    {
+      "username": "synaptek",
+      "title": "How I use TouchDesigner in my pen-testing demos",
+      "body": "TouchDesigner is usually seen as a VJ tool, but I\u2019ve been fusing it with Kali Linux and OBS. Here\u2019s how it plays out in demos.",
+      "category": "SHOWCASE",
+      "tags": [
+        "#touchdesigner",
+        "#demos",
+        "#pentesting"
+      ],
+      "posted_ago": "5 days ago",
+      "likes": 33,
+      "comments": 5,
+      "read_more": "Read More"
+    }
+  ]
+}
