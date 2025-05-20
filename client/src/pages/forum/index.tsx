@@ -101,27 +101,37 @@ export default function ForumPage() {
             
             {/* Active Filters Display */}
             {(searchTerm || categoryFilter) && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 mt-3">
                 <span className="text-sm text-gray-400">Active filters:</span>
                 <div className="flex flex-wrap gap-2">
                   {searchTerm && (
                     <Badge 
-                      className="flex items-center gap-1 bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20"
+                      className="forum-tag flex items-center gap-1 cursor-pointer"
                       onClick={() => setSearchTerm("")}
                     >
                       Search: {searchTerm}
-                      <span className="cursor-pointer">×</span>
+                      <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
                   {categoryFilter && (
                     <Badge 
-                      className="flex items-center gap-1 bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20"
+                      className="forum-tag flex items-center gap-1 cursor-pointer"
                       onClick={() => setCategoryFilter("")}
                     >
                       Category: {categoryFilter}
-                      <span className="cursor-pointer">×</span>
+                      <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
+                  <Badge 
+                    className="forum-tag bg-[#1e293b]/80 text-[#ff5c5c] border border-[#1e293b] flex items-center gap-1 hover:border-[#ff5c5c]/20 cursor-pointer"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setCategoryFilter("");
+                    }}
+                  >
+                    Clear All
+                    <span className="ml-1 text-xs">×</span>
+                  </Badge>
                 </div>
               </div>
             )}

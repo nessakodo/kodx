@@ -1,0 +1,110 @@
+🔔 Notifications System
+✅ Mark all as read should also remove the blue unread badge.
+
+✅ Display notifications in right-side panel with pagination (beyond 4 shown under "Recent Activity").
+
+🚫 Restrict notification interactions to signed-in users only.
+
+🧠 Lab & Project Experience
+🔄 Start Lab button should disappear once lab is in progress.
+
+🗂️ Progress Section:
+
+If user has >4 items, enable pagination.
+
+If <4 in progress, fill in with recommended Labs/Projects to total 4.
+
+✅ Todos UI: Normalize all buttons — fix oblong/uneven styles.
+
+📝 Publish Devlog:
+
+Seed devlog with selected notes from a completed Lab or Project.
+
+Allow tag selection, project/lab linkage, and title customization.
+
+Same logic applies for Labs and Projects.
+
+👤 User Profile & Settings
+🎨 Enable full CRUD for:
+
+Avatar (starts as "newbie" by default, user-editable).
+
+Username.
+
+🛑 Remove avatar ring from user display.
+
+🔧 All avatar/profile changes editable via Settings.
+
+📊 Forum UX & Backend
+🧵 Forum posts:
+
+Enable likes, comments, saves, and interaction tracking.
+
+Sync saved posts into dashboard view.
+
+🧱 Build backend post routes to allow reading individual post pages and interactivity.
+
+🔍 Forum Filters:
+
+Fix shifting bug when selecting filters.
+
+Fix same bug when opening badge info blurbs.
+
+📰 Side Panel Enhancements
+🌟 Featured Post: Shows one post with “Read More” → opens full post view.
+
+📡 KODEX Signal: Email signup form:
+
+Responsive to valid emails.
+
+Confirmation message after sign-up.
+
+🏷️ Featured Tags: Interactive; clicking a tag filters the forum by it.
+
+🏅 Badge & Level System
+🎖️ Show grayed-out badges for ones not yet earned but available in user’s level.
+
+e.g. "Level 2: 2/5 badges earned."
+
+🚫 No ring around avatars.
+
+✨ Add tooltip or modal on hover/click to show badge criteria.
+
+🚫 Signed-Out User Restrictions
+⛔ Disallow:
+
+Starting Labs/Projects
+
+Liking, commenting, or saving posts
+
+Creating forum posts
+
+✅ Prompt to sign in or sign up when trying to perform restricted actions.
+
+🛠️ Backend & Routing
+🌐 Create all necessary backend routes for:
+
+Posts (GET, POST, PATCH, DELETE)
+
+Notifications (pagination, state)
+
+Avatars + profile updates
+
+Forum interactions
+
+🔐 Gate all interactive content behind auth checks.
+
+✅ Implementation Tips
+Use localStorage/user state to manage in-progress items.
+
+Dashboard widgets should reflect real-time updates from:
+
+Devlogs
+
+Notes
+
+Saved items
+
+XP / Badge progress
+
+Add hooks or triggers on POST /notes, POST /forum-posts to update dashboards live.
