@@ -48,7 +48,7 @@ export function ForumPostDetail() {
   const [commentContent, setCommentContent] = useState("");
 
   // Fetch post details
-  const { data: post, isLoading } = useQuery({
+  const { data: post, isLoading } = useQuery<ForumPost>({
     queryKey: [`/api/forum-posts/${id}`],
     enabled: !!id,
   });
@@ -241,10 +241,8 @@ export function ForumPostDetail() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Link href="/forum">
-        <a className="inline-flex items-center text-[#9ecfff] hover:underline mb-6">
-          <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
-        </a>
+      <Link href="/forum" className="inline-flex items-center text-[#9ecfff] hover:underline mb-6">
+        <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
       </Link>
       
       {/* Main Post */}

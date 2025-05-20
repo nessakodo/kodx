@@ -1,432 +1,442 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Link } from "wouter";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { Link, useLocation } from "wouter";
-import { ArrowLeftIcon, SaveIcon, SendIcon, HashIcon, PlusIcon, XIcon } from "lucide-react";
-import { FORUM_CATEGORIES, TRENDING_TAGS } from "@/lib/mockData";
-import { useMutation } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeftIcon, Save, EyeIcon, PenIcon, TagIcon, Plus, X } from "lucide-react";
+import { FORUM_CATEGORIES } from "@/lib/mockData";
 
 export default function CreatePostPage() {
+  const [navigate, setLocation] = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated, user } = useAuth();
-  const [location, navigate] = useLocation();
-  const [activeTab, setActiveTab] = useState("write");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("edit");
+  const [newTag, setNewTag] = useState("");
   
-  // Post state
+  // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState(Object.keys(FORUM_CATEGORIES)[0]);
+  const [category, setCategory] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
-  const [savedAsDraft, setSavedAsDraft] = useState(false);
   
-  // Check if user is authenticated
-  useEffect(() => {
-    if (!isAuthenticated && !savedAsDraft) {
-      toast({
-        title: "Authentication required",
-        description: "You need to be signed in to create a post.",
-        variant: "destructive",
-      });
-      navigate("/forum");
-    }
-  }, [isAuthenticated, navigate, toast, savedAsDraft]);
+  // Auto-save draft
+  const DRAFT_KEY = "forum_post_draft";
   
-  // Load from draft if available
   useEffect(() => {
-    const savedDraft = localStorage.getItem("forum_post_draft");
+    // Load draft on mount
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
     if (savedDraft) {
       try {
         const draft = JSON.parse(savedDraft);
         setTitle(draft.title || "");
         setContent(draft.content || "");
-        setCategory(draft.category || Object.keys(FORUM_CATEGORIES)[0]);
+        setCategory(draft.category || "");
         setTags(draft.tags || []);
-        setSavedAsDraft(true);
-        
-        toast({
-          title: "Draft loaded",
-          description: "Your previous draft has been loaded.",
-        });
       } catch (e) {
-        console.error("Failed to load draft:", e);
+        console.error("Error loading draft:", e);
       }
     }
-  }, [toast]);
+  }, []);
   
-  // Auto-save draft
   useEffect(() => {
-    const autoSaveDraft = () => {
-      if (title || content || tags.length > 0) {
-        const draft = { title, content, category, tags };
-        localStorage.setItem("forum_post_draft", JSON.stringify(draft));
-        setSavedAsDraft(true);
+    // Auto-save draft every 5 seconds if there's content
+    const intervalId = setInterval(() => {
+      if (title || content || category || tags.length > 0) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, content, category, tags }));
       }
-    };
-    
-    // Auto-save every 30 seconds while the user is typing
-    const intervalId = setInterval(autoSaveDraft, 30000);
+    }, 5000);
     
     return () => clearInterval(intervalId);
   }, [title, content, category, tags]);
   
-  // Create post mutation
-  const createPostMutation = useMutation({
-    mutationFn: (data: { title: string; content: string; category: string; tags: string[] }) => 
-      apiRequest("POST", "/api/forum-posts/create", data),
-    onSuccess: (data) => {
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setTitle("");
+    setContent("");
+    setCategory("");
+    setTags([]);
+  };
+  
+  const handleTagAdd = () => {
+    if (!newTag.trim()) return;
+    
+    // Format tag with # if not present
+    let formattedTag = newTag.trim();
+    if (!formattedTag.startsWith('#')) {
+      formattedTag = `#${formattedTag}`;
+    }
+    
+    // Prevent duplicates
+    if (!tags.includes(formattedTag)) {
+      setTags([...tags, formattedTag]);
+    }
+    
+    setNewTag("");
+  };
+  
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title.trim() || !content.trim() || !category) {
+      toast({
+        title: "Missing information",
+        description: "Please fill out all required fields (title, content, and category).",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Create post
+      const response = await apiRequest("POST", "/api/forum-posts", {
+        title,
+        content,
+        category,
+        tags
+      });
+      
+      // Clear draft after successful submission
+      clearDraft();
+      
       toast({
         title: "Post created",
         description: "Your post has been published successfully.",
       });
-      // Clear the draft
-      localStorage.removeItem("forum_post_draft");
-      // Navigate to the new post
-      navigate(`/forum/post/${data.id}`);
-    },
-    onError: () => {
+      
+      // Redirect to post
+      navigate(`/forum/post/${response.id}`);
+    } catch (error) {
+      console.error("Error creating post:", error);
       toast({
         title: "Error",
-        description: "Failed to create post. Please try again.",
+        description: "There was an error creating your post. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
-  });
-  
-  // Handle tag addition
-  const handleAddTag = () => {
-    // Check if tag already exists or if we hit the limit
-    if (tags.length >= 5) {
-      toast({
-        title: "Tag limit reached",
-        description: "You can only add up to 5 tags per post.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    const formattedTag = newTag.trim().toLowerCase();
-    
-    if (!formattedTag) {
-      return;
-    }
-    
-    // Add # if not present
-    const finalTag = formattedTag.startsWith('#') ? formattedTag : `#${formattedTag}`;
-    
-    if (tags.includes(finalTag)) {
-      toast({
-        title: "Duplicate tag",
-        description: "This tag has already been added.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setTags([...tags, finalTag]);
-    setNewTag("");
   };
   
-  // Handle tag removal
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
-  
-  // Handle popular tag selection
-  const handlePopularTagClick = (tag: string) => {
-    const tagWithoutHash = tag.startsWith('#') ? tag.substring(1) : tag;
-    setNewTag(tagWithoutHash);
-  };
-  
-  // Save draft explicitly
-  const saveDraft = () => {
-    const draft = { title, content, category, tags };
-    localStorage.setItem("forum_post_draft", JSON.stringify(draft));
-    setSavedAsDraft(true);
-    
-    toast({
-      title: "Draft saved",
-      description: "Your post draft has been saved. You can continue editing later.",
-    });
-  };
-  
-  // Submit post
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!title.trim()) {
-      toast({
-        title: "Title required",
-        description: "Please enter a title for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!content.trim()) {
-      toast({
-        title: "Content required",
-        description: "Please enter content for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!category) {
-      toast({
-        title: "Category required",
-        description: "Please select a category for your post.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    createPostMutation.mutate({ title, content, category, tags });
-  };
-  
-  // Get categoriesObj for styling
   const categoriesObj = FORUM_CATEGORIES as Record<string, { label: string; color: string; route: string }>;
+  const categories = Object.keys(categoriesObj);
+  
+  // Get category styling for preview
+  const getCategoryStyle = (cat: string) => {
+    if (!cat || !categoriesObj[cat]) return {
+      color: "#9ca3af",
+      bg: "bg-gray-500/10",
+      border: "border-gray-500/20"
+    };
+    
+    return {
+      color: categoriesObj[cat].color,
+      bg: `bg-[${categoriesObj[cat].color}]/10`,
+      border: `border-[${categoriesObj[cat].color}]/30`
+    };
+  };
   
   return (
     <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">
       <Header />
       <main className="container mx-auto px-4 py-12">
-        <Link href="/forum">
-          <div className="inline-flex items-center text-[#9ecfff] hover:underline mb-6 cursor-pointer">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
-          </div>
+        <Link href="/forum" className="inline-flex items-center text-[#9ecfff] hover:underline mb-6">
+          <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Forum
         </Link>
         
-        <h1 className="font-orbitron text-3xl tracking-wider mb-6">
-          <span className="bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent">Create</span> Post
-        </h1>
-        
-        <GlassmorphicCard className="mb-8">
-          <Tabs defaultValue="write" value={activeTab} onValueChange={setActiveTab}>
-            <div className="px-6 pt-6">
-              <TabsList className="grid grid-cols-2 mb-6">
-                <TabsTrigger value="write">Write</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
-            </div>
-            
-            <Separator className="bg-[#9ecfff]/10 mb-6" />
-            
-            <TabsContent value="write" className="px-6 pb-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="Enter a descriptive title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                  />
-                </div>
-                
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="content">Content</Label>
-                    <span className="text-xs text-gray-500">
-                      Markdown supported
-                    </span>
-                  </div>
-                  <Textarea
-                    id="content"
-                    placeholder="Share your knowledge, experience, or ask a question..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[300px] bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                  />
-                </div>
-                
-                <div>
-                  <Label className="mb-2 block">Category</Label>
-                  <RadioGroup 
-                    value={category} 
-                    onValueChange={setCategory}
-                    className="space-y-3"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {Object.entries(categoriesObj).map(([key, { label, color }]) => (
-                        <div key={key} className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            value={key} 
-                            id={`category-${key}`} 
-                            className="border-[#9ecfff]/30 text-[#9ecfff]"
-                          />
-                          <Label 
-                            htmlFor={`category-${key}`}
-                            className="flex items-center cursor-pointer"
-                          >
-                            <div 
-                              className="w-3 h-3 rounded-full mr-2" 
-                              style={{ backgroundColor: color }}
-                            />
-                            {label}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div>
-                  <Label className="mb-2 block">Tags (up to 5)</Label>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {tags.map(tag => (
-                      <Badge 
-                        key={tag} 
-                        className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 flex items-center gap-1"
-                      >
-                        {tag}
-                        <XIcon
-                          className="h-3 w-3 cursor-pointer hover:text-[#ff5c5c]"
-                          onClick={() => handleRemoveTag(tag)}
-                        />
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <div className="relative flex-grow">
-                      <HashIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                      <Input
-                        placeholder="Add a tag..."
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddTag();
-                          }
-                        }}
-                        className="pl-10 bg-[#1e2535]/50 border-[#9ecfff]/20 focus-visible:ring-[#9ecfff]/50"
-                      />
-                    </div>
-                    <Button 
-                      type="button" 
-                      onClick={handleAddTag}
-                      variant="outline"
-                      className="border-[#9ecfff]/30 hover:bg-[#9ecfff]/10"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <Label className="text-xs text-gray-500 mb-2 block">Popular tags</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {TRENDING_TAGS.slice(0, 6).map(tag => (
-                        <Badge 
-                          key={tag.label} 
-                          className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 cursor-pointer hover:bg-[#1e293b]"
-                          onClick={() => handlePopularTagClick(tag.label)}
-                        >
-                          {tag.label}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="border-[#9ecfff]/30 hover:bg-[#9ecfff]/10 flex-1"
-                    onClick={saveDraft}
-                  >
-                    <SaveIcon className="mr-2 h-4 w-4" /> Save Draft
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30 flex-1"
-                    disabled={createPostMutation.isPending}
-                  >
-                    <SendIcon className="mr-2 h-4 w-4" /> 
-                    {createPostMutation.isPending ? "Publishing..." : "Publish Post"}
-                  </Button>
-                </div>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="preview" className="px-6 pb-6">
-              {!title && !content ? (
-                <div className="text-center py-12">
-                  <h3 className="text-xl font-orbitron mb-4">Nothing to Preview</h3>
-                  <p className="text-gray-500">
-                    Add some content in the Write tab to see a preview.
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <div className="flex items-center mb-4">
-                    {category && (
-                      <Badge
-                        className="text-xs uppercase tracking-wider mr-2"
-                        style={{
-                          backgroundColor: `${categoriesObj[category].color}20`,
-                          color: categoriesObj[category].color,
-                          borderColor: `${categoriesObj[category].color}40`
-                        }}
-                      >
-                        {categoriesObj[category].label}
-                      </Badge>
-                    )}
-                    
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {tags.map(tag => (
-                          <Badge 
-                            key={tag} 
-                            className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 text-xs"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <h1 className="text-2xl font-orbitron mb-4">
-                    {title || "Untitled Post"}
-                  </h1>
-                  
-                  <div className="prose prose-invert prose-sm max-w-none">
-                    {content.split('\n').map((paragraph, i) => (
-                      <p key={i}>{paragraph}</p>
-                    ))}
-                  </div>
-                </div>
-              )}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          <div className="md:col-span-2 lg:col-span-3 space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="font-orbitron text-2xl tracking-wider">
+                <span className="bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">Create</span> Post
+              </h1>
               
-              <div className="mt-6 pt-4 border-t border-[#9ecfff]/10">
-                <Button 
-                  type="button"
-                  onClick={() => setActiveTab("write")}
+              <div className="flex items-center gap-2">
+                <Button
                   variant="outline"
-                  className="border-[#9ecfff]/30 hover:bg-[#9ecfff]/10"
+                  size="sm"
+                  onClick={clearDraft}
+                  className="text-gray-400 border-gray-700"
                 >
-                  Back to Editing
+                  Clear Draft
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, content, category, tags }));
+                    toast({
+                      title: "Draft saved",
+                      description: "Your post draft has been saved locally.",
+                    });
+                  }}
+                  className="text-[#9ecfff] border-[#9ecfff]/30"
+                >
+                  <Save className="h-4 w-4 mr-2" /> Save Draft
                 </Button>
               </div>
-            </TabsContent>
-          </Tabs>
-        </GlassmorphicCard>
+            </div>
+            
+            <GlassmorphicCard>
+              <Tabs defaultValue="edit" value={activeTab} onValueChange={setActiveTab}>
+                <div className="p-6 border-b border-[#9ecfff]/10">
+                  <TabsList className="grid w-full md:w-60 grid-cols-2 bg-[#1e2535]/80">
+                    <TabsTrigger value="edit" className="data-[state=active]:bg-[#1e293b]">
+                      <PenIcon className="h-4 w-4 mr-2" /> Edit
+                    </TabsTrigger>
+                    <TabsTrigger value="preview" className="data-[state=active]:bg-[#1e293b]">
+                      <EyeIcon className="h-4 w-4 mr-2" /> Preview
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                
+                <TabsContent value="edit" className="p-6">
+                  <form onSubmit={handleSubmit}>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="title" className="block text-sm font-medium mb-2">
+                          Title <span className="text-[#ff5c5c]">*</span>
+                        </label>
+                        <Input
+                          id="title"
+                          placeholder="Enter post title"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="content" className="block text-sm font-medium mb-2">
+                          Content <span className="text-[#ff5c5c]">*</span>
+                        </label>
+                        <Textarea
+                          id="content"
+                          placeholder="Share your thoughts, ask questions, or show your work..."
+                          value={content}
+                          onChange={(e) => setContent(e.target.value)}
+                          className="min-h-[200px] bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="category" className="block text-sm font-medium mb-2">
+                          Category <span className="text-[#ff5c5c]">*</span>
+                        </label>
+                        <Select value={category} onValueChange={setCategory}>
+                          <SelectTrigger id="category" className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#1e2535] border-[#1e2535]">
+                            {categories.map((cat) => {
+                              const categoryData = categoriesObj[cat];
+                              return (
+                                <SelectItem 
+                                  key={cat} 
+                                  value={cat}
+                                  className="flex items-center"
+                                >
+                                  <div className="flex items-center">
+                                    <div 
+                                      className="w-2 h-2 rounded-full mr-2" 
+                                      style={{ backgroundColor: categoryData.color }}
+                                    />
+                                    {categoryData.label}
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Tags
+                        </label>
+                        <div className="flex gap-2 mb-2 flex-wrap">
+                          {tags.map((tag) => (
+                            <Badge 
+                              key={tag}
+                              className="bg-[#1e293b]/70 text-white border border-[#9ecfff]/20 flex items-center gap-1 cursor-pointer"
+                              onClick={() => removeTag(tag)}
+                            >
+                              {tag}
+                              <X className="h-3 w-3 ml-1" />
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add tag (e.g. #javascript)"
+                            value={newTag}
+                            onChange={(e) => setNewTag(e.target.value)}
+                            className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleTagAdd();
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            onClick={handleTagAdd}
+                            className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-4 mt-8">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => navigate("/forum")}
+                        className="border-gray-700"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit"
+                        className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Publishing..." : "Publish Post"}
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+                
+                <TabsContent value="preview" className="p-6">
+                  {!title && !content ? (
+                    <div className="text-center py-8">
+                      <h3 className="text-xl font-orbitron mb-2">Nothing to Preview</h3>
+                      <p className="text-gray-500">Add some content in the Edit tab to see a preview.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex justify-between items-start gap-4 mb-6">
+                        <div className="flex items-center">
+                          <div className="font-medium flex items-center">
+                            <span className="ml-2 text-xs py-0.5 px-1.5 bg-[#5cdc96]/20 text-[#5cdc96] rounded">
+                              Preview Mode
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {category && (
+                          <Badge 
+                            className="text-xs uppercase tracking-wider px-2 py-1 rounded border"
+                            style={{
+                              backgroundColor: `${getCategoryStyle(category).color}20`,
+                              color: getCategoryStyle(category).color,
+                              borderColor: `${getCategoryStyle(category).color}40`
+                            }}
+                          >
+                            {categoriesObj[category]?.label || category}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <h1 className="text-2xl md:text-3xl font-orbitron mb-6">
+                        {title || "Untitled Post"}
+                      </h1>
+                      <div className="text-gray-300 mb-8 whitespace-pre-line">
+                        {content || "No content yet."}
+                      </div>
+                      
+                      {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-6">
+                          {tags.map(tag => (
+                            <Badge 
+                              key={tag}
+                              className="bg-[#1e293b]/70 hover:bg-[#1e293b] text-white border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 cursor-pointer text-xs"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div className="border-t border-[#9ecfff]/10 pt-4 mt-6">
+                        <Button
+                          onClick={() => setActiveTab("edit")}
+                          className="bg-gradient-to-r from-[#9ecfff]/20 to-[#88c9b7]/20 border border-[#88c9b7]/30 hover:from-[#9ecfff]/30 hover:to-[#88c9b7]/30"
+                        >
+                          <PenIcon className="h-4 w-4 mr-2" /> Continue Editing
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </GlassmorphicCard>
+          </div>
+          
+          <div className="md:col-span-1">
+            <div className="space-y-6">
+              <GlassmorphicCard className="p-6">
+                <h3 className="text-xl font-orbitron mb-4">Posting Guidelines</h3>
+                <div className="space-y-4 text-gray-300">
+                  <div>
+                    <h4 className="font-medium text-[#9ecfff] mb-1">Choose the Right Category</h4>
+                    <p className="text-sm text-gray-500">Select the most appropriate category for your post to reach the right audience.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-[#9ecfff] mb-1">Use Descriptive Titles</h4>
+                    <p className="text-sm text-gray-500">Clear, concise titles help others understand your post's content at a glance.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-[#9ecfff] mb-1">Add Relevant Tags</h4>
+                    <p className="text-sm text-gray-500">Tags make your post more discoverable and help categorize related content.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-[#9ecfff] mb-1">Be Respectful</h4>
+                    <p className="text-sm text-gray-500">Maintain a supportive and constructive tone in your posts and comments.</p>
+                  </div>
+                </div>
+              </GlassmorphicCard>
+              
+              <GlassmorphicCard className="p-6">
+                <h3 className="text-xl font-orbitron mb-4">Formatting Tips</h3>
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-500">The forum supports basic text formatting:</p>
+                  <div className="space-y-1">
+                    <div className="flex items-start gap-2">
+                      <code className="bg-[#1e293b] px-1 py-0.5 rounded text-gray-300">**bold**</code>
+                      <span className="text-gray-500">for <strong>bold text</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <code className="bg-[#1e293b] px-1 py-0.5 rounded text-gray-300">*italic*</code>
+                      <span className="text-gray-500">for <em>italic text</em></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <code className="bg-[#1e293b] px-1 py-0.5 rounded text-gray-300">`code`</code>
+                      <span className="text-gray-500">for <code className="bg-[#1e293b] px-1 rounded">inline code</code></span>
+                    </div>
+                  </div>
+                </div>
+              </GlassmorphicCard>
+            </div>
+          </div>
+        </div>
       </main>
       <Footer />
     </div>

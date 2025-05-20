@@ -152,17 +152,17 @@ export default function ForumPage() {
                       <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
-                  {categoryFilter && (
+                  {categoryFilter && categoryFilter !== "all" && categoriesObj[categoryFilter] && (
                     <Badge 
                       style={{
-                        backgroundColor: `${categoriesObj[categoryFilter].color}20`,
-                        color: categoriesObj[categoryFilter].color,
-                        borderColor: `${categoriesObj[categoryFilter].color}40`
+                        backgroundColor: `${categoriesObj[categoryFilter]?.color || "#9ca3af"}20`,
+                        color: categoriesObj[categoryFilter]?.color || "#9ca3af",
+                        borderColor: `${categoriesObj[categoryFilter]?.color || "#9ca3af"}40`
                       }}
                       className="flex items-center gap-1 cursor-pointer border"
                       onClick={() => setCategoryFilter("")}
                     >
-                      Category: {categoriesObj[categoryFilter].label}
+                      Category: {categoriesObj[categoryFilter]?.label || categoryFilter}
                       <span className="ml-1 text-xs">×</span>
                     </Badge>
                   )}
