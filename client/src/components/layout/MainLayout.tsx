@@ -1,20 +1,19 @@
-import React, { ReactNode } from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import React from 'react';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 interface MainLayoutProps {
-  children: ReactNode;
-  showFooter?: boolean;
+  children: React.ReactNode;
 }
 
-export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#0c1527] to-[#101929]">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#0c1527] to-[#1a202c]">
       <Header />
       <main className="flex-grow">
         {children}
       </main>
-      {showFooter && <Footer />}
+      <Footer />
     </div>
   );
 }
