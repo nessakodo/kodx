@@ -1,0 +1,153 @@
+ Implement the full logic and interface to support Projects on KODΞX.WORLD. Projects are interactive build experiences that include video walkthroughs, GitHub fork links, task checklists, note-taking, and devlog publishing upon completion.
+
+Key Features to Build:
+
+📁 Project Markdown Rendering
+
+Route: /projects/:id
+
+Load project data from project-data.json or Supabase (title, video, repoUrl, badgeId, tasks[], timestamps[])
+
+Load corresponding Markdown file (/content/projects/:id.md) for overview section
+
+Render dynamic metadata at the top: title, XP, level, estimated time, tags
+
+🎥 YouTube Walkthrough + Timestamps
+
+Embed YouTube video (dynamic from project metadata)
+
+Display clickable timestamps next to or below the video:
+→ Clicking scrolls video to the correct time
+
+✅ Tasks Checklist
+
+Render interactive checklist from tasks[] array
+
+Store task completion progress locally (or in Supabase userProjectProgress table)
+
+Mark project as "Completed" when all tasks are checked
+
+📝 Notes Section
+
+Below checklist, include a Notes textarea
+
+Auto-save or save-on-click
+
+Notes tied to userId + projectId in DB
+
+On completion: aggregate notes + add prompt to "Publish Devlog"
+
+📣 Completion State
+
+When tasks are 100% complete:
+→ Show congratulatory message
+→ Display XP and badge earned
+→ Offer: “Post your devlog to the forum?”
+
+Clicking generates a prefilled forum post draft using their notes
+
+🧪 Devlog Creation
+
+Route: /forum/new-post?type=devlog&source=project&projectId={id}
+
+Prefill:
+
+Title: “Devlog: [Project Title]”
+
+Content: Insert aggregated notes from Notes section
+
+Tags: project, devlog, [project-specific tag]
+
+🔗 GitHub Fork Button
+
+Display a “Fork Project on GitHub” button
+→ Uses the repo_url in project metadata
+→ Link should open in new tab
+→ Style: consistent with other CTA buttons
+
+🛡 Auth Gating
+
+Only logged-in users can:
+
+Check tasks
+
+Save notes
+
+Complete project
+
+Post to forum
+
+Guests can read markdown, preview video, see tasks (disabled), and view overview
+
+📘 README Template for Each Project
+
+For each project in /content/projects/:id.md, use the following format:
+
+title: Build Your Own Password Manager
+level: Beginner
+xp: 40
+repo_url: https://github.com/nessakodo/password-manager-starter
+video_url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+Build Your Own Password Manager
+Create a local password manager app using JavaScript, secure storage patterns, and basic UI with encryption.
+
+🛠 What You'll Build
+Password entry interface
+
+Encrypted storage using localStorage or IndexedDB
+
+Clipboard copy, visibility toggle
+
+Save/load/delete logic
+
+🎥 Video Walkthrough
+00:00 – Project Intro
+
+01:25 – Setting up HTML/CSS
+
+05:40 – JavaScript encryption logic
+
+12:10 – UI hooks and button interactions
+
+18:45 – Finishing touches
+
+✅ Tasks
+ Set up base project with HTML + CSS
+
+ Add form inputs for account/password
+
+ Implement encryption logic
+
+ Store/retrieve securely
+
+ Style and finalize UI
+
+ Test and deploy to GitHub Pages
+
+🔗 Project Starter Repo
+→ Fork this: https://github.com/nessakodo/password-manager-starter
+
+📝 Take Notes Below
+Use the notes section below to capture learnings, questions, or bugs as you go. These will be saved automatically and shown again upon completion.
+
+✅ When project is complete:
+Display:
+
+Congratulations banner
+
+XP earned
+
+Badge unlocked (if applicable)
+
+CTA: “Would you like to post your devlog to the forum?”
+
+Clicking the CTA:
+→ Opens pre-filled devlog post from their notes.
+
+💬 Forum Devlog Format:
+
+Title: Devlog – Building My Own Password Manager
+Body: [insert user notes]
+Tags: devlog, password-manager, beginner
+
