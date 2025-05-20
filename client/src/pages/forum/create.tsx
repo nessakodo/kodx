@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeftIcon, Save, EyeIcon, PenIcon, TagIcon, Plus, X } from "lucide-react";
+import { ArrowLeftIcon, Save, EyeIcon, PenIcon, TagIcon, Plus, X, InfoIcon } from "lucide-react";
 import { FORUM_CATEGORIES } from "@/lib/mockData";
 
 export default function CreatePostPage() {
@@ -109,6 +109,8 @@ export default function CreatePostPage() {
         tags
       });
       
+      const newPost = await response.json();
+      
       // Clear draft after successful submission
       clearDraft();
       
@@ -117,8 +119,8 @@ export default function CreatePostPage() {
         description: "Your post has been published successfully.",
       });
       
-      // Redirect to post - for now, just go back to the forum
-      setLocation(`/forum`);
+      // Redirect to the newly created post
+      setLocation(`/forum/post/${response.id}`);
     } catch (error) {
       console.error("Error creating post:", error);
       toast({
@@ -229,8 +231,19 @@ export default function CreatePostPage() {
                           placeholder="Share your thoughts, ask questions, or show your work..."
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
-                          className="min-h-[200px] bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50"
+                          className="min-h-[200px] bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50 font-mono"
                         />
+                        <div className="mt-2 text-xs text-gray-400 flex items-start gap-2">
+                          <InfoIcon className="h-3.5 w-3.5 mt-0.5 text-[#9ecfff]" />
+                          <div>
+                            Markdown is supported. Use <code className="bg-[#1e2535] px-1 py-0.5 rounded">**bold**</code>, 
+                            <code className="bg-[#1e2535] px-1 py-0.5 rounded">*italic*</code>, 
+                            <code className="bg-[#1e2535] px-1 py-0.5 rounded"># Heading</code>,
+                            <code className="bg-[#1e2535] px-1 py-0.5 rounded">[link](url)</code>, 
+                            <code className="bg-[#1e2535] px-1 py-0.5 rounded">![image](url)</code>, 
+                            <code className="bg-[#1e2535] px-1 py-0.5 rounded">```code```</code>
+                          </div>
+                        </div>
                       </div>
                       
                       <div>
