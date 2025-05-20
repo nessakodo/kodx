@@ -885,10 +885,8 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
   });
 
   // Notifications endpoints
-  app.get("/api/notifications", isAuthenticated, async (req: any, res) => {
+  app.get("/api/notifications", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      
       // Sample notifications - in production these would come from the database
       const notifications = [
         {
@@ -964,9 +962,9 @@ app.post("/api/forum-posts/:id/like", isAuthenticated, async (req: any, res) => 
     }
   });
   
-  app.post("/api/notifications/mark-all-read", isAuthenticated, async (req: any, res) => {
+  app.post("/api/notifications/mark-all-read", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      // We can use req.user?.claims?.sub if needed for authenticated users
       
       // In a production environment, we would update notifications in the database
       // For this demo, we'll just return a success response

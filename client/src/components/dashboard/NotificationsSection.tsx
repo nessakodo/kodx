@@ -103,8 +103,8 @@ export function NotificationsSection({ limit = 4 }: NotificationsSectionProps) {
   });
   
   // Extract notifications and total count, handle pagination
-  const notifications: Notification[] = data.items || [];
-  const totalCount = data.totalCount || 0;
+  const notifications: Notification[] = (data as any)?.items || [];
+  const totalCount = (data as any)?.totalCount || 0;
   const [page, setPage] = useState(1);
   const hasMore = totalCount > limit;
   
