@@ -18,6 +18,15 @@ export function AuthNav() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Type safety for user object
+  const userData = user as {
+    id: string;
+    username?: string;
+    email?: string;
+    profileImageUrl?: string;
+    role?: string;
+  } | undefined;
 
   const handleLogout = async () => {
     try {
@@ -41,21 +50,21 @@ export function AuthNav() {
     );
   }
 
-  if (isAuthenticated && user) {
+  if (isAuthenticated && userData) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center space-x-2 px-2 py-1.5">
             <Avatar className="h-8 w-8 border border-blue-500/30 bg-blue-950/20">
-              <AvatarImage src={user.profileImageUrl || ""} />
+              <AvatarImage src={userData.profileImageUrl || ""} />
               <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white">
-                {user.username?.charAt(0).toUpperCase() || "U"}
+                {userData.username?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col items-start text-sm">
-              <span className="font-semibold">{user.username}</span>
+              <span className="font-semibold">{userData.username}</span>
               <span className="text-xs text-gray-400">
-                {user.role === "admin" ? "Admin" : "Member"}
+                {userData.role === "admin" ? "Admin" : "Member"}
               </span>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -64,9 +73,9 @@ export function AuthNav() {
         <DropdownMenuContent align="end" className="w-56 bg-black/95 backdrop-blur-lg border-gray-800">
           <div className="flex items-center justify-start p-2">
             <div className="flex flex-col space-y-1 leading-none">
-              <p className="font-medium">{user.username}</p>
+              <p className="font-medium">{userData.username}</p>
               <p className="w-[200px] truncate text-sm text-gray-400">
-                {user.email}
+                {userData.email}
               </p>
             </div>
           </div>
@@ -85,7 +94,7 @@ export function AuthNav() {
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
-          {user.role === "admin" && (
+          {userData.role === "admin" && (
             <DropdownMenuItem 
               className="cursor-pointer"
               onClick={() => setLocation("/admin")}

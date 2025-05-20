@@ -17,66 +17,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes - Development mode endpoints for testing
+  // Auth endpoints are now handled by replitAuth.ts
   
-  // USER account endpoint
-  app.get('/api/auth/user', async (req: any, res) => {
-    // Always return a standard user for development
+  // User profile endpoint - Protected route example
+  app.get('/api/profile', isAuthenticated, async (req: any, res) => {
     try {
-      // Try to get user from database first (to avoid creating duplicates)
-      let user = await storage.getUser("test-user-123");
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
       
       if (!user) {
-        // Create test user if not exists
-        const testUser = {
-          id: "test-user-123",
-          email: "test@example.com",
-          firstName: "Test",
-          lastName: "User",
-          username: "testuser",
-          profileImageUrl: "https://ui-avatars.com/api/?name=Test+User",
-          role: "user",
-          totalXp: 1250,
-        };
-        
-        user = await storage.upsertUser(testUser);
-        console.log("Created test user:", user);
+        return res.status(404).json({ message: "User not found" });
       }
       
-      return res.json(user);
+      // Remove sensitive data
+      const { password, ...safeUserData } = user;
+      return res.json(safeUserData);
     } catch (error) {
-      console.error("Error in auth:", error);
-      return res.status(500).json({ message: "Auth error" });
-    }
-  });
-  
-  // ADMIN account endpoint 
-  app.get('/api/auth/admin', async (req: any, res) => {
-    try {
-      // Try to get admin user from database first
-      let adminUser = await storage.getUser("admin-user-456");
-      
-      if (!adminUser) {
-        // Create admin user if not exists
-        const testAdminUser = {
-          id: "admin-user-456",
-          email: "admin@example.com",
-          firstName: "Admin",
-          lastName: "User",
-          username: "adminuser",
-          profileImageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=5cdc96&color=fff",
-          role: "admin",
-          totalXp: 5000,
-        };
-        
-        adminUser = await storage.upsertUser(testAdminUser);
-        console.log("Created admin user:", adminUser);
-      }
-      
-      return res.json(adminUser);
-    } catch (error) {
-      console.error("Error in admin auth:", error);
-      return res.status(500).json({ message: "Auth error" });
+      console.error("Error fetching profile:", error);
+      return res.status(500).json({ message: "Failed to fetch profile" });
     }
   });
 

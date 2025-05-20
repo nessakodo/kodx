@@ -61,8 +61,8 @@ export function Header() {
     setMobileMenuOpen(false);
   }, [currentLocation]);
   
-  // Get user level - would come from the API in a real app
-  const userLevel = user ? calculateLevel(user.totalXp || 0) : 0;
+  // Get user level - calculate based on user XP
+  const userLevel = user ? calculateLevel(user.totalXp as number || 0) : 0;
   
   const navLinks = [
     { text: "Home", href: "/" },
@@ -243,27 +243,22 @@ export function Header() {
             ) : (
               // Login and Signup Buttons for non-authenticated users
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
-                  onClick={() => setAuthModalOpen(true)}
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  variant="default" 
-                  className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
-                  onClick={() => setAuthModalOpen(true)}
-                >
-                  Sign Up
-                </Button>
-                
-                {/* Auth Modal for login/signup */}
-                <AuthModal 
-                  isOpen={authModalOpen}
-                  onClose={() => setAuthModalOpen(false)}
-                  initialMode="test-accounts"
-                />
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button 
+                    variant="default" 
+                    className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
               </div>
             )}
             
