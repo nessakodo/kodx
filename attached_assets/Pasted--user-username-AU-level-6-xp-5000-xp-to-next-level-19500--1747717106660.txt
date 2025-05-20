@@ -1,0 +1,83 @@
+{
+  "user": {
+    "username": "AU",
+    "level": 6,
+    "xp": 5000,
+    "xp_to_next_level": 19500
+  },
+  "progress": {
+    "labs": [
+      {
+        "title": "Quantum Computing Basics",
+        "tasks_completed": 3,
+        "total_tasks": 5,
+        "xp_earned": 300,
+        "xp_total": 500,
+        "status": "Beginner"
+      }
+    ],
+    "projects": []
+  },
+  "recent_activity": [
+    {
+      "text": "You earned the Beginner's Mind badge for completing your first lab.",
+      "timestamp": "2 days ago"
+    },
+    {
+      "text": "You completed 2/5 tasks in Quantum Computing Basics.",
+      "timestamp": "3 days ago"
+    },
+    {
+      "text": "You started the Mindful Meditation App project.",
+      "timestamp": "5 days ago"
+    }
+  ],
+  "badges": {
+    "earned": [
+      {
+        "name": "Beginner's Mind",
+        "description": "Awarded for completing your first lab.",
+        "earned_on": "2025-05-17"
+      },
+      {
+        "name": "Builder",
+        "description": "Started your first project.",
+        "earned_on": null
+      }
+    ],
+    "locked": [
+      {
+        "name": "Cyber Scholar",
+        "description": "Complete 5 Labs to earn this badge."
+      },
+      {
+        "name": "Community Contributor",
+        "description": "Comment on 10 different posts to earn this badge."
+      },
+      {
+        "name": "Insight Sharer",
+        "description": "Write 3 showcase posts to unlock this badge."
+      },
+      {
+        "name": "Deep Diver",
+        "description": "Achieve 100% on an advanced Lab."
+      },
+      {
+        "name": "Forum Starter",
+        "description": "Create 5 forum discussion threads."
+      },
+      {
+        "name": "Streak Seeker",
+        "description": "Log in and interact 7 days in a row."
+      },
+      {
+        "name": "Creative Hacker",
+        "description": "Submit a project using both creative tech and cybersecurity skills."
+      },
+      {
+        "name": "Devlog Maven",
+        "description": "Complete 10 devlogs across any projects or labs."
+      }
+    ]
+  }
+}

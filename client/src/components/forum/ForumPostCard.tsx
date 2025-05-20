@@ -32,25 +32,35 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
   // Format category badge style based on category type
   const getCategoryStyle = (category: string) => {
     switch (category.toLowerCase()) {
+      case 'discussion':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#9ecfff]/30",
+          text: "text-[#9ecfff]"
+        };
+      case 'resources':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#88c9b7]/30",
+          text: "text-[#88c9b7]"
+        };
+      case 'showcase':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#b166ff]/30",
+          text: "text-[#b166ff]"
+        };
       case 'announcement':
         return {
-          gradient: "from-[#88c9b7]/10 to-[#88c9b7]/10",
-          border: "border-[#88c9b7]/20"
-        };
-      case 'question':
-        return {
-          gradient: "from-[#9ecfff]/10 to-[#9ecfff]/10",
-          border: "border-[#9ecfff]/20"
-        };
-      case 'devlog':
-        return {
-          gradient: "from-[#b166ff]/10 to-[#9ecfff]/10",
-          border: "border-[#b166ff]/20"
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#d4af37]/30",
+          text: "text-[#d4af37]"
         };
       default:
         return {
-          gradient: "from-gray-500/10 to-gray-500/10",
-          border: "border-gray-500/20"
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-gray-500/30",
+          text: "text-gray-400"
         };
     }
   };
@@ -86,7 +96,7 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
             </div>
           </div>
           <Badge 
-            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border}`}
+            className={`text-xs uppercase tracking-wider bg-gradient-to-r ${categoryStyle.gradient} px-2 py-1 rounded border ${categoryStyle.border} ${categoryStyle.text}`}
           >
             {post.category}
           </Badge>

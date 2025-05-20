@@ -1,0 +1,64 @@
+{
+  "posts": [
+    {
+      "id": "post001",
+      "author": "zenDeveloper",
+      "timestamp": "2025-05-15T12:00:00Z",
+      "title": "Balancing tech productivity and mindfulness",
+      "body": "I've been struggling with maintaining mindfulness while coding for long hours. What techniques have worked for you?",
+      "category": "discussion",
+      "likes": 24,
+      "commentsCount": 12,
+      "comments": [
+        {
+          "id": "comment001",
+          "author": "mindfulCoder",
+          "timestamp": "2025-05-16T09:00:00Z",
+          "text": "I use Pomodoro with breathwork during breaks. Helps me reset."
+        },
+        {
+          "id": "comment002",
+          "author": "flowStateDev",
+          "timestamp": "2025-05-16T10:30:00Z",
+          "text": "Ambient soundscapes and journaling between sprints work wonders for me."
+        }
+      ]
+    },
+    {
+      "id": "post002",
+      "author": "ethicalCoder",
+      "timestamp": "2025-05-14T15:00:00Z",
+      "title": "Resources for ethical AI development",
+      "body": "I'm starting a project on AI ethics and looking for resources. Any recommendations?",
+      "category": "resources",
+      "likes": 18,
+      "commentsCount": 8,
+      "comments": [
+        {
+          "id": "comment003",
+          "author": "AIphilosopher",
+          "timestamp": "2025-05-15T08:00:00Z",
+          "text": "Check out 'Ethics of Artificial Intelligence and Robotics' from the Stanford Encyclopedia of Philosophy."
+        }
+      ]
+    },
+    {
+      "id": "post003",
+      "author": "quantumLeap",
+      "timestamp": "2025-05-13T08:00:00Z",
+      "title": "My experience with quantum computing lab",
+      "body": "Just completed the quantum computing lab and wanted to share some insights...",
+      "category": "showcase",
+      "likes": 32,
+      "commentsCount": 15,
+      "comments": [
+        {
+          "id": "comment004",
+          "author": "qubitMaster",
+          "timestamp": "2025-05-14T11:00:00Z",
+          "text": "Would love to hear about the challenges you faced in superposition calculations!"
+        }
+      ]
+    }
+  ]
+}

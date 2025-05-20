@@ -40,13 +40,49 @@ export default function ForumPage() {
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesCategory = categoryFilter === "" || post.category === categoryFilter;
+    const matchesCategory = categoryFilter === "" || categoryFilter === "all" || post.category === categoryFilter;
     
     return matchesSearch && matchesCategory;
   });
   
   // Get unique categories for filter dropdown
   const categories = Array.from(new Set(allPosts.map((post: any) => post.category)));
+  
+  // Get category badge style
+  const getCategoryStyle = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'discussion':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#9ecfff]/30",
+          text: "text-[#9ecfff]"
+        };
+      case 'resources':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#88c9b7]/30",
+          text: "text-[#88c9b7]"
+        };
+      case 'showcase':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#b166ff]/30",
+          text: "text-[#b166ff]"
+        };
+      case 'announcement':
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-[#d4af37]/30",
+          text: "text-[#d4af37]"
+        };
+      default:
+        return {
+          gradient: "from-[#1e293b] to-[#1e293b]",
+          border: "border-gray-500/30",
+          text: "text-gray-400"
+        };
+    }
+  };
   
   return (
     <div className="min-h-screen bg-kodex-grid bg-gradient-kodex">

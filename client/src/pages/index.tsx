@@ -9,9 +9,8 @@ import { Countdown } from "@/components/home/Countdown";
 
 export default function Home() {
   return (
-    <div className="bg-gradient-kodex bg-kodex-grid min-h-screen">
-      <Header />
-      <main>
+    <>
+      <main className="container mx-auto px-4">
         <Hero />
         <FeaturedModules />
         <UserExperience />
@@ -20,6 +19,6 @@ export default function Home() {
         <Countdown />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }
