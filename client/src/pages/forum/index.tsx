@@ -118,6 +118,88 @@ export default function ForumPage() {
     }
   };
   
+  // Save draft to localStorage
+  const saveDraft = () => {
+    if (!newPost.title.trim() && !newPost.content.trim()) {
+      toast({
+        title: "Empty Draft",
+        description: "Cannot save an empty draft",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const timestamp = new Date().toISOString();
+    const draft = {
+      id: selectedDraft !== null ? drafts[selectedDraft].id : Date.now(),
+      title: newPost.title,
+      content: newPost.content,
+      category: newPost.category,
+      createdAt: selectedDraft !== null ? drafts[selectedDraft].createdAt : timestamp,
+      updatedAt: timestamp
+    };
+    
+    let updatedDrafts;
+    if (selectedDraft !== null) {
+      // Update existing draft
+      updatedDrafts = [...drafts];
+      updatedDrafts[selectedDraft] = draft;
+    } else {
+      // Add new draft
+      updatedDrafts = [draft, ...drafts];
+    }
+    
+    setDrafts(updatedDrafts);
+    localStorage.setItem('forum_drafts', JSON.stringify(updatedDrafts));
+    
+    toast({
+      title: "Draft Saved",
+      description: "Your draft has been saved successfully",
+    });
+    
+    if (selectedDraft === null) {
+      // Reset form for new draft
+      setNewPost({
+        title: "",
+        content: "",
+        category: "discussion"
+      });
+    }
+    
+    setSelectedDraft(null);
+  };
+  
+  // Load a draft for editing
+  const loadDraft = (index: number) => {
+    const draft = drafts[index];
+    setNewPost({
+      title: draft.title,
+      content: draft.content,
+      category: draft.category
+    });
+    setSelectedDraft(index);
+    setIsDraftsModalOpen(false);
+    setIsCreatePostModalOpen(true);
+  };
+  
+  // Delete a draft
+  const deleteDraft = (index: number) => {
+    const updatedDrafts = drafts.filter((_, i) => i !== index);
+    setDrafts(updatedDrafts);
+    localStorage.setItem('forum_drafts', JSON.stringify(updatedDrafts));
+    
+    if (selectedDraft === index) {
+      setSelectedDraft(null);
+    } else if (selectedDraft !== null && selectedDraft > index) {
+      setSelectedDraft(selectedDraft - 1);
+    }
+    
+    toast({
+      title: "Draft Deleted",
+      description: "Your draft has been deleted",
+    });
+  };
+  
   // Handle creating a new forum post
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,6 +237,11 @@ export default function ForumPage() {
       const updatedPosts = [createdPost, ...allPosts];
       queryClient.setQueryData(["/api/forum-posts"], updatedPosts);
       
+      // If this was a draft, remove it from drafts
+      if (selectedDraft !== null) {
+        deleteDraft(selectedDraft);
+      }
+      
       // Reset form and close modal
       setNewPost({
         title: "",
@@ -162,6 +249,7 @@ export default function ForumPage() {
         category: "discussion"
       });
       setIsCreatePostModalOpen(false);
+      setSelectedDraft(null);
       
       toast({
         title: "Post Created",
@@ -215,12 +303,24 @@ export default function ForumPage() {
           </div>
           
           {isAuthenticated && (
-            <Button 
-              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
-              onClick={() => setIsCreatePostModalOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" /> Create Post
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+                onClick={() => setIsCreatePostModalOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" /> Create Post
+              </Button>
+              <Button 
+                className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#b166ff]/20 hover:border-[#b166ff]/40 text-white hover-glow"
+                onClick={() => setIsDraftsModalOpen(true)}
+              >
+                <Bookmark className="h-4 w-4 mr-2" /> My Drafts {drafts.length > 0 && 
+                  <span className="bg-[#b166ff]/30 text-xs font-semibold px-1.5 py-0.5 rounded-full ml-1">
+                    {drafts.length}
+                  </span>
+                }
+              </Button>
+            </div>
           )}
         </div>
         
@@ -345,8 +445,17 @@ export default function ForumPage() {
       {/* Create Post Modal */}
       <KodexModal
         isOpen={isCreatePostModalOpen}
-        onClose={() => setIsCreatePostModalOpen(false)}
-        title="Create New Post"
+        onClose={() => {
+          // Prompt to save draft if there's unsaved content
+          if ((newPost.title.trim() || newPost.content.trim()) && 
+              window.confirm("Save your draft before closing?")) {
+            saveDraft();
+          }
+          setIsCreatePostModalOpen(false);
+          setSelectedDraft(null);
+        }}
+        title={selectedDraft !== null ? "Edit Draft" : "Create New Post"}
+        size="lg"
       >
         <form onSubmit={handleCreatePost} className="space-y-4">
           <div>
@@ -378,33 +487,146 @@ export default function ForumPage() {
           </div>
           
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-300 mb-1">Content</label>
+            <div className="flex justify-between items-center mb-1">
+              <label htmlFor="content" className="block text-sm font-medium text-gray-300">Content</label>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="sm"
+                className="text-xs text-[#9ecfff] hover:text-[#b166ff]"
+                onClick={() => {
+                  // Simulate importing user notes (in a real app, this would fetch from the user's notes)
+                  const userNotes = [
+                    { id: 1, title: "Cybersecurity Best Practices", content: "1. Use strong, unique passwords\n2. Enable two-factor authentication\n3. Keep software updated\n4. Be cautious of phishing attempts" },
+                    { id: 2, title: "Privacy Tools Research", content: "Recommended privacy tools:\n- Signal for messaging\n- Brave for web browsing\n- Proton Mail for email\n- Bitwarden for password management" }
+                  ];
+                  
+                  // In a real implementation, show a modal to select which notes to import
+                  // For this demo, just import the first note
+                  const selectedNote = userNotes[0];
+                  
+                  setNewPost(prev => ({
+                    ...prev,
+                    content: prev.content ? 
+                      `${prev.content}\n\n--- Imported from my notes: ${selectedNote.title} ---\n\n${selectedNote.content}` :
+                      `--- Imported from my notes: ${selectedNote.title} ---\n\n${selectedNote.content}`
+                  }));
+                  
+                  toast({
+                    title: "Notes Imported",
+                    description: `Added content from "${selectedNote.title}"`,
+                  });
+                }}
+              >
+                Import from My Notes
+              </Button>
+            </div>
             <Textarea
               id="content"
               placeholder="Write your post content here..."
               value={newPost.content}
               onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-              className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50 min-h-[150px]"
+              className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50 min-h-[250px]"
             />
           </div>
           
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-between gap-3 pt-4">
             <Button 
               type="button"
-              variant="outline"
-              onClick={() => setIsCreatePostModalOpen(false)}
-              className="border-[#1e2535] hover:bg-[#1e2535]/50 text-gray-300"
+              onClick={saveDraft}
+              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#b166ff]/20 hover:border-[#b166ff]/40 text-white hover-glow"
             >
-              Cancel
+              {selectedDraft !== null ? "Update Draft" : "Save as Draft"}
             </Button>
-            <Button 
-              type="submit"
-              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
-            >
-              Publish Post
-            </Button>
+            
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreatePostModalOpen(false)}
+                className="border-[#1e2535] hover:bg-[#1e2535]/50 text-gray-300"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+              >
+                Publish Post
+              </Button>
+            </div>
           </div>
         </form>
+      </KodexModal>
+      
+      {/* Drafts Modal */}
+      <KodexModal
+        isOpen={isDraftsModalOpen}
+        onClose={() => setIsDraftsModalOpen(false)}
+        title="My Drafts"
+      >
+        {drafts.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-[#1e2535]/70 mb-4">
+              <Bookmark className="h-8 w-8 text-[#b166ff]" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">No Drafts Found</h3>
+            <p className="text-gray-400 mb-4">You haven't saved any drafts yet.</p>
+            <Button
+              onClick={() => {
+                setIsDraftsModalOpen(false);
+                setIsCreatePostModalOpen(true);
+              }}
+              className="bg-[#1e2535]/70 hover:bg-[#1e2535] border border-[#9ecfff]/20 hover:border-[#9ecfff]/40 text-white hover-glow"
+            >
+              Create New Post
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4 max-h-[60vh] overflow-auto">
+            {drafts.map((draft, index) => (
+              <div key={draft.id} className="bg-[#1e2535]/50 border border-[#1e2535] rounded-md p-4">
+                <div className="flex justify-between mb-2">
+                  <h3 className="text-lg font-medium truncate">{draft.title || "Untitled Draft"}</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-[#9ecfff]"
+                      onClick={() => loadDraft(index)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                        <path d="m15 5 4 4"></path>
+                      </svg>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-[#ff5c5c]"
+                      onClick={() => deleteDraft(index)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                      </svg>
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-gray-400 text-sm mb-2 line-clamp-2">{draft.content || "No content"}</p>
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span className="px-2 py-1 rounded-full bg-[#1e2535] text-[#b166ff] border border-[#b166ff]/20">
+                    {draft.category}
+                  </span>
+                  <span>{new Date(draft.updatedAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </KodexModal>
       
       {/* Pagination */}
