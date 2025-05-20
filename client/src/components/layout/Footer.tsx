@@ -46,40 +46,40 @@ export function Footer() {
           <div>
             <h3 className="font-orbitron text-white mb-4 uppercase">Labs</h3>
             <ul className="space-y-2">
-              <li><Link href="/labs"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Cybersecurity</a></Link></li>
-              <li><Link href="/labs"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Privacy</a></Link></li>
-              <li><Link href="/labs"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Secure Development</a></Link></li>
-              <li><Link href="/labs"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Digital Self-Agency</a></Link></li>
+              <li><Link href="/labs" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Cybersecurity</Link></li>
+              <li><Link href="/labs" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Privacy</Link></li>
+              <li><Link href="/labs" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Secure Development</Link></li>
+              <li><Link href="/labs" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Digital Self-Agency</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-orbitron text-white mb-4 uppercase">Projects</h3>
             <ul className="space-y-2">
-              <li><Link href="/projects"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Cryptography</a></Link></li>
-              <li><Link href="/projects"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Secure Applications</a></Link></li>
-              <li><Link href="/projects"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Privacy Tools</a></Link></li>
-              <li><Link href="/projects"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">CTF Challenges</a></Link></li>
+              <li><Link href="/projects" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Cryptography</Link></li>
+              <li><Link href="/projects" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Secure Applications</Link></li>
+              <li><Link href="/projects" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Privacy Tools</Link></li>
+              <li><Link href="/projects" className="text-gray-500 hover:text-[#9ecfff] transition-colors">CTF Challenges</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-orbitron text-white mb-4 uppercase">Community</h3>
             <ul className="space-y-2">
-              <li><Link href="/forum"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Forum</a></Link></li>
+              <li><Link href="/forum" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Forum</Link></li>
               <li><a href="https://discord.gg/6xyj2xshxY" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Discord</a></li>
-              <li><Link href="/"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Events</a></Link></li>
-              <li><Link href="/dashboard"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Badges</a></Link></li>
+              <li><Link href="/" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Events</Link></li>
+              <li><Link href="/dashboard" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Badges</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-orbitron text-white mb-4 uppercase">About</h3>
             <ul className="space-y-2">
-              <li><Link href="/"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Philosophy</a></Link></li>
-              <li><Link href="/"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Team</a></Link></li>
-              <li><Link href="/"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Manifesto</a></Link></li>
-              <li><Link href="/"><a className="text-gray-500 hover:text-[#9ecfff] transition-colors">Contact</a></Link></li>
+              <li><Link href="/" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Philosophy</Link></li>
+              <li><Link href="/" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Team</Link></li>
+              <li><Link href="/" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Manifesto</Link></li>
+              <li><Link href="/" className="text-gray-500 hover:text-[#9ecfff] transition-colors">Contact</Link></li>
             </ul>
           </div>
         </div>
@@ -90,9 +90,9 @@ export function Footer() {
           </div>
           
           <div className="flex gap-6">
-            <Link href="/"><a className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Privacy Policy</a></Link>
-            <Link href="/"><a className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Terms of Service</a></Link>
-            <Link href="/"><a className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Code of Conduct</a></Link>
+            <Link href="/" className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Privacy Policy</Link>
+            <Link href="/" className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Terms of Service</Link>
+            <Link href="/" className="text-gray-500 text-sm hover:text-[#9ecfff] transition-colors">Code of Conduct</Link>
           </div>
         </div>
       </div>
