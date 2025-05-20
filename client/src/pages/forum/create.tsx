@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { GlassmorphicCard } from "@/components/ui/glassmorphic-card";
@@ -15,7 +15,7 @@ import { ArrowLeftIcon, Save, EyeIcon, PenIcon, TagIcon, Plus, X } from "lucide-
 import { FORUM_CATEGORIES } from "@/lib/mockData";
 
 export default function CreatePostPage() {
-  const [navigate, setLocation] = useNavigate();
+  const [_, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("edit");
@@ -118,7 +118,7 @@ export default function CreatePostPage() {
       });
       
       // Redirect to post
-      navigate(`/forum/post/${response.id}`);
+      setLocation(`/forum/post/${response.id}`);
     } catch (error) {
       console.error("Error creating post:", error);
       toast({
@@ -343,7 +343,7 @@ export default function CreatePostPage() {
                         
                         {category && (
                           <Badge 
-                            className="text-xs uppercase tracking-wider px-2 py-1 rounded border"
+                            className="text-xs tracking-wider px-2 py-1 rounded border"
                             style={{
                               backgroundColor: `${getCategoryStyle(category).color}20`,
                               color: getCategoryStyle(category).color,

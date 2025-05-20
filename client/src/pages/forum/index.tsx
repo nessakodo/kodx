@@ -113,7 +113,7 @@ export default function ForumPage() {
                   <SelectTrigger className="bg-[#1e2535]/50 border-[#1e2535] focus:border-[#9ecfff]/50">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1e2535] border-[#1e2535]">
+                  <SelectContent className="bg-[#1e2535] border-[#1e2535] max-h-[300px]" position="popper" sideOffset={5}>
                     <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => {
                       const categoryData = categoriesObj[category];

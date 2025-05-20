@@ -102,7 +102,7 @@ export function ForumPostCard({ post, className }: ForumPostCardProps) {
               </Badge>
             )}
             <Badge 
-              className="text-xs px-2 py-1 rounded-full uppercase tracking-wider border"
+              className="text-xs px-2 py-1 rounded-full tracking-wider border"
               style={{
                 backgroundColor: `${categoryStyle.color}20`,
                 color: categoryStyle.color,
