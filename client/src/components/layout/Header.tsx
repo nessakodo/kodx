@@ -1,235 +1,326 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'wouter';
-import { useAuth } from '@/hooks/useAuth';
-import { 
-  ChevronDown, 
-  Menu, 
-  X, 
-  User, 
-  LogOut, 
-  Settings, 
-  Award, 
-  FileText, 
-  Home, 
-  BookOpen, 
-  Code,
-  MessageSquare,
-  Shield
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { BellIcon, LogOutIcon, MenuIcon, SettingsIcon, XIcon, ShieldIcon } from "lucide-react";
+import { NotificationsPanel } from "./NotificationsPanel";
+import { calculateLevel } from "@/lib/utils";
+import { KodexModal } from "@/components/ui/kodex-modal";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export function Header() {
-  const [location] = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const [currentLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { toast } = useToast();
   
-  // Navigation links structure
+  // Mocked unread notifications count - would come from the API in a real app
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  
+  // Ref for notification bell button to position the dropdown
+  const notificationBellRef = useRef<HTMLButtonElement>(null);
+  
+  // Ref for user menu button
+  const userMenuRef = useRef<HTMLButtonElement>(null);
+  
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationBellRef.current && !notificationBellRef.current.contains(event.target as Node)) {
+        // Close notifications when clicking outside notification bell
+        if (notificationsOpen) {
+          setNotificationsOpen(false);
+        }
+      }
+      
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        // Close user menu when clicking outside user menu button
+        if (userMenuOpen) {
+          setUserMenuOpen(false);
+        }
+      }
+      
+      // Close mobile menu when clicking outside
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mobileMenuOpen, userMenuOpen, notificationsOpen]);
+  
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [currentLocation]);
+  
+  // Get user level - calculate based on user XP
+  const userLevel = user ? calculateLevel(user.totalXp as number || 0) : 0;
+  
   const navLinks = [
-    { href: '/', label: 'Home', icon: <Home className="h-4 w-4 mr-2" /> },
-    { href: '/labs', label: 'Labs', icon: <BookOpen className="h-4 w-4 mr-2" /> },
-    { href: '/projects', label: 'Projects', icon: <Code className="h-4 w-4 mr-2" /> },
-    { href: '/forum', label: 'Forum', icon: <MessageSquare className="h-4 w-4 mr-2" /> },
-    { href: '/resources', label: 'Resources', icon: <FileText className="h-4 w-4 mr-2" /> },
+    { text: "Home", href: "/" },
+    { text: "Labs", href: "/labs" },
+    { text: "Projects", href: "/projects" },
+    { text: "Forum", href: "/forum" },
+    { text: "Resources", href: "/resources" },
   ];
   
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return currentLocation === href;
+    }
+    return currentLocation.startsWith(href);
   };
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
+  // Handle logout
+  const handleLogout = () => {
+    setUserMenuOpen(false);
+    // Use direct navigation to API logout endpoint
+    window.location.href = '/api/logout';
   };
 
+  // Handle admin login test
+  const handleAdminTest = () => {
+    setUserMenuOpen(false);
+    window.location.href = "/api/auth/admin";
+  };
+  
   return (
-    <header className="sticky top-0 z-50 bg-[#0c1527]/90 backdrop-blur-sm border-b border-[#1e293b]">
+    <header className="relative bg-[#0f172a]/70 backdrop-blur-sm border-b border-[#9ecfff]/10 z-40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/">
-            <div className="flex items-center space-x-2 cursor-pointer">
-              <div className="bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] w-8 h-8 rounded-lg flex items-center justify-center text-black font-orbitron font-bold">
-                ΞX
-              </div>
-              <span className="font-orbitron text-lg text-white tracking-wider hidden sm:inline-block">
-                KOD•X <span className="opacity-80">WORLD</span>
+          <div className="flex items-center">
+            <Link href="/">
+              <span className="font-orbitron text-xl tracking-wider bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent hover-glow kodex-logo">
+                KOD<span className="text-[#9ecfff]">•</span>X
               </span>
-            </div>
-          </Link>
-
+            </Link>
+          </div>
+          
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex space-x-1">
             {navLinks.map((link) => (
-              <Link href={link.href} key={link.label}>
-                <span
-                  className={`text-sm ${
-                    location === link.href
-                      ? 'text-[#9ecfff] font-medium'
-                      : 'text-gray-300 hover:text-white'
-                  } cursor-pointer transition-colors duration-200 flex items-center`}
-                >
-                  {link.icon}
-                  {link.label}
-                </span>
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`px-3 py-2 rounded-md text-sm ${
+                  isActive(link.href)
+                    ? "text-white bg-[#1e2535]/70 border-b-2 border-[#9ecfff]/50"
+                    : "text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+                } transition-colors duration-200`}
+              >
+                {link.text}
               </Link>
             ))}
           </nav>
-
-          {/* User Menu or Sign In */}
-          <div className="flex items-center">
+          
+          {/* User Actions */}
+          <div className="flex items-center space-x-1">
             {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center space-x-2 cursor-pointer">
-                    <Avatar className="h-8 w-8 border border-[#1e293b]">
+              <>
+                {/* Notifications Button */}
+                <Button
+                  ref={notificationBellRef}
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  onClick={() => {
+                    setNotificationsOpen(!notificationsOpen);
+                  }}
+                >
+                  <BellIcon className="h-5 w-5" />
+                  {unreadNotifications > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-[#9ecfff] text-[0.6rem]">
+                      {unreadNotifications}
+                    </Badge>
+                  )}
+                </Button>
+                
+                {/* User Menu */}
+                <div className="relative">
+                  <Button
+                    ref={userMenuRef}
+                    variant="ghost"
+                    className="flex items-center space-x-2 ml-2"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  >
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={user?.profileImageUrl} alt={user?.username} />
-                      <AvatarFallback className="bg-[#1e293b] text-[#9ecfff]">
-                        {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+                      <AvatarFallback className="bg-[#1e2535]">
+                        {user?.username?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="hidden sm:flex items-center text-sm text-white font-medium">
-                      {user?.username}
-                      <ChevronDown className="ml-1 h-4 w-4" />
+                    <div className="hidden sm:block text-left">
+                      <div className="text-xs font-medium truncate max-w-[100px]">
+                        {user?.username || "User"}
+                      </div>
+                      <div className="text-xs text-gray-500">Level {userLevel}</div>
                     </div>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#0c1527] border-[#1e293b] text-white w-56">
-                  <div className="px-3 py-2 text-sm font-semibold text-[#9ecfff]">
-                    @{user?.username}
-                  </div>
-                  <DropdownMenuSeparator className="bg-[#1e293b]" />
-                  <Link href="/dashboard">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Home className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/profile">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/profile/badges">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Award className="mr-2 h-4 w-4" />
-                      Badges
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/profile/settings">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </DropdownMenuItem>
-                  </Link>
-                  {user?.role === 'admin' && (
-                    <Link href="/admin">
-                      <DropdownMenuItem className="cursor-pointer">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Admin Panel
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
-                  <DropdownMenuSeparator className="bg-[#1e293b]" />
-                  <Link href="/api/logout">
-                    <DropdownMenuItem className="cursor-pointer text-red-400">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </Button>
+                  
+                  {/* User Menu Dropdown Modal */}
+                  <KodexModal
+                    isOpen={userMenuOpen}
+                    onClose={() => setUserMenuOpen(false)}
+                    positionElement={notificationBellRef.current as HTMLElement | undefined}
+                    title="Profile Menu"
+                    width="xs"
+                  >
+                    <div className="flex flex-col space-y-2 p-1">
+                      <Link 
+                        href="/dashboard"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-white transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#9ecfff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">Dashboard</div>
+                          <div className="text-xs text-gray-500">View your progress & awards</div>
+                        </div>
+                      </Link>
+                      
+                      <Link 
+                        href="/settings"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-white transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                          <SettingsIcon className="h-4 w-4 text-[#9ecfff]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">Settings</div>
+                          <div className="text-xs text-gray-500">Manage your account</div>
+                        </div>
+                      </Link>
+                      
+                      {/* Show Admin Panel option only for admin users */}
+                      {user?.role === 'admin' && (
+                        <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
+                          <Link 
+                            href="/admin"
+                            className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#9ecfff]/10 hover:text-[#9ecfff] transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center">
+                              <ShieldIcon className="h-4 w-4 text-[#9ecfff]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <div className="font-medium">Admin Panel</div>
+                              <div className="text-xs text-gray-500">Manage KOD-X WORLD</div>
+                            </div>
+                          </Link>
+                        </div>
+                      )}
+                      
+                      <div className="pt-2 mt-2 border-t border-[#9ecfff]/10">
+                        <button 
+                          className="flex w-full items-center gap-3 px-4 py-3 text-sm text-gray-300 rounded-md hover:bg-[#ff9e9e]/10 hover:text-[#ff9e9e] transition-colors"
+                          onClick={handleLogout}
+                        >
+                          <div className="flex-shrink-0 h-8 w-8 rounded-md bg-[#1e2535]/70 border border-[#ff9e9e]/20 flex items-center justify-center">
+                            <LogOutIcon className="h-4 w-4 text-[#ff9e9e]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="font-medium">Sign Out</div>
+                            <div className="text-xs text-gray-500">End your current session</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </KodexModal>
+                </div>
+              </>
             ) : (
-              <Link href="/api/login">
-                <Button 
-                  size="sm" 
-                  className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff] border border-[#9ecfff]/30"
-                >
-                  Sign In
-                </Button>
-              </Link>
+              // Login and Signup Buttons for non-authenticated users
+              <div className="flex gap-2">
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    className="bg-transparent border-[#9ecfff]/30 hover:bg-[#1e2535] hover:border-[#9ecfff]/50"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button 
+                    variant="default" 
+                    className="bg-[#9ecfff]/20 hover:bg-[#9ecfff]/30 text-[#9ecfff]"
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
-
-            {/* Mobile Menu Toggle */}
-            <button
-              type="button"
-              className="ml-4 md:hidden text-gray-300 hover:text-white"
-              onClick={toggleMobileMenu}
-              aria-expanded={mobileMenuOpen}
+            
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
+              {mobileMenuOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
       </div>
-
+      
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0c1527] border-t border-[#1e293b]">
-          <div className="px-4 pt-2 pb-4">
-            <nav className="grid gap-2">
-              {navLinks.map((link) => (
-                <Link href={link.href} key={link.label}>
-                  <a
-                    className={`${
-                      location === link.href
-                        ? 'bg-[#1e293b] text-[#9ecfff]'
-                        : 'text-gray-300 hover:bg-[#1e293b]/50 hover:text-white'
-                    } px-3 py-2 rounded-md text-base font-medium flex items-center`}
-                    onClick={closeMobileMenu}
-                  >
-                    {link.icon}
-                    {link.label}
-                  </a>
-                </Link>
-              ))}
-              {isAuthenticated && (
-                <>
-                  <div className="border-t border-[#1e293b] my-2"></div>
-                  <Link href="/dashboard">
-                    <a
-                      className="text-gray-300 hover:bg-[#1e293b]/50 hover:text-white px-3 py-2 rounded-md text-base font-medium flex items-center"
-                      onClick={closeMobileMenu}
-                    >
-                      <Home className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </a>
-                  </Link>
-                  <Link href="/profile">
-                    <a
-                      className="text-gray-300 hover:bg-[#1e293b]/50 hover:text-white px-3 py-2 rounded-md text-base font-medium flex items-center"
-                      onClick={closeMobileMenu}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
-                    </a>
-                  </Link>
-                  <Link href="/api/logout">
-                    <a
-                      className="text-red-400 hover:bg-[#1e293b]/50 hover:text-red-300 px-3 py-2 rounded-md text-base font-medium flex items-center"
-                      onClick={closeMobileMenu}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </a>
-                  </Link>
-                </>
-              )}
-            </nav>
+        <div className="md:hidden bg-[#0f172a]/95 backdrop-blur-sm border-b border-[#9ecfff]/10">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  isActive(link.href)
+                    ? "text-white bg-[#1e2535]/70 border-l-2 border-[#9ecfff]/50"
+                    : "text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+                } transition-colors duration-200`}
+              >
+                {link.text}
+              </Link>
+            ))}
+            
+            {isAuthenticated && (
+              <Link 
+                href="/dashboard"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-[#1e2535]/50"
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
         </div>
       )}
+      
+      {/* Notifications Modal */}
+      <NotificationsPanel 
+        isOpen={notificationsOpen}
+        onClose={() => {
+          setNotificationsOpen(false);
+          // When closed, mark all as read
+          setUnreadNotifications(0);
+        }}
+        positionElement={notificationBellRef.current as HTMLElement | undefined}
+        onMarkAllAsRead={() => setUnreadNotifications(0)}
+      />
     </header>
   );
 }

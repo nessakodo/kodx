@@ -64,9 +64,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <div className="bg-gradient-to-b from-[#0c1527] to-[#101929] min-h-screen">
-            <Router />
-          </div>
+          <Router />
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

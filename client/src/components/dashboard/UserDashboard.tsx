@@ -116,12 +116,12 @@ export function UserDashboard() {
   }
   
   return (
-    <div className="container max-w-7xl mx-auto py-6 px-4 sm:px-6">
+    <div className="container max-w-7xl mx-auto py-8">
       {/* Welcome Section with XP Ring */}
-      <div className="flex flex-col lg:flex-row justify-between items-center mb-8 p-6 rounded-lg bg-gradient-to-r from-[#0c1527]/80 to-[#1e293b]/60 border border-[#1e293b] shadow-glow-sm">
+      <div className="flex flex-col lg:flex-row justify-between items-center mb-12 p-6 rounded-lg bg-gradient-to-r from-[#0c1527]/80 to-[#1e293b]/60 border border-[#1e293b]">
         <div className="mb-6 lg:mb-0">
-          <h1 className="text-2xl md:text-3xl font-orbitron tracking-wider mb-3">
-            Welcome back, <span className="bg-gradient-to-r from-[#9ecfff] to-[#bb86fc] bg-clip-text text-transparent">{user?.username || 'Explorer'}</span>
+          <h1 className="text-2xl md:text-3xl font-orbitron text-white mb-3">
+            Welcome back, <span className="text-blue-400">{user?.username || 'Explorer'}</span>
           </h1>
           <p className="text-gray-300 max-w-xl">
             Continue your journey of digital enlightenment. Explore labs, complete projects, 
@@ -129,7 +129,7 @@ export function UserDashboard() {
           </p>
         </div>
         
-        <div className="flex items-center">
+        <div className="flex items-center space-x-8">
           {/* XP Ring Component */}
           <XPRing
             level={currentLevel}
@@ -140,23 +140,23 @@ export function UserDashboard() {
       </div>
       
       {/* Main Dashboard Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Labs & Projects */}
-        <div className="col-span-1 md:col-span-2 space-y-6">
+        <div className="col-span-1 lg:col-span-2 space-y-8">
           {/* Labs & Projects Tabs */}
-          <Card className="border border-[#1e293b] bg-[#0c1527]/50 shadow-glow-sm">
-            <Tabs defaultValue="labs" className="p-4 sm:p-6">
-              <TabsList className="mb-4 bg-[#1e293b]/50 w-full">
+          <Card className="border border-[#1e293b] bg-[#0c1527]/50">
+            <Tabs defaultValue="labs" className="p-6">
+              <TabsList className="mb-6 bg-[#1e293b]/50">
                 <TabsTrigger 
                   value="labs"
-                  className="flex-1 data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300"
+                  className="data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300"
                 >
                   <BookOpenCheck className="h-4 w-4 mr-2" />
                   Labs
                 </TabsTrigger>
                 <TabsTrigger 
                   value="projects"
-                  className="flex-1 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300"
+                  className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300"
                 >
                   <Code className="h-4 w-4 mr-2" />
                   Projects
