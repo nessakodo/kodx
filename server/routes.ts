@@ -14,18 +14,6 @@ import { z } from "zod";
 import { ZodError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint
-  app.get('/api/health', async (req, res) => {
-    try {
-      // Attempt to query the database
-      await db.select().from(users).limit(1);
-      res.json({ status: 'ok', database: 'connected' });
-    } catch (error) {
-      console.error('Database health check failed:', error);
-      res.json({ status: 'degraded', database: 'disconnected', error: String(error) });
-    }
-  });
-
   // Auth middleware
   await setupAuth(app);
 

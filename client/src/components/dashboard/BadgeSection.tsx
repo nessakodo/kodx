@@ -1,216 +1,147 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'wouter';
-import { Badge as BadgeUI } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { EmptyBadgesState } from './EmptyStates';
-import { BadgeModal } from '../modals/BadgeModal';
-import { 
-  type Badge,
-  BADGE_CATEGORY_COLORS,
-  BADGE_RARITY_EFFECTS,
-  type BadgeCategory
-} from '@shared/constants/badges';
+import { Badge as BadgeType, BADGE_CATEGORY_COLORS } from '@shared/constants/badges';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface BadgeSectionProps {
-  badges: Badge[];
-  isLoading: boolean;
-}
-
-export function BadgeSection({ badges = [], isLoading }: BadgeSectionProps) {
-  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
-  const [badgeModalOpen, setBadgeModalOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<BadgeCategory | 'all'>('all');
+export function BadgeSection() {
+  const { user, isAuthenticated } = useAuth();
   
-  // Filter badges by category
-  const filteredBadges = activeCategory === 'all' 
-    ? badges 
-    : badges.filter(badge => badge.category === activeCategory);
+  // Fetch user badges
+  const { data: userBadges = [] } = useQuery({
+    queryKey: ['/api/user-badges'],
+    enabled: isAuthenticated,
+  });
   
-  // Show badge modal
-  const handleBadgeClick = (badge: Badge) => {
-    setSelectedBadge(badge);
-    setBadgeModalOpen(true);
+  // Format badge earned date
+  const formatEarnedDate = (timestamp: string) => {
+    if (!timestamp) return "";
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(timestamp));
   };
   
-  // Get total count by category
-  const getCategoryCount = (category: BadgeCategory | 'all') => {
-    if (category === 'all') return badges.length;
-    return badges.filter(badge => badge.category === category).length;
-  };
-  
-  // Format date to show how long ago a badge was earned
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  // Get badge styles & colors
+  const getBadgeStyle = (badge: BadgeType) => {
+    const categoryColor = BADGE_CATEGORY_COLORS[badge.category];
+    const textColor = categoryColor?.text || 'text-white';
     
-    if (diffInSeconds < 60) return 'just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return new Intl.DateTimeFormat('en-US', { 
-      month: 'short', 
-      day: 'numeric'
-    }).format(date);
+    return {
+      borderColor: `var(--${badge.category}-color, rgba(158, 207, 255, 0.2))`,
+      textColor: textColor
+    };
   };
   
   return (
     <section className="mb-10">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-orbitron text-2xl text-purple-300">
-          Your Badges
-        </h2>
+        <h2 className="font-orbitron text-2xl text-purple-300">Achievement Badges</h2>
         
         <Link href="/profile/badges">
-          <Button variant="outline" className="border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20">
-            View All Badges
+          <Button variant="outline" 
+            className="border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20">
+            Badge System
           </Button>
         </Link>
       </div>
       
-      {/* Category filter tabs */}
-      <div className="flex mb-4 overflow-x-auto pb-2 scrollbar-thin">
-        {(['all', 'achievement', 'learning', 'community', 'security', 'wellbeing'] as const).map(category => {
-          const count = getCategoryCount(category);
-          const colors = category === 'all' 
-            ? { bg: 'bg-purple-500/10', text: 'text-purple-300' }
-            : { 
-                bg: `${BADGE_CATEGORY_COLORS[category].bg}`, 
-                text: `${BADGE_CATEGORY_COLORS[category].text}` 
-              };
-          
-          return (
-            <Button
-              key={category}
-              variant="ghost"
-              size="sm"
-              className={`mr-2 rounded-full px-4 ${
-                activeCategory === category 
-                  ? `${colors.bg} ${colors.text} border border-purple-500/30` 
-                  : 'bg-transparent text-gray-400 hover:bg-purple-500/5 hover:text-purple-300'
-              }`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category === 'all' ? 'All' : category}
-              {count > 0 && (
-                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                  activeCategory === category ? 'bg-purple-800/50' : 'bg-[#1e293b]'
-                }`}>
-                  {count}
-                </span>
-              )}
-            </Button>
-          );
-        })}
-      </div>
-      
-      {isLoading ? (
-        // Loading skeleton
-        <Card className="border border-[#1e293b] bg-[#0c1527]/50 p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-full bg-[#1e293b]/50 animate-pulse mb-2" />
-                <div className="h-4 bg-[#1e293b]/50 rounded w-20 animate-pulse mb-1" />
-                <div className="h-3 bg-[#1e293b]/50 rounded w-16 animate-pulse" />
-              </div>
-            ))}
-          </div>
-        </Card>
-      ) : filteredBadges.length > 0 ? (
-        <Card className="border border-[#1e293b] bg-[#0c1527]/50 p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredBadges.slice(0, 8).map(badge => {
-              const categoryColors = BADGE_CATEGORY_COLORS[badge.category];
-              const rarityEffects = BADGE_RARITY_EFFECTS[badge.rarity];
-              
-              return (
-                <TooltipProvider key={badge.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button 
-                        className="flex flex-col items-center group"
-                        onClick={() => handleBadgeClick(badge)}
-                      >
-                        {/* Badge icon */}
-                        <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 group-hover:scale-110 transition-all duration-300"
-                          style={{ 
-                            borderColor: rarityEffects.borderColor,
-                            boxShadow: rarityEffects.glow,
-                            background: `radial-gradient(circle, rgba(15, 23, 42, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%)`
-                          }}
+      {userBadges.length > 0 ? (
+        <div>
+          {/* Recent badges carousel */}
+          <div className="overflow-x-auto hide-scrollbar pb-4">
+            <div className="flex space-x-4">
+              {userBadges.map((badge: BadgeType) => {
+                const styles = getBadgeStyle(badge);
+                
+                return (
+                  <TooltipProvider key={badge.id}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Card 
+                          className="flex-shrink-0 p-4 flex flex-col items-center justify-center w-32 h-40 border bg-[#0f172a]/70 hover:bg-[#1e2535]/40 transition-colors"
+                          style={{ borderColor: styles.borderColor }}
                         >
-                          <span 
-                            className={`text-2xl font-orbitron ${categoryColors.text}`}
-                            style={{ textShadow: `0 0 10px ${categoryColors.gradient}` }}
-                          >
-                            {badge.name.charAt(0)}
-                          </span>
-                        </div>
-                        
-                        {/* Badge name */}
-                        <h3 className="text-sm font-medium text-white text-center mb-1">
-                          {badge.name}
-                        </h3>
-                        
-                        {/* Badge category */}
-                        <BadgeUI className={`${categoryColors.bg} ${categoryColors.text} text-xs`}>
-                          {badge.category}
-                        </BadgeUI>
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent 
-                      side="top" 
-                      className="bg-[#0f172a] border-[#1e293b] p-3 max-w-xs"
-                    >
-                      <p className="font-medium text-white mb-1">{badge.name}</p>
-                      <p className="text-sm text-gray-300 mb-2">{badge.description}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <BadgeUI className={`${categoryColors.bg} ${categoryColors.text}`}>
-                          {badge.category}
-                        </BadgeUI>
-                        <span className="text-gray-400 capitalize">
-                          {badge.rarity} · {badge.createdAt && formatTimeAgo(badge.createdAt)}
-                        </span>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
+                          {/* Badge Icon */}
+                          <div className="w-16 h-16 rounded-full bg-[#1e2535]/70 border border-[#9ecfff]/20 flex items-center justify-center mb-2">
+                            <span className={`text-2xl font-orbitron ${styles.textColor}`}>
+                              {badge.name.charAt(0)}
+                            </span>
+                          </div>
+                          
+                          <h3 className="text-sm font-orbitron text-center text-white mb-1 line-clamp-1">
+                            {badge.name}
+                          </h3>
+                          
+                          <Badge className={`${BADGE_CATEGORY_COLORS[badge.category].bg} ${BADGE_CATEGORY_COLORS[badge.category].text} text-xs truncate max-w-full`}>
+                            {badge.category}
+                          </Badge>
+                        </Card>
+                      </TooltipTrigger>
+                      
+                      <TooltipContent 
+                        side="bottom"
+                        className="max-w-xs border border-[#9ecfff]/20 bg-[#0f172a]/90 backdrop-blur-sm"
+                      >
+                        <h4 className="font-orbitron text-white mb-1">{badge.name}</h4>
+                        <p className="text-sm text-gray-300 mb-2">{badge.description}</p>
+                        {badge.timestampEarned && (
+                          <p className="text-xs text-gray-500">Earned {formatEarnedDate(badge.timestampEarned)}</p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
+            </div>
           </div>
           
-          {filteredBadges.length > 8 && (
-            <div className="text-center mt-6">
-              <Link href="/profile/badges">
-                <Button 
-                  variant="link" 
-                  className="text-purple-300 hover:text-purple-200"
-                >
-                  Show All ({filteredBadges.length}) Badges
-                </Button>
-              </Link>
-            </div>
-          )}
-        </Card>
+          {/* Badge stats summary */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Total Badges</h4>
+              <p className="text-xl font-orbitron text-white">{userBadges.length}</p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Rarest Badge</h4>
+              <p className="text-xl font-orbitron text-amber-400">
+                {userBadges.find((b: BadgeType) => b.rarity === "legendary")?.name || 
+                 userBadges.find((b: BadgeType) => b.rarity === "epic")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "rare")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "uncommon")?.name ||
+                 userBadges.find((b: BadgeType) => b.rarity === "common")?.name || 
+                 "None"}
+              </p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Latest Badge</h4>
+              <p className="text-xl font-orbitron text-white line-clamp-1">
+                {userBadges[0]?.name || "None"}
+              </p>
+            </Card>
+            
+            <Card className="p-4 border border-[#9ecfff]/20 bg-[#0f172a]/70">
+              <h4 className="text-xs text-gray-400 mb-1">Most Common</h4>
+              <p className="text-xl font-orbitron text-white">
+                {Object.entries(userBadges.reduce((acc: any, badge: BadgeType) => {
+                  acc[badge.category] = (acc[badge.category] || 0) + 1;
+                  return acc;
+                }, {})).sort((a, b) => b[1] - a[1])[0]?.[0] || "None"}
+              </p>
+            </Card>
+          </div>
+        </div>
       ) : (
         <EmptyBadgesState />
       )}
-      
-      {/* Badge modal */}
-      <BadgeModal
-        badge={selectedBadge}
-        open={badgeModalOpen}
-        onOpenChange={setBadgeModalOpen}
-      />
     </section>
   );
 }
