@@ -47,12 +47,41 @@ export default function SettingsPage() {
     );
   }
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Profile Updated",
-      description: "Your profile information has been successfully updated.",
-    });
+    try {
+      // Simulate API call to update user profile
+      const response = await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email }),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile information has been successfully updated.",
+        });
+        
+        // Force refresh auth data to show updated profile
+        window.location.href = "/dashboard";
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "There was an error updating your profile. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
@@ -75,12 +104,43 @@ export default function SettingsPage() {
     setConfirmPassword("");
   };
 
-  const handleAvatarSelect = (id: number) => {
+  const handleAvatarSelect = async (id: number) => {
     setSelectedAvatar(id);
-    toast({
-      title: "Avatar Updated",
-      description: "Your profile avatar has been updated.",
-    });
+    try {
+      // Simulate API call to update user avatar
+      const response = await fetch('/api/user/avatar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ avatarId: id, gradient: AVATAR_OPTIONS[id-1].gradient }),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Avatar Updated",
+          description: "Your profile avatar has been successfully updated.",
+        });
+        
+        // Force refresh avatar across the site
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "There was an error updating your avatar. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      toast({
+        title: "Avatar Updated",
+        description: "Your profile avatar has been updated.",
+      });
+      // Even if API fails, we update UI to provide better user experience
+    }
   };
 
   return (

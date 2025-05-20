@@ -117,6 +117,9 @@ export function XpRingProgress({ xp, username, profileImageUrl }: XpRingProgress
       
       {/* Level and XP Display */}
       <div className="mt-4 text-center">
+        <div className="text-base sm:text-lg font-orbitron bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent mb-1">
+          @{username}
+        </div>
         <div className="text-base sm:text-lg text-gray-300 mb-1">Level {level}</div>
         <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#9ecfff] to-[#88c9b7] bg-clip-text text-transparent">
           {animatedXp.toLocaleString()} XP
